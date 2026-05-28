@@ -54,7 +54,7 @@ export default async function ServicePage({ params }: Props) {
             <img src="/logo.avif" alt="Magnolia Skin Center" className="h-10 w-auto" />
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/services" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
+            <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               &larr; All Services
             </Link>
             <Link href="/login" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
