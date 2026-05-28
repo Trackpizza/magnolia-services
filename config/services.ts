@@ -136,7 +136,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['puffy eyes', 'bags under eyes', 'tired eyes', 'under eye puffiness', 'baggy under eyes', 'non-surgical eye bag fix'],
   },
   {
     slug: 'agnes-rf-acne-scar-treatment',
@@ -163,7 +163,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['pimple scars', 'acne marks', 'pitted skin', 'breakout scars', 'chickenpox scars', 'acne craters', 'enlarged pores', 'oily skin treatment'],
   },
   {
     slug: 'agnes-rf-non-surgical-facelift',
@@ -325,7 +325,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['thinning hair laser', 'scalp rejuvenation', 'hair growth laser', 'laser for bald spots', 'non-surgical hair regrowth', 'laser hair stimulation'],
   },
   {
     slug: 'plasmage-skin-tightening',
@@ -406,7 +406,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['skin tag removal', 'mole removal', 'spot removal', 'wart removal', 'flesh bumps', 'raised skin spots', 'skin growths'],
   },
   {
     slug: 'cellenis-derma-prp',
@@ -487,7 +487,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['vampire facial', 'blood facial', 'microneedling with prp', 'glow facial', 'dark circle treatment', 'skin rejuvenation facial'],
   },
   {
     slug: 'aquafirme-xs-hair-restoration',
@@ -568,7 +568,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['long lasting botox', 'botox alternative', 'peptide botox', '6 month botox', 'forehead wrinkle injections', 'frown line injections'],
   },
   {
     slug: 'jeuveau',
@@ -595,7 +595,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['newtox', 'botox alternative', 'wrinkle relaxer', 'frown line fixer', 'jaw slimming injection', "crow's feet treatment"],
   },
   {
     slug: 'xeomin',
@@ -622,7 +622,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['naked botox', 'pure botox', 'protein-free botox', 'botox alternative', 'wrinkle injection', 'forehead lines treatment'],
   },
   {
     slug: 'revanesse-versa',
@@ -649,7 +649,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['cheek filler', 'face filler', 'nasolabial fold filler', 'smile line filler', 'under eye filler', 'hollow cheek treatment', 'facial volume loss'],
   },
   {
     slug: 'revanesse-lip',
@@ -676,7 +676,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['lip plumping', 'natural lip filler', 'lip enhancement', 'lip augmentation', 'thin lip treatment', 'lip definition', 'lip border filler'],
   },
   {
     slug: 'prx-derm-perfexion',
@@ -703,7 +703,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['no peel facial', 'invisible peel', 'lunchtime facial', 'no downtime facial', 'zero downtime treatment', 'skin tightening no recovery'],
   },
   {
     slug: 'prx-plus-brightening',
@@ -730,7 +730,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['pregnancy mask treatment', 'melasma facial', 'brown spots no peel', 'hormonal dark patches', 'brightening treatment', 'no downtime brightening'],
   },
   {
     slug: 'sensi-peel',
@@ -757,7 +757,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['gentle peel', 'rosacea peel', 'sensitive skin facial', 'reactive skin peel', 'no downtime peel', 'mild chemical peel'],
   },
   {
     slug: 'ultra-peel',
@@ -784,7 +784,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['brightening peel', 'dark patch peel', 'even skin treatment', 'tone correcting peel', 'mild brightening facial', 'sun damage peel'],
   },
   {
     slug: 'pigment-peel',
@@ -811,7 +811,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['melasma peel', 'dark spot peel', 'brown spots treatment', 'hyperpigmentation peel', 'post-acne mark treatment', 'skin discoloration peel'],
   },
   {
     slug: 'b-complex-injection',
@@ -838,7 +838,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['b12 shot', 'energy shot', 'vitamin b injection', 'metabolism shot', 'fatigue injection', 'energy boost injection'],
   },
   {
     slug: 'glutathione-injection',
@@ -865,7 +865,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['glow shot', 'skin brightening injection', 'antioxidant shot', 'skin lightening injection', 'immunity injection', 'glass skin injection'],
   },
   {
     slug: 'mic-blend-injection',
@@ -892,7 +892,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['fat burner shot', 'lipotropic shot', 'metabolism injection', 'slim shot', 'hormonal balance shot', 'liver detox injection'],
   },
   {
     slug: 'lipotropic-plus',
@@ -919,7 +919,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['lipo shot', 'fat burning shot', 'weight loss injection', 'liver detox shot', 'metabolism boost shot', 'slim injection'],
   },
   {
     slug: 'ultraburn-injection',
@@ -946,7 +946,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['fat burner injection', 'energy fat shot', 'blood sugar shot', 'muscle recovery injection', 'weight management shot', 'chromium injection'],
   },
   {
     slug: 'ic-lipolean',
@@ -973,7 +973,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['lipo shot', 'weight loss shot', 'appetite suppression injection', 'fat burning injection', 'craving control shot', 'metabolism injection'],
   },
   {
     slug: 'bpc-157',
@@ -1000,7 +1000,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['healing peptide', 'joint repair peptide', 'gut healing peptide', 'anti-inflammatory peptide', 'tissue repair injection', 'body protection compound'],
   },
   {
     slug: 'ghk-cu-copper-peptide',
@@ -1027,7 +1027,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['copper peptide', 'anti-aging peptide', 'collagen peptide', 'glow peptide', 'dna repair peptide', 'hair growth peptide'],
   },
   {
     slug: 'sermorelin',
@@ -1054,7 +1054,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['natural hgh', 'growth hormone booster', 'hgh alternative', 'anti-aging hormone therapy', 'muscle building peptide', 'sleep improvement injection'],
   },
   {
     slug: 'nad-therapy',
@@ -1081,7 +1081,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['nad drip', 'anti-aging iv', 'energy iv drip', 'brain fog iv', 'longevity drip', 'cellular energy infusion', 'nad plus therapy'],
   },
   {
     slug: 'weight-loss-consultation',
@@ -1108,7 +1108,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['weight loss doctor visit', 'medical weight consult', 'free weight loss consultation', 'glp1 consultation', 'supervised weight loss eval'],
   },
   {
     slug: 'weight-loss-program',
@@ -1135,7 +1135,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['semaglutide', 'tirzepatide', 'ozempic alternative', 'wegovy alternative', 'glp-1 program', 'weight loss injections', 'medical weight loss'],
   },
   {
     slug: 'cherry-payment-plans',
@@ -1162,7 +1162,7 @@ export const SERVICES: ServiceEntry[] = [
       },
     ],
     disclaimer: DISCLAIMER,
-    alsoKnownAs: [],
+    alsoKnownAs: ['pay monthly', 'treatment financing', 'aesthetic payment plan', 'no credit check financing', 'split treatment cost', 'pay over time'],
   },
 ]
 

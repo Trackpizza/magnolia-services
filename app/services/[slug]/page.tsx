@@ -129,9 +129,6 @@ export default async function ServicePage({ params }: Props) {
         </div>
       </section>
 
-      {/* Also Known As */}
-      <AlsoKnownAs terms={service.alsoKnownAs} />
-
       {/* What it treats */}
       <section className="max-w-5xl mx-auto px-6 py-6">
         <div className="bg-white rounded-2xl border border-gray-100 p-8">
@@ -148,6 +145,9 @@ export default async function ServicePage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Also Known As */}
+      <AlsoKnownAs terms={service.alsoKnownAs} />
 
       {/* How it works */}
       <section className="max-w-5xl mx-auto px-6 py-6">
