@@ -13,7 +13,7 @@ export default async function ServicesPage() {
     services: cat.slugs.map(slug => {
       const s = SERVICES.find(sv => sv.slug === slug)
       if (!s) return null
-      return { name: s.name, description: s.searchDescription, href: `/services/${s.slug}`, keywords: s.keywords }
+      return { name: s.name, description: s.searchDescription, href: `/services/${s.slug}`, keywords: [...s.keywords, ...(s.alsoKnownAs ?? [])] }
     }).filter((x): x is NonNullable<typeof x> => x !== null),
   }))
 
