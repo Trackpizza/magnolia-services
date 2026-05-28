@@ -1,0 +1,17 @@
+runConfig:
+  concurrency: 80
+  minInstances: 0
+
+env:
+  - variable: FIREBASE_PROJECT_ID
+    secret: FIREBASE_PROJECT_ID
+  - variable: FIREBASE_CLIENT_EMAIL
+    secret: FIREBASE_CLIENT_EMAIL
+  - variable: FIREBASE_PRIVATE_KEY_BASE64
+    secret: FIREBASE_PRIVATE_KEY_BASE64
+  - variable: ADMIN_PASSWORD
+    secret: ADMIN_PASSWORD
+  - variable: NEXT_PUBLIC_MEMBERSHIP_URL
+    value: https://magnolia-membership--magscmembership.us-east4.hosted.app
+  - variable: NEXT_PUBLIC_APP_URL
+    value: https://magnolia-services--magscmembership.us-east4.hosted.app
