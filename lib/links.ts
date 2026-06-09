@@ -11,6 +11,7 @@ export async function getLinks(): Promise<ServiceLinks> {
       mainFooter: { ...DEFAULT_LINKS.mainFooter, ...(data.mainFooter ?? {}) },
       serviceFooter: { ...DEFAULT_LINKS.serviceFooter, ...(data.serviceFooter ?? {}) },
       videos: data.videos ?? {},
+      content: data.content ?? {},
     }
   } catch {
     return DEFAULT_LINKS

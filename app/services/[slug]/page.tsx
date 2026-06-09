@@ -4,6 +4,7 @@ import { getServiceBySlug, getAllSlugs } from '@/config/services'
 import { getLinks } from '@/lib/links'
 import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
+import ServiceContent from '@/components/ServiceContent'
 
 export const revalidate = 3600
 
@@ -43,6 +44,7 @@ export default async function ServicePage({ params }: Props) {
   const links = await getLinks()
   const videoUrl = links.videos[service.slug] ?? ''
   const embedUrl = getYouTubeEmbedUrl(videoUrl)
+  const customContent = links.content[service.slug] ?? ''
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -170,6 +172,9 @@ export default async function ServicePage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Custom editable content (admin-managed markdown) */}
+      <ServiceContent markdown={customContent} />
 
       {/* CTA */}
       <ServiceCTA

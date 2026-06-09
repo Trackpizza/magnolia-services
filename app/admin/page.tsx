@@ -89,6 +89,7 @@ export default function AdminPage() {
         mainFooter: { ...prev.mainFooter, ...(data.mainFooter ?? {}) },
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
+        content: data.content ?? {},
       }))
     } else {
       setAuthError('Incorrect password')
@@ -104,6 +105,7 @@ export default function AdminPage() {
         mainFooter: { ...prev.mainFooter, ...(data.mainFooter ?? {}) },
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
+        content: data.content ?? {},
       }))
     }
     setLoading(false)
@@ -129,6 +131,9 @@ export default function AdminPage() {
 
   const updateVideo = (slug: string, url: string) =>
     setLinks(l => ({ ...l, videos: { ...l.videos, [slug]: url } }))
+
+  const updateContent = (slug: string, md: string) =>
+    setLinks(l => ({ ...l, content: { ...l.content, [slug]: md } }))
 
   // ── Login screen ────────────────────────────────────────────────────────
   if (!authed) {
@@ -260,6 +265,37 @@ export default function AdminPage() {
           </div>
           <div className="mt-5 flex justify-end">
             <SaveButton section="videos" onClick={() => save('videos', { videos: links.videos })} />
+          </div>
+        </section>
+
+        {/* ── Page Content (Markdown) ─────────────────────────── */}
+        <section className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Page Content</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Extra text shown directly under the &ldquo;How it works&rdquo; box on each service page. Leave blank to hide.</p>
+            </div>
+            <SaveButton section="content" onClick={() => save('content', { content: links.content })} />
+          </div>
+          <p className="text-xs text-gray-400 mb-5">
+            Supports Markdown: <code className="text-gray-500">## Heading</code>, <code className="text-gray-500">**bold**</code>, <code className="text-gray-500">*italic*</code>, <code className="text-gray-500">- bullet</code>, <code className="text-gray-500">[link](https://...)</code>, <code className="text-gray-500">&gt; quote</code>. Single line breaks are preserved.
+          </p>
+          <div className="space-y-6">
+            {SERVICE_SLUGS.map(({ slug, name }) => (
+              <div key={slug}>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{name}</label>
+                <textarea
+                  value={links.content[slug] ?? ''}
+                  onChange={e => updateContent(slug, e.target.value)}
+                  placeholder="Add extra info, FAQs, pricing notes, etc. (Markdown supported)"
+                  rows={5}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 flex justify-end">
+            <SaveButton section="content" onClick={() => save('content', { content: links.content })} />
           </div>
         </section>
 

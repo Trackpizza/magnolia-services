@@ -15,6 +15,7 @@ export interface ServiceLinks {
     phone: string
   }
   videos: Record<string, string>  // slug → YouTube URL (empty = show placeholder)
+  content: Record<string, string>  // slug → markdown shown under "How it works" (empty = hide)
 }
 
 export const DEFAULT_LINKS: ServiceLinks = {
@@ -34,4 +35,5 @@ export const DEFAULT_LINKS: ServiceLinks = {
     phone: '(747) 305-8973',
   },
   videos: {},
+  content: {},
 }
