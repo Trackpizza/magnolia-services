@@ -115,7 +115,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'agnes-rf-eye-bag-treatment',
-    slug: 'agnes-rf-eye-bag-treatment',
+    slug: 'agnes-rf-eye-bag-treatment-for-puffy-eyes-bags-under-eyes-tired-eyes-burbank-ca',
     name: 'Agnes RF Eye Bag Treatment',
     category: 'Agnes RF',
     tagline:
@@ -143,7 +143,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'agnes-rf-acne-scar-treatment',
-    slug: 'agnes-rf-acne-scar-treatment',
+    slug: 'agnes-rf-acne-treatment-for-acne-cystic-acne-acne-scars-large-pores-burbank-ca',
     name: 'Agnes RF Acne & Scar Treatment',
     category: 'Agnes RF',
     tagline:
@@ -171,7 +171,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'agnes-rf-non-surgical-facelift',
-    slug: 'agnes-rf-non-surgical-facelift',
+    slug: 'agnes-rf-non-surgical-facelift-for-jowls-saggy-neck-double-chin-smile-lines-burbank-ca',
     name: 'Agnes RF Non-Surgical Facelift',
     category: 'Agnes RF',
     tagline:
@@ -199,7 +199,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'scarlet-pro-srf-microneedling',
-    slug: 'scarlet-pro-srf-microneedling',
+    slug: 'scarlet-pro-srf-microneedling-for-wrinkles-fine-lines-large-pores-crepey-neck-burbank-ca',
     name: 'Scarlet PRO SRF Microneedling',
     category: 'Scarlet PRO SRF',
     tagline:
@@ -227,7 +227,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'scarlet-srf-body-tightening',
-    slug: 'scarlet-srf-body-tightening',
+    slug: 'scarlet-srf-body-tightening-for-stretch-marks-saggy-arms-loose-skin-spider-veins-burbank-ca',
     name: 'Scarlet SRF Body Tightening',
     category: 'Scarlet PRO SRF',
     tagline:
@@ -255,7 +255,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'nouvaderm-laser-resurfacing',
-    slug: 'nouvaderm-laser-resurfacing',
+    slug: 'nouvaderm-laser-resurfacing-for-sun-spots-dark-spots-acne-scars-wrinkles-burbank-ca',
     name: 'NOUVADerm Laser Resurfacing',
     category: 'NOUVADerm Laser',
     tagline:
@@ -283,7 +283,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'nouvaderm-laser-rosacea',
-    slug: 'nouvaderm-laser-rosacea',
+    slug: 'nouvaderm-laser-for-rosacea-facial-redness-red-cheeks-spider-veins-burbank-ca',
     name: 'NOUVADerm Laser for Rosacea',
     category: 'NOUVADerm Laser',
     tagline:
@@ -311,7 +311,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'nouvaderm-scalp-laser',
-    slug: 'nouvaderm-scalp-laser',
+    slug: 'nouvaderm-scalp-laser-for-thinning-hair-hair-loss-bald-spots-hair-regrowth-burbank-ca',
     name: 'NOUVADerm Scalp Laser for Hair',
     category: 'NOUVADerm Laser',
     tagline:
@@ -339,7 +339,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'plasmage-skin-tightening',
-    slug: 'plasmage-skin-tightening',
+    slug: 'plasmage-skin-tightening-for-crepey-skin-wrinkles-loose-skin-lipstick-lines-burbank-ca',
     name: 'Plasmage Skin Tightening',
     category: 'Plasmage',
     tagline:
@@ -367,7 +367,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'plasmage-eyelid-lift',
-    slug: 'plasmage-eyelid-lift',
+    slug: 'plasmage-eyelid-lift-for-hooded-eyes-droopy-eyelids-crows-feet-burbank-ca',
     name: 'Plasmage Eyelid Lift',
     category: 'Plasmage',
     tagline:
@@ -395,7 +395,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'plasmage-scar-removal',
-    slug: 'plasmage-scar-removal',
+    slug: 'plasmage-for-skin-tag-removal-mole-removal-wart-removal-acne-scars-burbank-ca',
     name: 'Plasmage Scar & Lesion Removal',
     category: 'Plasmage',
     tagline:
@@ -423,7 +423,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'cellenis-derma-prp',
-    slug: 'cellenis-derma-prp',
+    slug: 'cellenis-derma-prp-for-volume-loss-sunken-cheeks-acne-scars-fine-lines-burbank-ca',
     name: 'Cellenis Derma PRP',
     category: 'PRP / Cellenis PRP',
     tagline:
@@ -451,7 +451,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'prp-hair-restoration',
-    slug: 'prp-hair-restoration',
+    slug: 'prp-hair-restoration-for-hair-loss-thinning-hair-receding-hairline-thinning-crown-burbank-ca',
     name: 'PRP Hair Restoration',
     category: 'PRP / Cellenis PRP',
     tagline:
@@ -479,7 +479,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'prp-microneedling-facial',
-    slug: 'prp-microneedling-facial',
+    slug: 'prp-microneedling-vampire-facial-for-dark-circles-dull-skin-fine-lines-burbank-ca',
     name: 'PRP Microneedling Facial',
     category: 'PRP / Cellenis PRP',
     tagline:
@@ -507,7 +507,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'aquafirme-xs-hair-restoration',
-    slug: 'aquafirme-xs-hair-restoration',
+    slug: 'aquafirme-xs-hair-restoration-for-hair-loss-thinning-hair-receding-hairline-bald-spots-burbank-ca',
     name: 'AquaFirme XS Hair Restoration',
     category: 'Hair Restoration',
     tagline:
@@ -535,7 +535,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'derive-scalp-serum',
-    slug: 'derive-scalp-serum',
+    slug: 'derive-scalp-serum-for-hair-loss-thinning-hair-postpartum-hair-shedding-burbank-ca',
     name: 'DE|RIVE Scalp Serum Infusion',
     category: 'Hair Restoration',
     tagline:
@@ -563,7 +563,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'daxxify',
-    slug: 'daxxify',
+    slug: 'daxxify-botox-for-frown-lines-forehead-wrinkles-crows-feet-burbank-ca',
     name: 'Daxxify',
     category: 'Neurotoxins',
     tagline:
@@ -591,7 +591,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'jeuveau',
-    slug: 'jeuveau',
+    slug: 'jeuveau-botox-for-frown-lines-crows-feet-forehead-wrinkles-burbank-ca',
     name: 'Jeuveau',
     category: 'Neurotoxins',
     tagline:
@@ -619,7 +619,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'xeomin',
-    slug: 'xeomin',
+    slug: 'xeomin-botox-for-frown-lines-forehead-wrinkles-crows-feet-burbank-ca',
     name: 'Xeomin',
     category: 'Neurotoxins',
     tagline:
@@ -647,7 +647,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'revanesse-versa',
-    slug: 'revanesse-versa',
+    slug: 'revanesse-versa-filler-for-cheeks-smile-lines-under-eye-hollows-volume-loss-burbank-ca',
     name: 'Revanesse Versa Filler',
     category: 'Dermal Fillers',
     tagline:
@@ -675,7 +675,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'revanesse-lip',
-    slug: 'revanesse-lip',
+    slug: 'revanesse-lip-filler-for-lip-plumping-bigger-lips-thin-lips-burbank-ca',
     name: 'Revanesse Lip Filler',
     category: 'Dermal Fillers',
     tagline:
@@ -703,7 +703,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'prx-derm-perfexion',
-    slug: 'prx-derm-perfexion',
+    slug: 'prx-derm-perfexion-for-large-pores-fine-lines-skin-firmness-no-downtime-facial-burbank-ca',
     name: 'PRX Derm Perfexion',
     category: 'PRX Therapy',
     tagline:
@@ -731,7 +731,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'prx-plus-brightening',
-    slug: 'prx-plus-brightening',
+    slug: 'prx-plus-brightening-for-melasma-dark-spots-brown-spots-uneven-skin-tone-burbank-ca',
     name: 'PRX-PLUS Brightening',
     category: 'PRX Therapy',
     tagline:
@@ -759,7 +759,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'sensi-peel',
-    slug: 'sensi-peel',
+    slug: 'sensi-peel-for-sensitive-skin-uneven-tone-redness-gentle-chemical-peel-burbank-ca',
     name: 'Sensi Peel',
     category: 'Chemical Peels',
     tagline:
@@ -787,7 +787,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'ultra-peel',
-    slug: 'ultra-peel',
+    slug: 'ultra-peel-for-uneven-skin-tone-dark-spots-sun-damage-fine-lines-burbank-ca',
     name: 'Ultra Peel',
     category: 'Chemical Peels',
     tagline:
@@ -815,7 +815,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'pigment-peel',
-    slug: 'pigment-peel',
+    slug: 'pigment-peel-for-melasma-dark-spots-brown-spots-hyperpigmentation-burbank-ca',
     name: 'Pigment Peel',
     category: 'Chemical Peels',
     tagline:
@@ -843,7 +843,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'b-complex-injection',
-    slug: 'b-complex-injection',
+    slug: 'b-complex-b12-injection-for-energy-fatigue-slow-metabolism-burbank-ca',
     name: 'B-Complex Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -871,7 +871,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'glutathione-injection',
-    slug: 'glutathione-injection',
+    slug: 'glutathione-injection-for-skin-brightening-glowing-skin-dark-spots-burbank-ca',
     name: 'Glutathione Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -899,7 +899,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'mic-blend-injection',
-    slug: 'mic-blend-injection',
+    slug: 'mic-injection-for-fat-burning-metabolism-weight-loss-slim-shot-burbank-ca',
     name: 'MIC Blend Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -927,7 +927,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'lipotropic-plus',
-    slug: 'lipotropic-plus',
+    slug: 'lipotropic-plus-injection-for-fat-burning-weight-loss-metabolism-boost-burbank-ca',
     name: 'Lipotropic Plus Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -955,7 +955,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'ultraburn-injection',
-    slug: 'ultraburn-injection',
+    slug: 'ultraburn-injection-for-fat-burning-energy-metabolism-weight-management-burbank-ca',
     name: 'UltraBurn Lipotropic Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -983,7 +983,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'ic-lipolean',
-    slug: 'ic-lipolean',
+    slug: 'ic-lipolean-injection-for-weight-loss-fat-burning-appetite-control-burbank-ca',
     name: 'IC LipoLean Injection',
     category: 'IV Therapy & Injections',
     tagline:
@@ -1011,7 +1011,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'bpc-157',
-    slug: 'bpc-157',
+    slug: 'bpc-157-peptide-therapy-for-joint-pain-injury-recovery-gut-health-burbank-ca',
     name: 'BPC-157 Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
     tagline:
@@ -1039,7 +1039,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'ghk-cu-copper-peptide',
-    slug: 'ghk-cu-copper-peptide',
+    slug: 'ghk-cu-copper-peptide-for-collagen-loss-skin-aging-hair-loss-anti-aging-burbank-ca',
     name: 'GHK-Cu Copper Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
     tagline:
@@ -1067,7 +1067,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'sermorelin',
-    slug: 'sermorelin',
+    slug: 'sermorelin-peptide-therapy-for-low-energy-muscle-loss-poor-sleep-natural-hgh-burbank-ca',
     name: 'Sermorelin Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
     tagline:
@@ -1095,7 +1095,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'nad-therapy',
-    slug: 'nad-therapy',
+    slug: 'nad-iv-therapy-for-energy-brain-fog-anti-aging-longevity-burbank-ca',
     name: 'NAD+ IV Therapy',
     category: 'IV Therapy & Injections',
     tagline:
@@ -1123,7 +1123,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'weight-loss-consultation',
-    slug: 'weight-loss-consultation',
+    slug: 'weight-loss-consultation-for-semaglutide-glp-1-medical-weight-loss-burbank-ca',
     name: 'Weight Loss Consultation',
     category: 'Weight Loss',
     tagline:
@@ -1151,7 +1151,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'weight-loss-program',
-    slug: 'weight-loss-program',
+    slug: 'weight-loss-program-semaglutide-tirzepatide-ozempic-glp-1-burbank-ca',
     name: 'Weight Loss Program',
     category: 'Weight Loss',
     tagline:
@@ -1179,7 +1179,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'cherry-payment-plans',
-    slug: 'cherry-payment-plans',
+    slug: 'cherry-payment-plans-financing-pay-monthly-no-credit-check-burbank-ca',
     name: 'Cherry Payment Plans',
     category: 'Financing',
     tagline:
