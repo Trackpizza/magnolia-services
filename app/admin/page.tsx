@@ -64,6 +64,62 @@ function Input({ label, value, onChange, placeholder, hint }: {
   )
 }
 
+function FooterLinksEditor({ links, onAdd, onUpdate, onRemove }: {
+  links: { label: string; url: string }[]
+  onAdd: () => void
+  onUpdate: (i: number, key: 'label' | 'url', val: string) => void
+  onRemove: (i: number) => void
+}) {
+  return (
+    <div className="mt-6 pt-6 border-t border-gray-100">
+      <div className="flex items-center justify-between mb-1">
+        <h3 className="text-sm font-semibold text-gray-900">Footer Links</h3>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+        >
+          <span className="text-lg leading-none">+</span> Add link
+        </button>
+      </div>
+      <p className="text-xs text-gray-400 mb-4">Add any links you want in the footer (Instagram, Facebook, TikTok, reviews, etc.). Each needs a name and a URL.</p>
+
+      {links.length === 0 ? (
+        <p className="text-sm text-gray-400 italic">No links yet — click &ldquo;+ Add link&rdquo; to create one.</p>
+      ) : (
+        <div className="space-y-3">
+          {links.map((link, i) => (
+            <div key={i} className="flex gap-2 items-start">
+              <input
+                type="text"
+                value={link.label}
+                onChange={e => onUpdate(i, 'label', e.target.value)}
+                placeholder="Link name (e.g. Instagram)"
+                className="w-1/3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <input
+                type="text"
+                value={link.url}
+                onChange={e => onUpdate(i, 'url', e.target.value)}
+                placeholder="https://instagram.com/..."
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <button
+                type="button"
+                onClick={() => onRemove(i)}
+                aria-label="Remove link"
+                className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
@@ -126,22 +182,24 @@ export default function AdminPage() {
   const updateMainFooter = (key: keyof ServiceLinks['mainFooter'], val: string) =>
     setLinks(l => ({ ...l, mainFooter: { ...l.mainFooter, [key]: val } }))
 
-  const addCustomLink = () =>
-    setLinks(l => ({ ...l, mainFooter: { ...l.mainFooter, customLinks: [...l.mainFooter.customLinks, { label: '', url: '' }] } }))
+  type FooterKey = 'mainFooter' | 'serviceFooter'
 
-  const updateCustomLink = (i: number, key: 'label' | 'url', val: string) =>
+  const addCustomLink = (footer: FooterKey) =>
+    setLinks(l => ({ ...l, [footer]: { ...l[footer], customLinks: [...l[footer].customLinks, { label: '', url: '' }] } }))
+
+  const updateCustomLink = (footer: FooterKey, i: number, key: 'label' | 'url', val: string) =>
     setLinks(l => ({
       ...l,
-      mainFooter: {
-        ...l.mainFooter,
-        customLinks: l.mainFooter.customLinks.map((link, idx) => idx === i ? { ...link, [key]: val } : link),
+      [footer]: {
+        ...l[footer],
+        customLinks: l[footer].customLinks.map((link, idx) => idx === i ? { ...link, [key]: val } : link),
       },
     }))
 
-  const removeCustomLink = (i: number) =>
+  const removeCustomLink = (footer: FooterKey, i: number) =>
     setLinks(l => ({
       ...l,
-      mainFooter: { ...l.mainFooter, customLinks: l.mainFooter.customLinks.filter((_, idx) => idx !== i) },
+      [footer]: { ...l[footer], customLinks: l[footer].customLinks.filter((_, idx) => idx !== i) },
     }))
 
   const updateServiceFooter = (key: keyof ServiceLinks['serviceFooter'], val: string) =>
@@ -238,53 +296,12 @@ export default function AdminPage() {
             <Input label="Main Website URL" value={links.mainFooter.websiteUrl} onChange={v => updateMainFooter('websiteUrl', v)} placeholder="https://www.magnoliaskincenter.com" hint="The logo link" />
           </div>
 
-          {/* Custom footer links (add as many as you like) */}
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="text-sm font-semibold text-gray-900">Footer Links</h3>
-              <button
-                type="button"
-                onClick={addCustomLink}
-                className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
-              >
-                <span className="text-lg leading-none">+</span> Add link
-              </button>
-            </div>
-            <p className="text-xs text-gray-400 mb-4">Add any links you want in the footer (Instagram, Facebook, TikTok, reviews, etc.). Each needs a name and a URL.</p>
-
-            {links.mainFooter.customLinks.length === 0 ? (
-              <p className="text-sm text-gray-400 italic">No links yet — click &ldquo;+ Add link&rdquo; to create one.</p>
-            ) : (
-              <div className="space-y-3">
-                {links.mainFooter.customLinks.map((link, i) => (
-                  <div key={i} className="flex gap-2 items-start">
-                    <input
-                      type="text"
-                      value={link.label}
-                      onChange={e => updateCustomLink(i, 'label', e.target.value)}
-                      placeholder="Link name (e.g. Instagram)"
-                      className="w-1/3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    />
-                    <input
-                      type="text"
-                      value={link.url}
-                      onChange={e => updateCustomLink(i, 'url', e.target.value)}
-                      placeholder="https://instagram.com/..."
-                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeCustomLink(i)}
-                      aria-label="Remove link"
-                      className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <FooterLinksEditor
+            links={links.mainFooter.customLinks}
+            onAdd={() => addCustomLink('mainFooter')}
+            onUpdate={(i, k, v) => updateCustomLink('mainFooter', i, k, v)}
+            onRemove={i => removeCustomLink('mainFooter', i)}
+          />
         </section>
 
         {/* ── Service Detail Page Footer ──────────────────────── */}
@@ -301,6 +318,12 @@ export default function AdminPage() {
             <Input label="Membership Site URL" value={links.serviceFooter.membershipUrl} onChange={v => updateServiceFooter('membershipUrl', v)} placeholder="https://membership.magnoliaskincenter.com" hint="'View Memberships' button" />
             <Input label="Phone" value={links.serviceFooter.phone} onChange={v => updateServiceFooter('phone', v)} placeholder="(747) 305-8973" />
           </div>
+          <FooterLinksEditor
+            links={links.serviceFooter.customLinks}
+            onAdd={() => addCustomLink('serviceFooter')}
+            onUpdate={(i, k, v) => updateCustomLink('serviceFooter', i, k, v)}
+            onRemove={i => removeCustomLink('serviceFooter', i)}
+          />
         </section>
 
         {/* ── Video URLs ──────────────────────────────────────── */}

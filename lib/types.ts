@@ -17,6 +17,7 @@ export interface ServiceLinks {
     bookingUrl: string
     membershipUrl: string
     phone: string
+    customLinks: FooterLink[]  // named links shown in the footer of every service detail page
   }
   videos: Record<string, string>  // slug → YouTube URL (empty = show placeholder)
   content: Record<string, string>  // slug → markdown shown under "How it works" (empty = hide)
@@ -36,6 +37,7 @@ export const DEFAULT_LINKS: ServiceLinks = {
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',
     membershipUrl: process.env.NEXT_PUBLIC_MEMBERSHIP_URL ?? 'https://magnolia-membership--magscmembership.us-east4.hosted.app',
     phone: '(747) 305-8973',
+    customLinks: [],
   },
   videos: {},
   content: {},

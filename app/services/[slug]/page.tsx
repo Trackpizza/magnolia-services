@@ -192,6 +192,26 @@ export default async function ServicePage({ params }: Props) {
         </div>
       </div>
 
+      {/* Footer */}
+      <footer className="bg-plum-900 border-t border-white/10 py-10">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left">
+            {links.serviceFooter.phone && (
+              <a href={`tel:${links.serviceFooter.phone.replace(/\D/g, '')}`}
+                className="text-white/50 hover:text-white/70 text-sm transition-colors">{links.serviceFooter.phone}</a>
+            )}
+          </div>
+          <div className="flex items-center gap-4 text-sm flex-wrap justify-center">
+            {links.serviceFooter.customLinks.map((link, i) => (
+              <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
+            ))}
+            <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
+            <a href={links.serviceFooter.membershipUrl} className="text-white/50 hover:text-white transition-colors">Memberships</a>
+          </div>
+        </div>
+      </footer>
+
     </div>
   )
 }

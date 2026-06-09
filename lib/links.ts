@@ -7,14 +7,19 @@ export async function getLinks(): Promise<ServiceLinks> {
     const snap = await adminDb.collection('serviceLinks').doc('config').get()
     if (!snap.exists) return DEFAULT_LINKS
     const data = snap.data() as Partial<ServiceLinks>
-    const mainFooter = { ...DEFAULT_LINKS.mainFooter, ...(data.mainFooter ?? {}) }
     // Keep only well-formed links with an actual destination
-    mainFooter.customLinks = (mainFooter.customLinks ?? []).filter(
-      l => l && typeof l.url === 'string' && l.url.trim() !== ''
-    )
+    const cleanLinks = (links: unknown) =>
+      (Array.isArray(links) ? links : []).filter(
+        (l): l is { label: string; url: string } =>
+          !!l && typeof l.url === 'string' && l.url.trim() !== ''
+      )
+    const mainFooter = { ...DEFAULT_LINKS.mainFooter, ...(data.mainFooter ?? {}) }
+    mainFooter.customLinks = cleanLinks(mainFooter.customLinks)
+    const serviceFooter = { ...DEFAULT_LINKS.serviceFooter, ...(data.serviceFooter ?? {}) }
+    serviceFooter.customLinks = cleanLinks(serviceFooter.customLinks)
     return {
       mainFooter,
-      serviceFooter: { ...DEFAULT_LINKS.serviceFooter, ...(data.serviceFooter ?? {}) },
+      serviceFooter,
       videos: data.videos ?? {},
       content: data.content ?? {},
     }
