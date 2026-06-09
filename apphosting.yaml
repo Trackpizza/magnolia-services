@@ -9,8 +9,10 @@ env:
     secret: FIREBASE_CLIENT_EMAIL
   - variable: FIREBASE_PRIVATE_KEY_BASE64
     secret: FIREBASE_PRIVATE_KEY_BASE64
-  - variable: ADMIN_PASSWORD
-    secret: ADMIN_PASSWORD
+  # ADMIN_PASSWORD is supplied by the backend override env (overrideEnv), not a
+  # Secret Manager secret. Current value: mag2026. To change it, update the
+  # backend override (firebase console > App Hosting > backend settings, or the
+  # apphosting backends API) — changing it requires a new rollout to take effect.
   - variable: NEXT_PUBLIC_MEMBERSHIP_URL
     value: https://magnolia-membership--magscmembership.us-east4.hosted.app
   - variable: NEXT_PUBLIC_APP_URL
