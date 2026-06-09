@@ -2,6 +2,11 @@ runConfig:
   concurrency: 80
   minInstances: 0
 
+# All values come from Secret Manager secrets in the active project.
+# - New standalone project (magnolia-services): secrets created from the
+#   project's own firebase-adminsdk service-account key + ADMIN_PASSWORD.
+# - Legacy backend (magscmembership): supplies these via per-backend overrideEnv,
+#   which overrides this file, so it is unaffected.
 env:
   - variable: FIREBASE_PROJECT_ID
     secret: FIREBASE_PROJECT_ID
@@ -9,11 +14,9 @@ env:
     secret: FIREBASE_CLIENT_EMAIL
   - variable: FIREBASE_PRIVATE_KEY_BASE64
     secret: FIREBASE_PRIVATE_KEY_BASE64
-  # ADMIN_PASSWORD is supplied by the backend override env (overrideEnv), not a
-  # Secret Manager secret. Current value: mag2026. To change it, update the
-  # backend override (firebase console > App Hosting > backend settings, or the
-  # apphosting backends API) — changing it requires a new rollout to take effect.
+  - variable: ADMIN_PASSWORD
+    secret: ADMIN_PASSWORD
   - variable: NEXT_PUBLIC_MEMBERSHIP_URL
     value: https://magnolia-membership--magscmembership.us-east4.hosted.app
   - variable: NEXT_PUBLIC_APP_URL
-    value: https://magnolia-services--magscmembership.us-east4.hosted.app
+    value: https://magnolia-services--magnolia-services.us-west2.hosted.app
