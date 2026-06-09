@@ -1,3 +1,8 @@
+export interface FooterLink {
+  label: string
+  url: string
+}
+
 export interface ServiceLinks {
   mainFooter: {
     address: string
@@ -5,9 +10,8 @@ export interface ServiceLinks {
     email: string
     bookingUrl: string
     membershipUrl: string
-    instagramUrl: string
-    facebookUrl: string
     websiteUrl: string
+    customLinks: FooterLink[]  // arbitrary named links shown in the footer link row
   }
   serviceFooter: {
     bookingUrl: string
@@ -25,9 +29,8 @@ export const DEFAULT_LINKS: ServiceLinks = {
     email: '',
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',
     membershipUrl: process.env.NEXT_PUBLIC_MEMBERSHIP_URL ?? 'https://magnolia-membership--magscmembership.us-east4.hosted.app',
-    instagramUrl: '',
-    facebookUrl: '',
     websiteUrl: 'https://www.magnoliaskincenter.com',
+    customLinks: [],
   },
   serviceFooter: {
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',

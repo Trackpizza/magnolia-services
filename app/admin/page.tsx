@@ -126,6 +126,24 @@ export default function AdminPage() {
   const updateMainFooter = (key: keyof ServiceLinks['mainFooter'], val: string) =>
     setLinks(l => ({ ...l, mainFooter: { ...l.mainFooter, [key]: val } }))
 
+  const addCustomLink = () =>
+    setLinks(l => ({ ...l, mainFooter: { ...l.mainFooter, customLinks: [...l.mainFooter.customLinks, { label: '', url: '' }] } }))
+
+  const updateCustomLink = (i: number, key: 'label' | 'url', val: string) =>
+    setLinks(l => ({
+      ...l,
+      mainFooter: {
+        ...l.mainFooter,
+        customLinks: l.mainFooter.customLinks.map((link, idx) => idx === i ? { ...link, [key]: val } : link),
+      },
+    }))
+
+  const removeCustomLink = (i: number) =>
+    setLinks(l => ({
+      ...l,
+      mainFooter: { ...l.mainFooter, customLinks: l.mainFooter.customLinks.filter((_, idx) => idx !== i) },
+    }))
+
   const updateServiceFooter = (key: keyof ServiceLinks['serviceFooter'], val: string) =>
     setLinks(l => ({ ...l, serviceFooter: { ...l.serviceFooter, [key]: val } }))
 
@@ -217,9 +235,55 @@ export default function AdminPage() {
             <Input label="Email" value={links.mainFooter.email} onChange={v => updateMainFooter('email', v)} placeholder="hello@magnoliaskincenter.com" />
             <Input label="Booking / Consultation URL" value={links.mainFooter.bookingUrl} onChange={v => updateMainFooter('bookingUrl', v)} placeholder="https://..." hint="The 'Book a Complimentary Call' button" />
             <Input label="Membership Site URL" value={links.mainFooter.membershipUrl} onChange={v => updateMainFooter('membershipUrl', v)} placeholder="https://membership.magnoliaskincenter.com" hint="Where 'View Memberships' links to" />
-            <Input label="Main Website URL" value={links.mainFooter.websiteUrl} onChange={v => updateMainFooter('websiteUrl', v)} placeholder="https://www.magnoliaskincenter.com" />
-            <Input label="Instagram URL" value={links.mainFooter.instagramUrl} onChange={v => updateMainFooter('instagramUrl', v)} placeholder="https://instagram.com/..." />
-            <Input label="Facebook URL" value={links.mainFooter.facebookUrl} onChange={v => updateMainFooter('facebookUrl', v)} placeholder="https://facebook.com/..." />
+            <Input label="Main Website URL" value={links.mainFooter.websiteUrl} onChange={v => updateMainFooter('websiteUrl', v)} placeholder="https://www.magnoliaskincenter.com" hint="The logo link" />
+          </div>
+
+          {/* Custom footer links (add as many as you like) */}
+          <div className="mt-6 pt-6 border-t border-gray-100">
+            <div className="flex items-center justify-between mb-1">
+              <h3 className="text-sm font-semibold text-gray-900">Footer Links</h3>
+              <button
+                type="button"
+                onClick={addCustomLink}
+                className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-brand-700 transition-colors"
+              >
+                <span className="text-lg leading-none">+</span> Add link
+              </button>
+            </div>
+            <p className="text-xs text-gray-400 mb-4">Add any links you want in the footer (Instagram, Facebook, TikTok, reviews, etc.). Each needs a name and a URL.</p>
+
+            {links.mainFooter.customLinks.length === 0 ? (
+              <p className="text-sm text-gray-400 italic">No links yet — click &ldquo;+ Add link&rdquo; to create one.</p>
+            ) : (
+              <div className="space-y-3">
+                {links.mainFooter.customLinks.map((link, i) => (
+                  <div key={i} className="flex gap-2 items-start">
+                    <input
+                      type="text"
+                      value={link.label}
+                      onChange={e => updateCustomLink(i, 'label', e.target.value)}
+                      placeholder="Link name (e.g. Instagram)"
+                      className="w-1/3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    />
+                    <input
+                      type="text"
+                      value={link.url}
+                      onChange={e => updateCustomLink(i, 'url', e.target.value)}
+                      placeholder="https://instagram.com/..."
+                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeCustomLink(i)}
+                      aria-label="Remove link"
+                      className="shrink-0 w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:text-red-500 hover:border-red-200 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

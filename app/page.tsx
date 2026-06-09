@@ -106,14 +106,10 @@ export default async function ServicesPage() {
             )}
           </div>
           <div className="flex items-center gap-4 text-sm flex-wrap justify-center">
-            {f.instagramUrl && (
-              <a href={f.instagramUrl} target="_blank" rel="noopener noreferrer"
-                className="text-white/50 hover:text-white transition-colors">Instagram</a>
-            )}
-            {f.facebookUrl && (
-              <a href={f.facebookUrl} target="_blank" rel="noopener noreferrer"
-                className="text-white/50 hover:text-white transition-colors">Facebook</a>
-            )}
+            {f.customLinks.map((link, i) => (
+              <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
+            ))}
             {f.websiteUrl && (
               <a href={f.websiteUrl} target="_blank" rel="noopener noreferrer"
                 className="text-white/50 hover:text-white transition-colors">magnoliaskincenter.com</a>
