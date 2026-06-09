@@ -2,49 +2,12 @@
 import { useState, useEffect } from 'react'
 import type { ServiceLinks } from '@/lib/types'
 import { DEFAULT_LINKS } from '@/lib/types'
+import { SERVICES } from '@/config/services'
 
-const SERVICE_SLUGS: Array<{ slug: string; name: string }> = [
-  { slug: 'agnes-rf-microneedling', name: 'Agnes RF Microneedling' },
-  { slug: 'agnes-rf-eye-bag-treatment', name: 'Agnes RF Eye Bag Treatment' },
-  { slug: 'agnes-rf-acne-scar-treatment', name: 'Agnes RF Acne & Scar Treatment' },
-  { slug: 'agnes-rf-non-surgical-facelift', name: 'Agnes RF Non-Surgical Facelift' },
-  { slug: 'scarlet-pro-srf-microneedling', name: 'Scarlet PRO SRF Microneedling' },
-  { slug: 'scarlet-srf-body-tightening', name: 'Scarlet SRF Body Tightening' },
-  { slug: 'nouvaderm-laser-resurfacing', name: 'NOUVADerm Laser Resurfacing' },
-  { slug: 'nouvaderm-laser-rosacea', name: 'NOUVADerm Laser for Rosacea' },
-  { slug: 'nouvaderm-scalp-laser', name: 'NOUVADerm Scalp Laser Treatment' },
-  { slug: 'plasmage-skin-tightening', name: 'Plasmage Plasma Skin Tightening' },
-  { slug: 'plasmage-eyelid-lift', name: 'Plasmage Eyelid & Eye Bag Lift' },
-  { slug: 'plasmage-scar-removal', name: 'Plasmage Scar & Skin Tag Removal' },
-  { slug: 'cellenis-derma-prp', name: 'Cellenis Derma PRP' },
-  { slug: 'prp-hair-restoration', name: 'PRP Hair Restoration' },
-  { slug: 'prp-microneedling-facial', name: 'PRP Microneedling Facial' },
-  { slug: 'aquafirme-xs-hair-restoration', name: 'AquaFirme XS Hair Restoration' },
-  { slug: 'derive-scalp-serum', name: 'Dérives Scalp Serum' },
-  { slug: 'daxxify', name: 'Daxxify' },
-  { slug: 'jeuveau', name: 'Jeuveau' },
-  { slug: 'xeomin', name: 'Xeomin' },
-  { slug: 'revanesse-versa', name: 'Revanesse Versa+' },
-  { slug: 'revanesse-lip', name: 'Revanesse Lip' },
-  { slug: 'prx-derm-perfexion', name: 'PRX Derm Perfexion' },
-  { slug: 'prx-plus-brightening', name: 'PRX Plus Brightening Peel' },
-  { slug: 'sensi-peel', name: 'Sensi Peel' },
-  { slug: 'ultra-peel', name: 'Ultra Peel' },
-  { slug: 'pigment-peel', name: 'Pigment Peel' },
-  { slug: 'b-complex-injection', name: 'B-Complex Injection' },
-  { slug: 'glutathione-injection', name: 'Glutathione Injection' },
-  { slug: 'mic-blend-injection', name: 'MIC Blend Injection' },
-  { slug: 'lipotropic-plus', name: 'Lipotropic Plus' },
-  { slug: 'ultraburn-injection', name: 'UltraBurn Injection' },
-  { slug: 'ic-lipolean', name: 'IC LipoLean' },
-  { slug: 'bpc-157', name: 'BPC-157' },
-  { slug: 'ghk-cu-copper-peptide', name: 'GHK-Cu Copper Peptide' },
-  { slug: 'sermorelin', name: 'Sermorelin' },
-  { slug: 'nad-therapy', name: 'NAD+ Therapy' },
-  { slug: 'weight-loss-consultation', name: 'Weight Loss Consultation' },
-  { slug: 'weight-loss-program', name: 'Medical Weight Loss Program' },
-  { slug: 'cherry-payment-plans', name: 'Cherry Payment Plans' },
-]
+// Single source of truth: the editable service list is derived from config/services.ts.
+// Keyed by the stable `id` (which never changes); the SEO `slug` (the page URL) can be
+// edited freely in config without touching video/content mappings here.
+const SERVICE_LIST = SERVICES.map(s => ({ id: s.id, name: s.name }))
 
 function Input({ label, value, onChange, placeholder, hint }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; hint?: string
@@ -337,13 +300,13 @@ export default function AdminPage() {
           </div>
           <p className="text-xs text-gray-400 mb-5">Accepts full YouTube URL (e.g. https://youtube.com/watch?v=...) or short link (https://youtu.be/...)</p>
           <div className="space-y-3">
-            {SERVICE_SLUGS.map(({ slug, name }) => (
-              <div key={slug} className="grid grid-cols-5 gap-3 items-center">
+            {SERVICE_LIST.map(({ id, name }) => (
+              <div key={id} className="grid grid-cols-5 gap-3 items-center">
                 <label className="col-span-2 text-sm text-gray-700 font-medium leading-tight">{name}</label>
                 <input
                   type="text"
-                  value={links.videos[slug] ?? ''}
-                  onChange={e => updateVideo(slug, e.target.value)}
+                  value={links.videos[id] ?? ''}
+                  onChange={e => updateVideo(id, e.target.value)}
                   placeholder="https://youtube.com/watch?v=..."
                   className="col-span-3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
@@ -368,12 +331,12 @@ export default function AdminPage() {
             Supports Markdown: <code className="text-gray-500">## Heading</code>, <code className="text-gray-500">**bold**</code>, <code className="text-gray-500">*italic*</code>, <code className="text-gray-500">- bullet</code>, <code className="text-gray-500">[link](https://...)</code>, <code className="text-gray-500">&gt; quote</code>. Single line breaks are preserved.
           </p>
           <div className="space-y-6">
-            {SERVICE_SLUGS.map(({ slug, name }) => (
-              <div key={slug}>
+            {SERVICE_LIST.map(({ id, name }) => (
+              <div key={id}>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{name}</label>
                 <textarea
-                  value={links.content[slug] ?? ''}
-                  onChange={e => updateContent(slug, e.target.value)}
+                  value={links.content[id] ?? ''}
+                  onChange={e => updateContent(id, e.target.value)}
                   placeholder="Add extra info, FAQs, pricing notes, etc. (Markdown supported)"
                   rows={5}
                   className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand-500"

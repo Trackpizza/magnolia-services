@@ -42,9 +42,9 @@ export default async function ServicePage({ params }: Props) {
   if (!service) notFound()
 
   const links = await getLinks()
-  const videoUrl = links.videos[service.slug] ?? ''
+  const videoUrl = links.videos[service.id] ?? ''
   const embedUrl = getYouTubeEmbedUrl(videoUrl)
-  const customContent = links.content[service.slug] ?? ''
+  const customContent = links.content[service.id] ?? ''
 
   return (
     <div className="min-h-screen bg-cream-100">

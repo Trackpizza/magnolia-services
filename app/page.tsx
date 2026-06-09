@@ -10,8 +10,8 @@ export default async function ServicesPage() {
   const builtCategories = SERVICE_CATEGORIES.map(cat => ({
     name: cat.name,
     description: cat.description,
-    services: cat.slugs.map(slug => {
-      const s = SERVICES.find(sv => sv.slug === slug)
+    services: cat.ids.map(id => {
+      const s = SERVICES.find(sv => sv.id === id)
       if (!s) return null
       return { name: s.name, description: s.searchDescription, href: `/services/${s.slug}`, keywords: [...s.keywords, ...(s.alsoKnownAs ?? [])] }
     }).filter((x): x is NonNullable<typeof x> => x !== null),

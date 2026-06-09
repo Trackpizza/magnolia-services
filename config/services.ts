@@ -1,4 +1,5 @@
 export interface ServiceEntry {
+  id: string
   slug: string
   name: string
   category: string
@@ -12,71 +13,71 @@ export interface ServiceEntry {
   alsoKnownAs: string[]
 }
 
-export const SERVICE_CATEGORIES: Array<{ name: string; description: string; slugs: string[] }> = [
+export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids: string[] }> = [
   {
     name: 'Agnes RF',
     description: 'Precision radiofrequency microneedling that safely reaches deeper skin layers for lasting, non-surgical results.',
-    slugs: ['agnes-rf-microneedling', 'agnes-rf-eye-bag-treatment', 'agnes-rf-acne-scar-treatment', 'agnes-rf-non-surgical-facelift'],
+    ids: ['agnes-rf-microneedling', 'agnes-rf-eye-bag-treatment', 'agnes-rf-acne-scar-treatment', 'agnes-rf-non-surgical-facelift'],
   },
   {
     name: 'Scarlet PRO SRF',
     description: 'FDA-cleared short-pulse RF microneedling that stimulates collagen, elastin, and hyaluronic acid with minimal downtime.',
-    slugs: ['scarlet-pro-srf-microneedling', 'scarlet-srf-body-tightening'],
+    ids: ['scarlet-pro-srf-microneedling', 'scarlet-srf-body-tightening'],
   },
   {
     name: 'NOUVADerm Laser',
     description: '4th-generation fractional laser for resurfacing, pigmentation, rosacea, and scalp health.',
-    slugs: ['nouvaderm-laser-resurfacing', 'nouvaderm-laser-rosacea', 'nouvaderm-scalp-laser'],
+    ids: ['nouvaderm-laser-resurfacing', 'nouvaderm-laser-rosacea', 'nouvaderm-scalp-laser'],
   },
   {
     name: 'Plasmage',
     description: 'Fractional plasma technology that firms skin and removes lesions with no direct skin contact.',
-    slugs: ['plasmage-skin-tightening', 'plasmage-eyelid-lift', 'plasmage-scar-removal'],
+    ids: ['plasmage-skin-tightening', 'plasmage-eyelid-lift', 'plasmage-scar-removal'],
   },
   {
     name: 'PRP / Cellenis PRP',
     description: 'Platelet-rich plasma from your own blood to stimulate collagen, restore volume, and regenerate naturally.',
-    slugs: ['cellenis-derma-prp', 'prp-hair-restoration', 'prp-microneedling-facial'],
+    ids: ['cellenis-derma-prp', 'prp-hair-restoration', 'prp-microneedling-facial'],
   },
   {
     name: 'Hair Restoration',
     description: 'Non-surgical treatments to restore scalp health, strengthen follicles, and promote natural regrowth.',
-    slugs: ['aquafirme-xs-hair-restoration', 'derive-scalp-serum'],
+    ids: ['aquafirme-xs-hair-restoration', 'derive-scalp-serum'],
   },
   {
     name: 'Neurotoxins',
     description: 'Precision neurotoxin treatments to smooth lines and refresh your expression — no surgery required.',
-    slugs: ['daxxify', 'jeuveau', 'xeomin'],
+    ids: ['daxxify', 'jeuveau', 'xeomin'],
   },
   {
     name: 'Dermal Fillers',
     description: 'Hyaluronic acid fillers for natural-looking volume, contour, and lip enhancement.',
-    slugs: ['revanesse-versa', 'revanesse-lip'],
+    ids: ['revanesse-versa', 'revanesse-lip'],
   },
   {
     name: 'Chemical Peels',
     description: 'Medical-grade peels for tone, texture, pigmentation, and radiance — with minimal downtime.',
-    slugs: ['prx-derm-perfexion', 'prx-plus-brightening', 'sensi-peel', 'ultra-peel', 'pigment-peel'],
+    ids: ['prx-derm-perfexion', 'prx-plus-brightening', 'sensi-peel', 'ultra-peel', 'pigment-peel'],
   },
   {
     name: 'IV Therapy & Injections',
     description: 'Targeted nutrient injections and IV formulas to boost energy, metabolism, and overall wellness.',
-    slugs: ['b-complex-injection', 'glutathione-injection', 'mic-blend-injection', 'lipotropic-plus', 'ultraburn-injection', 'ic-lipolean'],
+    ids: ['b-complex-injection', 'glutathione-injection', 'mic-blend-injection', 'lipotropic-plus', 'ultraburn-injection', 'ic-lipolean'],
   },
   {
     name: 'Peptide & Anti-Aging Therapy',
     description: 'Advanced peptide protocols that work at a cellular level to support longevity, recovery, and skin health.',
-    slugs: ['bpc-157', 'ghk-cu-copper-peptide', 'sermorelin', 'nad-therapy'],
+    ids: ['bpc-157', 'ghk-cu-copper-peptide', 'sermorelin', 'nad-therapy'],
   },
   {
     name: 'Weight Loss',
     description: 'Medically supervised programs combining clinical guidance, nutrition support, and targeted treatments.',
-    slugs: ['weight-loss-consultation', 'weight-loss-program'],
+    ids: ['weight-loss-consultation', 'weight-loss-program'],
   },
   {
     name: 'Financing',
     description: 'Flexible payment options so the treatment you want is never out of reach.',
-    slugs: ['cherry-payment-plans'],
+    ids: ['cherry-payment-plans'],
   },
 ]
 
@@ -85,7 +86,8 @@ const DISCLAIMER =
 
 export const SERVICES: ServiceEntry[] = [
   {
-    slug: 'agnes-rf-microneedling',
+    id: 'agnes-rf-microneedling',
+    slug: 'agnes-rf-microneedling-for-acne-scars-jowls-wrinkles-skin-tightening-burbank-ca',
     name: 'Agnes RF Microneedling',
     category: 'Agnes RF',
     tagline:
@@ -112,6 +114,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['turkey neck', 'double chin', 'tech neck lines', 'saggy jawline', 'droopy cheeks', 'face fat'],
   },
   {
+    id: 'agnes-rf-eye-bag-treatment',
     slug: 'agnes-rf-eye-bag-treatment',
     name: 'Agnes RF Eye Bag Treatment',
     category: 'Agnes RF',
@@ -139,6 +142,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['puffy eyes', 'bags under eyes', 'tired eyes', 'under eye puffiness', 'baggy under eyes', 'non-surgical eye bag fix'],
   },
   {
+    id: 'agnes-rf-acne-scar-treatment',
     slug: 'agnes-rf-acne-scar-treatment',
     name: 'Agnes RF Acne & Scar Treatment',
     category: 'Agnes RF',
@@ -166,6 +170,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['pimple scars', 'acne marks', 'pitted skin', 'breakout scars', 'chickenpox scars', 'acne craters', 'enlarged pores', 'oily skin treatment'],
   },
   {
+    id: 'agnes-rf-non-surgical-facelift',
     slug: 'agnes-rf-non-surgical-facelift',
     name: 'Agnes RF Non-Surgical Facelift',
     category: 'Agnes RF',
@@ -193,6 +198,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['turkey neck', 'double chin', 'saggy jawline', 'droopy cheeks', 'face fat', 'melt chin fat', 'tech neck lines'],
   },
   {
+    id: 'scarlet-pro-srf-microneedling',
     slug: 'scarlet-pro-srf-microneedling',
     name: 'Scarlet PRO SRF Microneedling',
     category: 'Scarlet PRO SRF',
@@ -220,6 +226,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['crepey neck', 'crepey chest', 'saggy neck', 'loose face skin', 'aging skin'],
   },
   {
+    id: 'scarlet-srf-body-tightening',
     slug: 'scarlet-srf-body-tightening',
     name: 'Scarlet SRF Body Tightening',
     category: 'Scarlet PRO SRF',
@@ -247,6 +254,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['chicken wings', 'bat wings', 'saggy arms', 'mommy tummy', 'mom belly', 'stomach crinkles', 'crepey cleavage', 'bra fat', 'loose knee skin', 'postpartum belly', 'pregnancy stretch marks', 'loose skin after baby'],
   },
   {
+    id: 'nouvaderm-laser-resurfacing',
     slug: 'nouvaderm-laser-resurfacing',
     name: 'NOUVADerm Laser Resurfacing',
     category: 'NOUVADerm Laser',
@@ -274,6 +282,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['sun spots', 'liver spots', 'pregnancy mask', 'dark patches', 'postpartum melasma', 'hormonal dark patches', 'brown spots after pregnancy', 'large pores', 'rough skin'],
   },
   {
+    id: 'nouvaderm-laser-rosacea',
     slug: 'nouvaderm-laser-rosacea',
     name: 'NOUVADerm Laser for Rosacea',
     category: 'NOUVADerm Laser',
@@ -301,6 +310,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['red face', 'red cheeks', 'always flushing', 'blotchy skin', 'broken veins on face'],
   },
   {
+    id: 'nouvaderm-scalp-laser',
     slug: 'nouvaderm-scalp-laser',
     name: 'NOUVADerm Scalp Laser for Hair',
     category: 'NOUVADerm Laser',
@@ -328,6 +338,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['thinning hair laser', 'scalp rejuvenation', 'hair growth laser', 'laser for bald spots', 'non-surgical hair regrowth', 'laser hair stimulation'],
   },
   {
+    id: 'plasmage-skin-tightening',
     slug: 'plasmage-skin-tightening',
     name: 'Plasmage Skin Tightening',
     category: 'Plasmage',
@@ -355,6 +366,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['smoker lines', 'lipstick lines', 'accordion lines', 'belly button sagging', 'crepey skin', 'loose tummy skin'],
   },
   {
+    id: 'plasmage-eyelid-lift',
     slug: 'plasmage-eyelid-lift',
     name: 'Plasmage Eyelid Lift',
     category: 'Plasmage',
@@ -382,6 +394,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['hooded eyes', 'droopy eyelids', 'heavy eyelids', 'eye bags', 'laugh lines', 'frown lines'],
   },
   {
+    id: 'plasmage-scar-removal',
     slug: 'plasmage-scar-removal',
     name: 'Plasmage Scar & Lesion Removal',
     category: 'Plasmage',
@@ -409,6 +422,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['skin tag removal', 'mole removal', 'spot removal', 'wart removal', 'flesh bumps', 'raised skin spots', 'skin growths'],
   },
   {
+    id: 'cellenis-derma-prp',
     slug: 'cellenis-derma-prp',
     name: 'Cellenis Derma PRP',
     category: 'PRP / Cellenis PRP',
@@ -436,6 +450,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['tired mom face', 'postpartum breast deflation', 'restore breast volume', 'stretched breast skin', 'sunken cheeks', 'hollow face', 'natural filler'],
   },
   {
+    id: 'prp-hair-restoration',
     slug: 'prp-hair-restoration',
     name: 'PRP Hair Restoration',
     category: 'PRP / Cellenis PRP',
@@ -463,6 +478,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['postpartum hair loss', 'thinning crown', 'receding hairline', 'hair shedding', 'losing hair after baby', 'hormonal hair loss', 'covid hair loss', 'thinning edges'],
   },
   {
+    id: 'prp-microneedling-facial',
     slug: 'prp-microneedling-facial',
     name: 'PRP Microneedling Facial',
     category: 'PRP / Cellenis PRP',
@@ -490,6 +506,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['vampire facial', 'blood facial', 'microneedling with prp', 'glow facial', 'dark circle treatment', 'skin rejuvenation facial'],
   },
   {
+    id: 'aquafirme-xs-hair-restoration',
     slug: 'aquafirme-xs-hair-restoration',
     name: 'AquaFirme XS Hair Restoration',
     category: 'Hair Restoration',
@@ -517,6 +534,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ["widow's peak", 'receding hairline', 'bald spots', 'thinning crown', 'postpartum hair loss', 'covid hair loss', 'losing hair after baby', 'thinning edges after pregnancy', 'hormonal hair shedding'],
   },
   {
+    id: 'derive-scalp-serum',
     slug: 'derive-scalp-serum',
     name: 'DE|RIVE Scalp Serum Infusion',
     category: 'Hair Restoration',
@@ -544,6 +562,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['postpartum hair loss', 'covid hair loss', 'hormonal hair loss', 'baby shedding', 'losing hair after baby', 'thinning edges', 'hair shedding after pregnancy'],
   },
   {
+    id: 'daxxify',
     slug: 'daxxify',
     name: 'Daxxify',
     category: 'Neurotoxins',
@@ -571,6 +590,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['long lasting botox', 'botox alternative', 'peptide botox', '6 month botox', 'forehead wrinkle injections', 'frown line injections'],
   },
   {
+    id: 'jeuveau',
     slug: 'jeuveau',
     name: 'Jeuveau',
     category: 'Neurotoxins',
@@ -598,6 +618,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['newtox', 'botox alternative', 'wrinkle relaxer', 'frown line fixer', 'jaw slimming injection', "crow's feet treatment"],
   },
   {
+    id: 'xeomin',
     slug: 'xeomin',
     name: 'Xeomin',
     category: 'Neurotoxins',
@@ -625,6 +646,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['naked botox', 'pure botox', 'protein-free botox', 'botox alternative', 'wrinkle injection', 'forehead lines treatment'],
   },
   {
+    id: 'revanesse-versa',
     slug: 'revanesse-versa',
     name: 'Revanesse Versa Filler',
     category: 'Dermal Fillers',
@@ -652,6 +674,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['cheek filler', 'face filler', 'nasolabial fold filler', 'smile line filler', 'under eye filler', 'hollow cheek treatment', 'facial volume loss'],
   },
   {
+    id: 'revanesse-lip',
     slug: 'revanesse-lip',
     name: 'Revanesse Lip Filler',
     category: 'Dermal Fillers',
@@ -679,6 +702,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['lip plumping', 'natural lip filler', 'lip enhancement', 'lip augmentation', 'thin lip treatment', 'lip definition', 'lip border filler'],
   },
   {
+    id: 'prx-derm-perfexion',
     slug: 'prx-derm-perfexion',
     name: 'PRX Derm Perfexion',
     category: 'PRX Therapy',
@@ -706,6 +730,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['no peel facial', 'invisible peel', 'lunchtime facial', 'no downtime facial', 'zero downtime treatment', 'skin tightening no recovery'],
   },
   {
+    id: 'prx-plus-brightening',
     slug: 'prx-plus-brightening',
     name: 'PRX-PLUS Brightening',
     category: 'PRX Therapy',
@@ -733,6 +758,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['pregnancy mask treatment', 'melasma facial', 'brown spots no peel', 'hormonal dark patches', 'brightening treatment', 'no downtime brightening'],
   },
   {
+    id: 'sensi-peel',
     slug: 'sensi-peel',
     name: 'Sensi Peel',
     category: 'Chemical Peels',
@@ -760,6 +786,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['gentle peel', 'rosacea peel', 'sensitive skin facial', 'reactive skin peel', 'no downtime peel', 'mild chemical peel'],
   },
   {
+    id: 'ultra-peel',
     slug: 'ultra-peel',
     name: 'Ultra Peel',
     category: 'Chemical Peels',
@@ -787,6 +814,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['brightening peel', 'dark patch peel', 'even skin treatment', 'tone correcting peel', 'mild brightening facial', 'sun damage peel'],
   },
   {
+    id: 'pigment-peel',
     slug: 'pigment-peel',
     name: 'Pigment Peel',
     category: 'Chemical Peels',
@@ -814,6 +842,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['melasma peel', 'dark spot peel', 'brown spots treatment', 'hyperpigmentation peel', 'post-acne mark treatment', 'skin discoloration peel'],
   },
   {
+    id: 'b-complex-injection',
     slug: 'b-complex-injection',
     name: 'B-Complex Injection',
     category: 'IV Therapy & Injections',
@@ -841,6 +870,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['b12 shot', 'energy shot', 'vitamin b injection', 'metabolism shot', 'fatigue injection', 'energy boost injection'],
   },
   {
+    id: 'glutathione-injection',
     slug: 'glutathione-injection',
     name: 'Glutathione Injection',
     category: 'IV Therapy & Injections',
@@ -868,6 +898,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['glow shot', 'skin brightening injection', 'antioxidant shot', 'skin lightening injection', 'immunity injection', 'glass skin injection'],
   },
   {
+    id: 'mic-blend-injection',
     slug: 'mic-blend-injection',
     name: 'MIC Blend Injection',
     category: 'IV Therapy & Injections',
@@ -895,6 +926,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['fat burner shot', 'lipotropic shot', 'metabolism injection', 'slim shot', 'hormonal balance shot', 'liver detox injection'],
   },
   {
+    id: 'lipotropic-plus',
     slug: 'lipotropic-plus',
     name: 'Lipotropic Plus Injection',
     category: 'IV Therapy & Injections',
@@ -922,6 +954,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['lipo shot', 'fat burning shot', 'weight loss injection', 'liver detox shot', 'metabolism boost shot', 'slim injection'],
   },
   {
+    id: 'ultraburn-injection',
     slug: 'ultraburn-injection',
     name: 'UltraBurn Lipotropic Injection',
     category: 'IV Therapy & Injections',
@@ -949,6 +982,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['fat burner injection', 'energy fat shot', 'blood sugar shot', 'muscle recovery injection', 'weight management shot', 'chromium injection'],
   },
   {
+    id: 'ic-lipolean',
     slug: 'ic-lipolean',
     name: 'IC LipoLean Injection',
     category: 'IV Therapy & Injections',
@@ -976,6 +1010,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['lipo shot', 'weight loss shot', 'appetite suppression injection', 'fat burning injection', 'craving control shot', 'metabolism injection'],
   },
   {
+    id: 'bpc-157',
     slug: 'bpc-157',
     name: 'BPC-157 Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
@@ -1003,6 +1038,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['healing peptide', 'joint repair peptide', 'gut healing peptide', 'anti-inflammatory peptide', 'tissue repair injection', 'body protection compound'],
   },
   {
+    id: 'ghk-cu-copper-peptide',
     slug: 'ghk-cu-copper-peptide',
     name: 'GHK-Cu Copper Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
@@ -1030,6 +1066,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['copper peptide', 'anti-aging peptide', 'collagen peptide', 'glow peptide', 'dna repair peptide', 'hair growth peptide'],
   },
   {
+    id: 'sermorelin',
     slug: 'sermorelin',
     name: 'Sermorelin Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
@@ -1057,6 +1094,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['natural hgh', 'growth hormone booster', 'hgh alternative', 'anti-aging hormone therapy', 'muscle building peptide', 'sleep improvement injection'],
   },
   {
+    id: 'nad-therapy',
     slug: 'nad-therapy',
     name: 'NAD+ IV Therapy',
     category: 'IV Therapy & Injections',
@@ -1084,6 +1122,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['nad drip', 'anti-aging iv', 'energy iv drip', 'brain fog iv', 'longevity drip', 'cellular energy infusion', 'nad plus therapy'],
   },
   {
+    id: 'weight-loss-consultation',
     slug: 'weight-loss-consultation',
     name: 'Weight Loss Consultation',
     category: 'Weight Loss',
@@ -1111,6 +1150,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['weight loss doctor visit', 'medical weight consult', 'free weight loss consultation', 'glp1 consultation', 'supervised weight loss eval'],
   },
   {
+    id: 'weight-loss-program',
     slug: 'weight-loss-program',
     name: 'Weight Loss Program',
     category: 'Weight Loss',
@@ -1138,6 +1178,7 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['semaglutide', 'tirzepatide', 'ozempic alternative', 'wegovy alternative', 'glp-1 program', 'weight loss injections', 'medical weight loss'],
   },
   {
+    id: 'cherry-payment-plans',
     slug: 'cherry-payment-plans',
     name: 'Cherry Payment Plans',
     category: 'Financing',
@@ -1168,6 +1209,9 @@ export const SERVICES: ServiceEntry[] = [
 
 export function getServiceBySlug(slug: string): ServiceEntry | undefined {
   return SERVICES.find(s => s.slug === slug)
+}
+export function getServiceById(id: string): ServiceEntry | undefined {
+  return SERVICES.find(s => s.id === id)
 }
 
 export function getServicesByCategory(category: string): ServiceEntry[] {
