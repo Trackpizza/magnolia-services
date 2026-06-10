@@ -67,7 +67,8 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
   {
     name: 'Peptide & Anti-Aging Therapy',
     description: 'Advanced peptide protocols that work at a cellular level to support longevity, recovery, and skin health.',
-    ids: ['bpc-157', 'ghk-cu-copper-peptide', 'sermorelin', 'nad-therapy'],
+    // bpc-157 and ghk-cu-copper-peptide hidden from the directory/search (pages still exist by direct URL)
+    ids: ['sermorelin', 'nad-therapy'],
   },
   {
     name: 'Weight Loss',
