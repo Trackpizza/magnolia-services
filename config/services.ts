@@ -1,5 +1,6 @@
 export interface ServiceEntry {
   id: string
+  hidden?: boolean  // true = fully off: not in directory/search AND direct URL returns 404
   slug: string
   name: string
   category: string
@@ -1012,6 +1013,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'bpc-157',
+    hidden: true,
     slug: 'bpc-157-peptide-therapy-for-joint-pain-injury-recovery-gut-health-burbank-ca',
     name: 'BPC-157 Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
@@ -1040,6 +1042,7 @@ export const SERVICES: ServiceEntry[] = [
   },
   {
     id: 'ghk-cu-copper-peptide',
+    hidden: true,
     slug: 'ghk-cu-copper-peptide-for-collagen-loss-skin-aging-hair-loss-anti-aging-burbank-ca',
     name: 'GHK-Cu Copper Peptide Therapy',
     category: 'Peptide & Anti-Aging Therapy',
@@ -1209,7 +1212,8 @@ export const SERVICES: ServiceEntry[] = [
 ]
 
 export function getServiceBySlug(slug: string): ServiceEntry | undefined {
-  return SERVICES.find(s => s.slug === slug)
+  const s = SERVICES.find(s => s.slug === slug)
+  return s && s.hidden ? undefined : s
 }
 export function getServiceById(id: string): ServiceEntry | undefined {
   return SERVICES.find(s => s.id === id)
@@ -1220,5 +1224,5 @@ export function getServicesByCategory(category: string): ServiceEntry[] {
 }
 
 export function getAllSlugs(): string[] {
-  return SERVICES.map(s => s.slug)
+  return SERVICES.filter(s => !s.hidden).map(s => s.slug)
 }
