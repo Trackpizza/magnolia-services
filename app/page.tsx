@@ -2,7 +2,8 @@ import { getLinks } from '@/lib/links'
 import { SERVICE_CATEGORIES, SERVICES } from '@/config/services'
 import ServicesSearch from '@/components/ServicesSearch'
 
-export const revalidate = 3600
+// Render per-request so admin edits (footer links) appear immediately.
+export const dynamic = 'force-dynamic'
 
 export default async function ServicesPage() {
   const links = await getLinks()

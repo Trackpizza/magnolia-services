@@ -6,7 +6,9 @@ import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
 
-export const revalidate = 3600
+// Render per-request so admin edits (video, content) appear immediately.
+// Each request reads one small Firestore doc — cheap. No stale CDN cache.
+export const dynamic = 'force-dynamic'
 
 export async function generateStaticParams() {
   return getAllSlugs().map(slug => ({ slug }))
