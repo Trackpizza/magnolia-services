@@ -7,9 +7,9 @@ import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
 import { getYouTubeEmbedUrl } from '@/lib/youtube'
 
-// Render per-request so admin edits (video, content) appear immediately.
-// Each request reads one small Firestore doc — cheap. No stale CDN cache.
-export const dynamic = 'force-dynamic'
+// Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
+// background at most once per minute, and immediately when the admin saves (revalidate hook).
+export const revalidate = 60
 
 export async function generateStaticParams() {
   return getAllSlugs().map(slug => ({ slug }))

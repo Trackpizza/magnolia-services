@@ -1,9 +1,14 @@
 import { notFound } from 'next/navigation'
-import { getServiceBySlug } from '@/config/services'
+import { getServiceBySlug, getAllSlugs } from '@/config/services'
 import { getLinks } from '@/lib/links'
 import GuidePage from '@/components/GuidePage'
 
-export const dynamic = 'force-dynamic'
+// Cached/ISR: instant from CDN, refreshes in the background (and on admin save).
+export const revalidate = 60
+
+export function generateStaticParams() {
+  return getAllSlugs().map(slug => ({ slug }))
+}
 
 const GUIDE_TITLE = 'After Care'
 

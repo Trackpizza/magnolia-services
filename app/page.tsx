@@ -2,8 +2,9 @@ import { getLinks } from '@/lib/links'
 import { SERVICE_CATEGORIES, SERVICES } from '@/config/services'
 import ServicesSearch from '@/components/ServicesSearch'
 
-// Render per-request so admin edits (footer links) appear immediately.
-export const dynamic = 'force-dynamic'
+// Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
+// background at most once per minute, and immediately when the admin saves (revalidate hook).
+export const revalidate = 60
 
 export default async function ServicesPage() {
   const links = await getLinks()
