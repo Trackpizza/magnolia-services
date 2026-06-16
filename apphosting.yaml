@@ -1,6 +1,8 @@
 runConfig:
   concurrency: 80
-  minInstances: 0
+  # Keep one instance always warm to avoid cold-start latency on the first visit
+  # (pages are dynamic/SSR; with minInstances 0 a cold visitor waited ~4-5s).
+  minInstances: 1
 
 # All values come from Secret Manager secrets in the active project.
 # - New standalone project (magnolia-services): secrets created from the
