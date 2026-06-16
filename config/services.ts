@@ -1012,64 +1012,6 @@ export const SERVICES: ServiceEntry[] = [
     alsoKnownAs: ['lipo shot', 'weight loss shot', 'appetite suppression injection', 'fat burning injection', 'craving control shot', 'metabolism injection'],
   },
   {
-    id: 'bpc-157',
-    hidden: true,
-    slug: 'bpc-157-peptide-therapy-for-joint-pain-injury-recovery-gut-health-burbank-ca',
-    name: 'BPC-157 Peptide Therapy',
-    category: 'Peptide & Anti-Aging Therapy',
-    tagline:
-      'Regenerative peptide that accelerates tissue and joint repair, reduces inflammation, and supports gut health — promoting faster recovery and improved mobility across multiple tissue types.',
-    searchDescription:
-      'BPC-157 peptide accelerates tissue and joint repair, reduces systemic inflammation, and supports gut health — promoting faster recovery across multiple tissue types.',
-    keywords: ['bpc 157 burbank', 'peptide therapy', 'joint repair peptide', 'tissue healing injection', 'gut health peptide', 'inflammation peptide therapy'],
-    highlights: [
-      { icon: '', title: 'Accelerates tissue and joint repair', body: 'BPC-157 has demonstrated consistent tissue-healing properties across tendons, ligaments, muscle, and bone in research settings, accelerating the recovery timeline for injuries and overuse conditions.' },
-      { icon: '', title: 'Reduces systemic inflammation', body: 'BPC-157 modulates multiple inflammatory signaling pathways, reducing pro-inflammatory cytokines and supporting a more controlled healing response throughout the body.' },
-      { icon: '', title: 'Supports gut lining integrity', body: 'BPC-157 was originally identified for its gastric protective properties; it supports the integrity of the gastrointestinal mucosal lining and promotes healing of inflammatory gut conditions.' },
-      { icon: '', title: 'Improves mobility and recovery time', body: 'By accelerating the repair of connective tissue and reducing inflammation at injury sites, BPC-157 supports faster return to full mobility and reduced post-exercise recovery time.' },
-      { icon: '', title: 'Versatile healing peptide with broad tissue applicability', body: 'BPC-157\'s healing effects have been observed across diverse tissue types — musculoskeletal, gastrointestinal, vascular, and neurological — making it a versatile addition to a comprehensive wellness protocol.' },
-    ],
-    treats: ['Joint Pain', 'Tissue Injury', 'Inflammation', 'Gut Health', 'Post-Exercise Recovery', 'Wound Healing'],
-    howItWorks: [
-      {
-        step: '1',
-        title: 'How It Works',
-        body: 'BPC-157 (Body Protection Compound) is a pentadecapeptide derived from a protein found in gastric juice. It promotes angiogenesis through vascular endothelial growth factor (VEGF) pathways, modulates nitric oxide synthesis to improve blood flow and reduce oxidative stress, and activates growth hormone receptor signaling in musculoskeletal tissue — accelerating healing in tendons, ligaments, muscle, and cartilage. Its gastric origin confers direct protective effects on the gastrointestinal lining, making it effective for inflammatory gut conditions. The anti-inflammatory effects are mediated through reduction of pro-inflammatory cytokine activity, contributing to a more controlled and efficient healing response throughout the body.',
-      },
-    ],
-    disclaimer: DISCLAIMER,
-    alsoKnownAs: ['healing peptide', 'joint repair peptide', 'gut healing peptide', 'anti-inflammatory peptide', 'tissue repair injection', 'body protection compound'],
-  },
-  {
-    id: 'ghk-cu-copper-peptide',
-    hidden: true,
-    slug: 'ghk-cu-copper-peptide-for-collagen-loss-skin-aging-hair-loss-anti-aging-burbank-ca',
-    name: 'GHK-Cu Copper Peptide Therapy',
-    category: 'Peptide & Anti-Aging Therapy',
-    tagline:
-      'GHK-Cu copper peptide stimulates collagen, repairs DNA, promotes blood vessel regrowth, and supports hair follicle health — delivering comprehensive cellular repair and rejuvenation.',
-    searchDescription:
-      'GHK-Cu copper peptide therapy stimulates collagen, repairs DNA, promotes angiogenesis, and supports hair follicle health — comprehensive cellular rejuvenation.',
-    keywords: ['ghk cu peptide', 'copper peptide therapy burbank', 'collagen peptide injection', 'dna repair peptide', 'hair follicle peptide', 'cellular rejuvenation injection'],
-    highlights: [
-      { icon: '', title: 'Stimulates collagen and elastin production', body: 'GHK-Cu activates fibroblasts to produce collagen type I, III, and IV, as well as elastin, supporting structural tissue integrity throughout the body.' },
-      { icon: '', title: 'Supports DNA repair mechanisms', body: 'GHK-Cu upregulates genes involved in DNA repair and antioxidant enzyme systems, contributing to improved cellular integrity and reduced age-related DNA damage accumulation.' },
-      { icon: '', title: 'Promotes angiogenesis — new blood vessel formation', body: 'GHK-Cu promotes the formation of new blood vessels in target tissues, improving circulation and nutrient delivery to skin, hair follicles, and healing tissue.' },
-      { icon: '', title: 'Supports hair follicle health and growth', body: 'The angiogenic and growth-factor-activating properties of GHK-Cu make it a valuable adjunct for hair restoration protocols, supporting follicle vascularity and activity.' },
-      { icon: '', title: 'Broad systemic cellular benefits', body: 'GHK-Cu influences the expression of over 4,000 human genes, affecting pathways involved in tissue repair, inflammation regulation, and cellular metabolism.' },
-    ],
-    treats: ['Collagen Loss', 'DNA Damage', 'Poor Wound Healing', 'Hair Loss', 'Skin Aging', 'Cellular Decline'],
-    howItWorks: [
-      {
-        step: '1',
-        title: 'How It Works',
-        body: 'GHK-Cu (glycyl-L-histidyl-L-lysine copper) is a naturally occurring copper peptide complex that declines significantly with age. It activates collagen and elastin synthesis by stimulating fibroblasts, upregulates antioxidant enzyme systems to reduce oxidative cellular damage, promotes angiogenesis through vascular endothelial growth factor pathways, and activates DNA repair enzymes. Research has demonstrated that GHK-Cu influences the expression of over 4,000 human genes, with broad effects on tissue repair, anti-inflammatory signaling, hair follicle cycling, and cellular metabolic function — delivering regenerative effects across skin, hair, and systemic tissue in a single peptide compound.',
-      },
-    ],
-    disclaimer: DISCLAIMER,
-    alsoKnownAs: ['copper peptide', 'anti-aging peptide', 'collagen peptide', 'glow peptide', 'dna repair peptide', 'hair growth peptide'],
-  },
-  {
     id: 'sermorelin',
     slug: 'sermorelin-peptide-therapy-for-low-energy-muscle-loss-poor-sleep-natural-hgh-burbank-ca',
     name: 'Sermorelin Peptide Therapy',
