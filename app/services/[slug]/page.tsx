@@ -41,6 +41,9 @@ export default async function ServicePage({ params }: Props) {
   const prepContent = links.prepContent[service.id] ?? ''
   const afterCareVideo = links.afterCareVideos[service.id] ?? ''
   const afterCareContent = links.afterCareContent[service.id] ?? ''
+  // Show a guide link only when that guide has a video or text
+  const hasPrep = !!(prepVideo.trim() || prepContent.trim())
+  const hasAfterCare = !!(afterCareVideo.trim() || afterCareContent.trim())
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -172,11 +175,31 @@ export default async function ServicePage({ params }: Props) {
       {/* Custom editable content (admin-managed markdown) */}
       <ServiceContent markdown={customContent} />
 
-      {/* Pre-Treatment & Planning Guide (admin-managed video + markdown) */}
-      <ServiceContent title="Pre-Treatment & Planning Guide" videoUrl={prepVideo} markdown={prepContent} />
-
-      {/* After Care (admin-managed video + markdown) */}
-      <ServiceContent title="After Care" videoUrl={afterCareVideo} markdown={afterCareContent} />
+      {/* Guide links → dedicated Pre-Treatment / After Care pages (shown when that guide has content) */}
+      {(hasPrep || hasAfterCare) && (
+        <section className="max-w-5xl mx-auto px-6 py-6">
+          <div className="grid sm:grid-cols-2 gap-4">
+            {hasPrep && (
+              <Link href={`/services/${service.slug}/pre-treatment`} className="group flex items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-300 hover:shadow-sm transition-all">
+                <div>
+                  <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Guide</p>
+                  <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Pre-Treatment &amp; Planning Guide</p>
+                </div>
+                <span className="text-brand-600 text-xl shrink-0 group-hover:translate-x-1 transition-transform">&rarr;</span>
+              </Link>
+            )}
+            {hasAfterCare && (
+              <Link href={`/services/${service.slug}/after-care`} className="group flex items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-300 hover:shadow-sm transition-all">
+                <div>
+                  <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Guide</p>
+                  <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>After Care</p>
+                </div>
+                <span className="text-brand-600 text-xl shrink-0 group-hover:translate-x-1 transition-transform">&rarr;</span>
+              </Link>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* CTA */}
       <ServiceCTA
