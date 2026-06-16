@@ -5,6 +5,7 @@ import { getLinks } from '@/lib/links'
 import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
+import { getYouTubeEmbedUrl } from '@/lib/youtube'
 
 // Render per-request so admin edits (video, content) appear immediately.
 // Each request reads one small Firestore doc — cheap. No stale CDN cache.
@@ -12,17 +13,6 @@ export const dynamic = 'force-dynamic'
 
 export async function generateStaticParams() {
   return getAllSlugs().map(slug => ({ slug }))
-}
-
-function getYouTubeEmbedUrl(url: string): string | null {
-  if (!url) return null
-  // Handle youtu.be/ID
-  const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/)
-  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`
-  // Handle youtube.com/watch?v=ID
-  const longMatch = url.match(/youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/)
-  if (longMatch) return `https://www.youtube.com/embed/${longMatch[1]}`
-  return null
 }
 
 interface Props {
@@ -47,6 +37,10 @@ export default async function ServicePage({ params }: Props) {
   const videoUrl = links.videos[service.id] ?? ''
   const embedUrl = getYouTubeEmbedUrl(videoUrl)
   const customContent = links.content[service.id] ?? ''
+  const prepVideo = links.prepVideos[service.id] ?? ''
+  const prepContent = links.prepContent[service.id] ?? ''
+  const afterCareVideo = links.afterCareVideos[service.id] ?? ''
+  const afterCareContent = links.afterCareContent[service.id] ?? ''
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -177,6 +171,12 @@ export default async function ServicePage({ params }: Props) {
 
       {/* Custom editable content (admin-managed markdown) */}
       <ServiceContent markdown={customContent} />
+
+      {/* Pre-Treatment & Planning Guide (admin-managed video + markdown) */}
+      <ServiceContent title="Pre-Treatment & Planning Guide" videoUrl={prepVideo} markdown={prepContent} />
+
+      {/* After Care (admin-managed video + markdown) */}
+      <ServiceContent title="After Care" videoUrl={afterCareVideo} markdown={afterCareContent} />
 
       {/* CTA */}
       <ServiceCTA

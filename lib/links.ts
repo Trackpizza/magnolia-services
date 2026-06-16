@@ -22,6 +22,10 @@ export async function getLinks(): Promise<ServiceLinks> {
       serviceFooter,
       videos: data.videos ?? {},
       content: data.content ?? {},
+      prepVideos: data.prepVideos ?? {},
+      prepContent: data.prepContent ?? {},
+      afterCareVideos: data.afterCareVideos ?? {},
+      afterCareContent: data.afterCareContent ?? {},
     }
   } catch {
     return DEFAULT_LINKS

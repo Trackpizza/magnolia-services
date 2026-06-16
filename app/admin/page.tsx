@@ -83,6 +83,53 @@ function FooterLinksEditor({ links, onAdd, onUpdate, onRemove }: {
   )
 }
 
+// Per-service editor with a YouTube URL + a Markdown box for each service.
+// Used by the Pre-Treatment & Planning and After Care sections.
+function GuideEditor({ title, description, videos, content, onVideo, onContent, saveButton }: {
+  title: string
+  description: string
+  videos: Record<string, string>
+  content: Record<string, string>
+  onVideo: (id: string, val: string) => void
+  onContent: (id: string, val: string) => void
+  saveButton: React.ReactNode
+}) {
+  return (
+    <section className="bg-white rounded-2xl border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-2">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+          <p className="text-sm text-gray-500 mt-0.5">{description}</p>
+        </div>
+        {saveButton}
+      </div>
+      <p className="text-xs text-gray-400 mb-5">For each service: paste a YouTube URL (optional) and/or write Markdown. Blank fields are hidden on the page. Shows below the main description, before the footer.</p>
+      <div className="space-y-8">
+        {SERVICE_LIST.map(({ id, name }) => (
+          <div key={id} className="border-t border-gray-100 pt-5 first:border-t-0 first:pt-0">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">{name}</label>
+            <input
+              type="text"
+              value={videos[id] ?? ''}
+              onChange={e => onVideo(id, e.target.value)}
+              placeholder="YouTube URL (optional) — https://youtube.com/watch?v=..."
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+            <textarea
+              value={content[id] ?? ''}
+              onChange={e => onContent(id, e.target.value)}
+              placeholder="Markdown text (optional)"
+              rows={5}
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-mono leading-relaxed focus:outline-none focus:ring-2 focus:ring-brand-500"
+            />
+          </div>
+        ))}
+      </div>
+      <div className="mt-5 flex justify-end">{saveButton}</div>
+    </section>
+  )
+}
+
 export default function AdminPage() {
   const [password, setPassword] = useState('')
   const [authed, setAuthed] = useState(false)
@@ -109,6 +156,10 @@ export default function AdminPage() {
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
         content: data.content ?? {},
+        prepVideos: data.prepVideos ?? {},
+        prepContent: data.prepContent ?? {},
+        afterCareVideos: data.afterCareVideos ?? {},
+        afterCareContent: data.afterCareContent ?? {},
       }))
     } else {
       setAuthError('Incorrect password')
@@ -125,6 +176,10 @@ export default function AdminPage() {
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
         content: data.content ?? {},
+        prepVideos: data.prepVideos ?? {},
+        prepContent: data.prepContent ?? {},
+        afterCareVideos: data.afterCareVideos ?? {},
+        afterCareContent: data.afterCareContent ?? {},
       }))
     }
     setLoading(false)
@@ -173,6 +228,11 @@ export default function AdminPage() {
 
   const updateContent = (slug: string, md: string) =>
     setLinks(l => ({ ...l, content: { ...l.content, [slug]: md } }))
+
+  // Generic per-id updater for the Pre-Treatment / After Care string maps
+  type MapKey = 'prepVideos' | 'prepContent' | 'afterCareVideos' | 'afterCareContent'
+  const updateMap = (mapKey: MapKey, id: string, val: string) =>
+    setLinks(l => ({ ...l, [mapKey]: { ...l[mapKey], [id]: val } }))
 
   // ── Login screen ────────────────────────────────────────────────────────
   if (!authed) {
@@ -348,6 +408,28 @@ export default function AdminPage() {
             <SaveButton section="content" onClick={() => save('content', { content: links.content })} />
           </div>
         </section>
+
+        {/* ── Pre-Treatment & Planning Guide ──────────────────── */}
+        <GuideEditor
+          title="Pre-Treatment & Planning Guide"
+          description="Video + Markdown shown on each service page (after the description, before the footer)."
+          videos={links.prepVideos}
+          content={links.prepContent}
+          onVideo={(id, v) => updateMap('prepVideos', id, v)}
+          onContent={(id, v) => updateMap('prepContent', id, v)}
+          saveButton={<SaveButton section="prep" onClick={() => save('prep', { prepVideos: links.prepVideos, prepContent: links.prepContent })} />}
+        />
+
+        {/* ── After Care ──────────────────────────────────────── */}
+        <GuideEditor
+          title="After Care"
+          description="Video + Markdown shown on each service page (after Pre-Treatment, before the footer)."
+          videos={links.afterCareVideos}
+          content={links.afterCareContent}
+          onVideo={(id, v) => updateMap('afterCareVideos', id, v)}
+          onContent={(id, v) => updateMap('afterCareContent', id, v)}
+          saveButton={<SaveButton section="aftercare" onClick={() => save('aftercare', { afterCareVideos: links.afterCareVideos, afterCareContent: links.afterCareContent })} />}
+        />
 
       </div>
     </div>
