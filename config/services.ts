@@ -58,7 +58,7 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
   {
     name: 'Chemical Peels',
     description: 'Medical-grade peels for tone, texture, pigmentation, and radiance — with minimal downtime.',
-    ids: ['prx-derm-perfexion', 'prx-plus-brightening', 'sensi-peel', 'ultra-peel', 'pigment-peel'],
+    ids: ['prx-derm-perfexion', 'prx-plus-brightening', 'prx-c-plus-brightening', 'sensi-peel', 'ultra-peel', 'pigment-peel'],
   },
   {
     name: 'IV Therapy & Injections',
@@ -758,6 +758,34 @@ export const SERVICES: ServiceEntry[] = [
     ],
     disclaimer: DISCLAIMER,
     alsoKnownAs: ['pregnancy mask treatment', 'melasma facial', 'brown spots no peel', 'hormonal dark patches', 'brightening treatment', 'no downtime brightening'],
+  },
+  {
+    id: 'prx-c-plus-brightening',
+    slug: 'prx-c-plus-brightening-for-dark-spots-melasma-sun-damage-uneven-skin-tone-burbank-ca',
+    name: 'PRX C-PLUS Brightening',
+    category: 'PRX Therapy',
+    tagline:
+      'Patented 15-minute liquid skin treatment infused with Vitamin C that gets rid of stubborn dark spots, melasma, and sun damage deep within the skin layers — giving you an instant, radiant glow with absolutely zero peeling and zero downtime.',
+    searchDescription:
+      'PRX C-PLUS is a patented 15-minute, no-peel Vitamin C treatment that fades stubborn dark spots, melasma, and sun damage deep in the skin — instant radiant glow, zero downtime, safe for all skin tones.',
+    keywords: ['prx c-plus burbank', 'vitamin c brightening treatment', 'no peel melasma treatment', 'dark spot treatment burbank', '15 minute glow facial', 'sun damage treatment', 'hyperpigmentation no downtime'],
+    highlights: [
+      { icon: '', title: 'Erases stubborn dark spots and melasma where they start', body: 'Instead of just scrubbing the surface of your skin, PRX C-PLUS travels deep into your skin cells to shut down the overactive pigment engines causing your chronic dark patches.' },
+      { icon: '', title: 'Gives you an instant, long-lasting radiant glow', body: 'The addition of high-strength Vitamin C works like an immediate shot of brightness, leaving your skin looking visibly refreshed, hydrated, and glowing the exact same day.' },
+      { icon: '', title: 'Tightens your skin and smooths lines with zero peeling', body: 'While it clears up your uneven skin tone, this treatment goes deep to trigger new collagen growth. You get the skin-firming benefits of a deep peel without your face flaking or shedding off.' },
+      { icon: '', title: 'Zero downtime — perfect for busy schedules', body: 'This is a quick, 15-minute \'glow-and-go\' treatment. Because it leaves the outer surface of your face completely intact, you can apply makeup, head right back to work, or go to a dinner party immediately after your visit.' },
+      { icon: '', title: 'Completely safe for all skin types, year-round', body: 'Unlike older lasers or traditional harsh chemical peels that can cause scarring or reverse dark marks on deeper complexions, PRX C-PLUS is safe for all skin tones and can be done safely even during hot summer months.' },
+    ],
+    treats: ['Stubborn Dark Spots & Sun Damage', 'Hormonal Melasma & Dark Patches', 'Uneven Skin Tone & Patchiness', 'Dull, Tired-Looking Complexion', 'Dark Marks from Old Acne Breakouts', 'Large Pores & Rough Skin Texture'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'PRX C-PLUS delivers a powerful, deeply penetrating liquid formula that gently absorbs through the top layer of your skin in just 15 minutes without disturbing the surface. Once inside, high-potency Vitamin C pairs with a patented biostimulator to actively block the skin enzymes responsible for overproducing dark pigment — this double-action process immediately starts fading dark spots and evening out patchiness across multiple skin layers simultaneously. While the brightening mechanism is actively erasing discoloration, the formula safely signals your deep cells to jumpstart fresh collagen production, giving you a dual-action result — fading your most frustrating dark patches while completely smoothing out your skin structure — all in a single, comfortable 15-minute visit with zero redness, zero raw flaking, and zero downtime.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['15-minute glow facial', 'no-peel melasma treatment', 'vitamin c brightening booster', 'hormonal dark patch facial', 'lunch break skin rejuvenation', 'sun damage eraser'],
   },
   {
     id: 'sensi-peel',
