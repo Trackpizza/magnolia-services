@@ -240,7 +240,22 @@ export default function ServicesSearch({ categories, membershipUrl }: {
                       className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
                       <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
                       {hits.length > 0 && (
-                        <p className="text-xs font-medium text-brand-600 mb-2">Addresses: {hits.join(', ')}</p>
+                        <div className="mb-3">
+                          {selected.length > 1 && (
+                            <p className="text-xs font-semibold text-brand-700 mb-1.5 flex items-center gap-1">
+                              <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                              Addresses {hits.length} of your {selected.length} concerns
+                            </p>
+                          )}
+                          <div className="flex flex-wrap gap-1.5">
+                            {hits.map(h => (
+                              <span key={h} className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full bg-brand-50 text-brand-700 border border-brand-100">
+                                <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                {h}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
                       )}
                       <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
                       {service.href && (
