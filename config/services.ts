@@ -1197,10 +1197,16 @@ export function getAllSlugs(): string[] {
   return SERVICES.filter(s => !s.hidden).map(s => s.slug)
 }
 
-// Categories whose "concerns" aren't visual skin/aesthetic issues — excluded from the /spin game.
-const SPINNER_EXCLUDED_CATEGORIES = ['IV Therapy & Injections', 'Peptide & Anti-Aging Therapy', 'Weight Loss', 'Financing']
+// Excluded from the /spin game: Financing (payment plans) + the Weight Loss Consultation
+// (its "concerns" are process steps, not symptoms). The Weight Loss Program stays in.
+const SPINNER_EXCLUDED_CATEGORIES = ['Financing']
+const SPINNER_EXCLUDED_IDS = ['weight-loss-consultation']
 
-// Skin & aesthetic treatments eligible for the "guess the treatment" spinner.
+// Treatments eligible for the "guess the treatment" spinner.
 export function getSpinnerServices(): ServiceEntry[] {
-  return SERVICES.filter(s => !s.hidden && !SPINNER_EXCLUDED_CATEGORIES.includes(s.category))
+  return SERVICES.filter(s =>
+    !s.hidden &&
+    !SPINNER_EXCLUDED_CATEGORIES.includes(s.category) &&
+    !SPINNER_EXCLUDED_IDS.includes(s.id)
+  )
 }
