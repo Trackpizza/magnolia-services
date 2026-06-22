@@ -1,5 +1,5 @@
 'use client'
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Fuse from 'fuse.js'
 
@@ -21,8 +21,6 @@ interface FlatService extends Service {
   categoryDescription: string
 }
 
-// Each concern is a friendly label + the terms to look for in a treatment's text
-// (name + keywords + also-known-as + what-it-treats). Match = any term is a substring.
 interface Concern { label: string; match: string[] }
 const CONCERN_GROUPS: { group: string; concerns: Concern[] }[] = [
   { group: 'Face & aging', concerns: [
@@ -82,13 +80,14 @@ export default function ServicesSearch({ categories, membershipUrl }: {
 }) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string[]>([])
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const resultsRef = useRef<HTMLDivElement>(null)
 
   const flatServices = useMemo<FlatService[]>(() =>
     categories.flatMap(cat =>
       cat.services.map(s => ({ ...s, categoryName: cat.name, categoryDescription: cat.description }))
     ), [categories])
 
-  // Lowercased searchable text per service (name + keywords/aka/treats)
   const corpus = useMemo(() => {
     const map = new Map<string, string>()
     flatServices.forEach(s => map.set(s.name, (s.name + ' ' + (s.keywords ?? []).join(' ')).toLowerCase()))
@@ -127,7 +126,6 @@ export default function ServicesSearch({ categories, membershipUrl }: {
 
   const isFiltering = query.trim().length > 0 || selected.length > 0
 
-  // Flat, ranked results when filtering by text and/or concerns
   const ranked = useMemo(() => {
     if (!isFiltering) return []
     const q = query.trim()
@@ -140,10 +138,17 @@ export default function ServicesSearch({ categories, membershipUrl }: {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, selected, fuse, flatServices, isFiltering])
 
+  // When concerns change, bring the results into view (only scrolls if off-screen)
+  useEffect(() => {
+    if (selected.length > 0 && resultsRef.current) {
+      resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [selected])
+
   return (
     <>
       {/* Search bar */}
-      <div className="max-w-2xl mx-auto px-6 pb-6">
+      <div className="max-w-2xl mx-auto px-6 pb-4">
         <div className="relative">
           <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
             fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,7 +158,7 @@ export default function ServicesSearch({ categories, membershipUrl }: {
             type="text"
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Type a concern, or tap your concerns below…"
+            placeholder="Search a concern, e.g. jowls, melasma, hair loss…"
             className="w-full pl-12 pr-10 py-4 rounded-2xl border border-gray-200 bg-white text-gray-900 text-base placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
           {query && (
@@ -166,119 +171,127 @@ export default function ServicesSearch({ categories, membershipUrl }: {
             </button>
           )}
         </div>
-      </div>
 
-      {/* Concern chips (multi-select) */}
-      <div className="max-w-3xl mx-auto px-6 pb-8">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <p className="text-sm text-gray-400">Tap the concerns that apply — pick as many as you like</p>
-          {selected.length > 0 && (
-            <button onClick={() => setSelected([])}
-              className="text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
-              Clear ({selected.length})
-            </button>
-          )}
+        {/* Selected concerns (removable) */}
+        {selected.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            {selected.map(label => (
+              <button key={label} onClick={() => toggle(label)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-full bg-brand-600 text-white hover:bg-brand-700 transition-colors">
+                {label}
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            ))}
+            <button onClick={() => setSelected([])} className="text-sm font-medium text-gray-500 hover:text-gray-700 px-2 transition-colors">Clear all</button>
+          </div>
+        )}
+
+        {/* Picker toggle */}
+        <div className="mt-4 flex justify-center">
+          <button onClick={() => setPickerOpen(o => !o)}
+            className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
+            {selected.length > 0 ? 'Add or edit concerns' : 'Not sure? Find your treatment by concern'}
+            <svg className={`w-4 h-4 transition-transform ${pickerOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+          </button>
         </div>
-        <div className="space-y-3">
-          {CONCERN_GROUPS.map(g => (
-            <div key={g.group} className="flex flex-wrap items-center justify-center gap-2">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest w-full text-center sm:w-auto sm:text-left">{g.group}</span>
-              {g.concerns.map(c => {
-                const on = selected.includes(c.label)
-                return (
-                  <button key={c.label} onClick={() => toggle(c.label)}
-                    className={`px-3 py-1.5 text-sm rounded-full border transition-colors cursor-pointer ${
-                      on
-                        ? 'bg-brand-600 border-brand-600 text-white'
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-brand-500 hover:text-brand-600'
-                    }`}>
-                    {c.label}
-                  </button>
-                )
-              })}
-            </div>
-          ))}
-        </div>
-        {isFiltering && (
-          <p className="mt-5 text-sm text-gray-500 text-center">
-            {ranked.length === 0
-              ? 'No treatments match — try fewer or different concerns'
-              : `${ranked.length} treatment${ranked.length !== 1 ? 's' : ''}${selected.length ? ' for your concerns' : ''}`}
-          </p>
+
+        {/* Concern picker (collapsed by default) */}
+        {pickerOpen && (
+          <div className="mt-4 space-y-3">
+            {CONCERN_GROUPS.map(g => (
+              <div key={g.group} className="flex flex-wrap items-center justify-center gap-2">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest w-full text-center sm:w-auto sm:text-left">{g.group}</span>
+                {g.concerns.map(c => {
+                  const on = selected.includes(c.label)
+                  return (
+                    <button key={c.label} onClick={() => toggle(c.label)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors cursor-pointer ${
+                        on ? 'bg-brand-600 border-brand-600 text-white' : 'bg-white border-gray-200 text-gray-600 hover:border-brand-500 hover:text-brand-600'
+                      }`}>
+                      {c.label}
+                    </button>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
       {/* Results */}
-      {isFiltering ? (
-        ranked.length === 0 ? (
-          <div className="max-w-6xl mx-auto px-6 pb-24 text-center py-10">
-            <button onClick={() => { setQuery(''); setSelected([]) }}
-              className="text-sm text-brand-600 hover:text-brand-700 font-medium transition-colors">
-              Clear all
-            </button>
-          </div>
-        ) : (
-          <section className="max-w-6xl mx-auto px-6 pb-24">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {ranked.map(service => {
-                const hits = selected.length ? matchedConcerns(service) : []
-                return (
-                  <div key={service.name}
-                    className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
-                    <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
-                    {hits.length > 0 && (
-                      <p className="text-xs font-medium text-brand-600 mb-2">Addresses: {hits.join(', ')}</p>
-                    )}
-                    <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
-                    {service.href && (
-                      <Link href={service.href}
-                        className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
-                        Learn more →
-                      </Link>
-                    )}
-                  </div>
-                )
-              })}
+      <div ref={resultsRef} className="scroll-mt-4">
+        {isFiltering ? (
+          ranked.length === 0 ? (
+            <div className="max-w-6xl mx-auto px-6 pb-24 text-center py-10">
+              <p className="text-gray-400 mb-3">No treatments match — try fewer or different concerns</p>
+              <button onClick={() => { setQuery(''); setSelected([]) }}
+                className="text-sm text-brand-600 hover:text-brand-700 font-medium transition-colors">Clear all</button>
             </div>
-          </section>
-        )
-      ) : (
-        /* Default browse — grouped by category */
-        <section className="max-w-6xl mx-auto px-6 pb-24 space-y-16">
-          {categories.map(category => (
-            <div key={category.name}>
-              <div className="mb-8 pb-4 border-b border-gray-200">
-                <h3 className="text-3xl font-semibold text-plum-900 mb-1"
-                  style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
-                  {category.name}
-                </h3>
-                <p className="text-gray-500 text-base">{category.description}</p>
-              </div>
+          ) : (
+            <section className="max-w-6xl mx-auto px-6 pb-24">
+              <p className="text-sm text-gray-500 text-center mb-6">
+                {ranked.length} treatment{ranked.length !== 1 ? 's' : ''}{selected.length ? ' for your concerns' : ''}
+              </p>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {category.services.map(service => (
-                  <div key={service.name}
-                    className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
-                    <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
-                    <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
-                    {service.href && (
-                      <Link href={service.href}
-                        className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
-                        Learn more →
-                      </Link>
-                    )}
-                  </div>
-                ))}
+                {ranked.map(service => {
+                  const hits = selected.length ? matchedConcerns(service) : []
+                  return (
+                    <div key={service.name}
+                      className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
+                      <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
+                      {hits.length > 0 && (
+                        <p className="text-xs font-medium text-brand-600 mb-2">Addresses: {hits.join(', ')}</p>
+                      )}
+                      <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
+                      {service.href && (
+                        <Link href={service.href}
+                          className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
+                          Learn more →
+                        </Link>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
-              <div className="mt-6 text-right">
-                <a href={membershipUrl}
-                  className="text-sm text-brand-600 hover:text-brand-700 transition-colors">
-                  Apply membership credits toward these services →
-                </a>
+            </section>
+          )
+        ) : (
+          <section className="max-w-6xl mx-auto px-6 pb-24 space-y-16 pt-4">
+            {categories.map(category => (
+              <div key={category.name}>
+                <div className="mb-8 pb-4 border-b border-gray-200">
+                  <h3 className="text-3xl font-semibold text-plum-900 mb-1"
+                    style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+                    {category.name}
+                  </h3>
+                  <p className="text-gray-500 text-base">{category.description}</p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {category.services.map(service => (
+                    <div key={service.name}
+                      className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
+                      <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
+                      <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
+                      {service.href && (
+                        <Link href={service.href}
+                          className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
+                          Learn more →
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 text-right">
+                  <a href={membershipUrl}
+                    className="text-sm text-brand-600 hover:text-brand-700 transition-colors">
+                    Apply membership credits toward these services →
+                  </a>
+                </div>
               </div>
-            </div>
-          ))}
-        </section>
-      )}
+            ))}
+          </section>
+        )}
+      </div>
     </>
   )
 }
