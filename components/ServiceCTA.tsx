@@ -32,7 +32,7 @@ export default function ServiceCTA({ headline, address, bookingUrl, membershipUr
 
         <div className="border border-white/15 rounded-2xl px-8 py-6 max-w-lg mx-auto flex flex-col items-center gap-4 text-center">
           <div>
-            <p className="text-white text-sm font-semibold leading-snug">Not sure which plan is right for you?</p>
+            <p className="text-white text-sm font-semibold leading-snug">Not sure what treatment is right for you?</p>
             <p className="text-white/50 text-xs mt-0.5">Book a complimentary 15-minute video call with our team.</p>
           </div>
           <a
