@@ -50,7 +50,7 @@ export default async function ServicesPage() {
           Our Services
         </h1>
         <p className="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
-          Browse all treatments, search by concern, or tap a service to learn more and watch it in action.
+          Browse all treatments, search by concern, or tap any service to watch Dr. David and Nurse Eileen explain it in detail.
         </p>
       </section>
 
