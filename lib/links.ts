@@ -24,8 +24,10 @@ export async function getLinks(): Promise<ServiceLinks> {
       videoDates: data.videoDates ?? {},
       content: data.content ?? {},
       prepVideos: data.prepVideos ?? {},
+      prepVideoDates: data.prepVideoDates ?? {},
       prepContent: data.prepContent ?? {},
       afterCareVideos: data.afterCareVideos ?? {},
+      afterCareVideoDates: data.afterCareVideoDates ?? {},
       afterCareContent: data.afterCareContent ?? {},
     }
   } catch {

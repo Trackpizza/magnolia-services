@@ -23,8 +23,10 @@ export interface ServiceLinks {
   videoDates: Record<string, string>  // id → upload date (YYYY-MM-DD) for VideoObject structured data
   content: Record<string, string>  // id → markdown shown under "How it works" (empty = hide)
   prepVideos: Record<string, string>     // id → Pre-Treatment & Planning Guide video
+  prepVideoDates: Record<string, string> // id → prep video upload date (YYYY-MM-DD) for VideoObject
   prepContent: Record<string, string>    // id → Pre-Treatment & Planning Guide markdown
   afterCareVideos: Record<string, string>  // id → After Care video
+  afterCareVideoDates: Record<string, string> // id → after-care video upload date for VideoObject
   afterCareContent: Record<string, string> // id → After Care markdown
 }
 
@@ -48,7 +50,9 @@ export const DEFAULT_LINKS: ServiceLinks = {
   videoDates: {},
   content: {},
   prepVideos: {},
+  prepVideoDates: {},
   prepContent: {},
   afterCareVideos: {},
+  afterCareVideoDates: {},
   afterCareContent: {},
 }

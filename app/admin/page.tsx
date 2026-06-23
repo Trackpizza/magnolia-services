@@ -100,12 +100,14 @@ function FooterLinksEditor({ links, onAdd, onUpdate, onRemove }: {
 
 // Per-service editor with a YouTube URL + a Markdown box for each service.
 // Used by the Pre-Treatment & Planning and After Care sections.
-function GuideEditor({ title, description, videos, content, onVideo, onContent, saveButton }: {
+function GuideEditor({ title, description, videos, dates, content, onVideo, onDate, onContent, saveButton }: {
   title: string
   description: string
   videos: Record<string, string>
+  dates: Record<string, string>
   content: Record<string, string>
   onVideo: (id: string, val: string) => void
+  onDate: (id: string, val: string) => void
   onContent: (id: string, val: string) => void
   saveButton: React.ReactNode
 }) {
@@ -123,13 +125,23 @@ function GuideEditor({ title, description, videos, content, onVideo, onContent, 
         {SERVICE_LIST.map(({ id, name }) => (
           <div key={id} className="border-t border-gray-100 pt-5 first:border-t-0 first:pt-0">
             <label className="block text-sm font-semibold text-gray-900 mb-2">{name}</label>
-            <input
-              type="text"
-              value={videos[id] ?? ''}
-              onChange={e => onVideo(id, e.target.value)}
-              placeholder="YouTube URL (optional) — https://youtube.com/watch?v=..."
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
-            />
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={videos[id] ?? ''}
+                onChange={e => onVideo(id, e.target.value)}
+                placeholder="YouTube URL (optional) — https://youtube.com/watch?v=..."
+                className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <input
+                type="date"
+                value={dates[id] ?? ''}
+                onChange={e => onDate(id, e.target.value)}
+                disabled={(videos[id] ?? '').trim() === ''}
+                title="Video upload date (used for Google video search)"
+                className="w-40 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-300"
+              />
+            </div>
             <textarea
               value={content[id] ?? ''}
               onChange={e => onContent(id, e.target.value)}
@@ -173,8 +185,10 @@ export default function AdminPage() {
         videoDates: backfillVideoDates(data.videos ?? {}, data.videoDates ?? {}),
         content: data.content ?? {},
         prepVideos: data.prepVideos ?? {},
+        prepVideoDates: backfillVideoDates(data.prepVideos ?? {}, data.prepVideoDates ?? {}),
         prepContent: data.prepContent ?? {},
         afterCareVideos: data.afterCareVideos ?? {},
+        afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
         afterCareContent: data.afterCareContent ?? {},
       }))
     } else {
@@ -194,8 +208,10 @@ export default function AdminPage() {
         videoDates: backfillVideoDates(data.videos ?? {}, data.videoDates ?? {}),
         content: data.content ?? {},
         prepVideos: data.prepVideos ?? {},
+        prepVideoDates: backfillVideoDates(data.prepVideos ?? {}, data.prepVideoDates ?? {}),
         prepContent: data.prepContent ?? {},
         afterCareVideos: data.afterCareVideos ?? {},
+        afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
         afterCareContent: data.afterCareContent ?? {},
       }))
     }
@@ -260,6 +276,28 @@ export default function AdminPage() {
   type MapKey = 'prepVideos' | 'prepContent' | 'afterCareVideos' | 'afterCareContent'
   const updateMap = (mapKey: MapKey, id: string, val: string) =>
     setLinks(l => ({ ...l, [mapKey]: { ...l[mapKey], [id]: val } }))
+
+  // Guide video updaters that also auto-stamp the upload date (for VideoObject)
+  type GuideKind = 'prep' | 'afterCare'
+  const updateGuideVideo = (kind: GuideKind, id: string, url: string) =>
+    setLinks(l => {
+      const vKey = kind === 'prep' ? 'prepVideos' : 'afterCareVideos'
+      const dKey = kind === 'prep' ? 'prepVideoDates' : 'afterCareVideoDates'
+      return {
+        ...l,
+        [vKey]: { ...l[vKey], [id]: url },
+        [dKey]: url.trim() && !l[dKey][id] ? { ...l[dKey], [id]: todayISO() } : l[dKey],
+      }
+    })
+
+  const updateGuideDate = (kind: GuideKind, id: string, date: string) =>
+    setLinks(l => ({
+      ...l,
+      [kind === 'prep' ? 'prepVideoDates' : 'afterCareVideoDates']: {
+        ...l[kind === 'prep' ? 'prepVideoDates' : 'afterCareVideoDates'],
+        [id]: date,
+      },
+    }))
 
   // ── Login screen ────────────────────────────────────────────────────────
   if (!authed) {
@@ -452,10 +490,12 @@ export default function AdminPage() {
           title="Pre-Treatment & Planning Guide"
           description="Video + Markdown shown on each service page (after the description, before the footer)."
           videos={links.prepVideos}
+          dates={links.prepVideoDates}
           content={links.prepContent}
-          onVideo={(id, v) => updateMap('prepVideos', id, v)}
+          onVideo={(id, v) => updateGuideVideo('prep', id, v)}
+          onDate={(id, v) => updateGuideDate('prep', id, v)}
           onContent={(id, v) => updateMap('prepContent', id, v)}
-          saveButton={<SaveButton section="prep" onClick={() => save('prep', { prepVideos: links.prepVideos, prepContent: links.prepContent })} />}
+          saveButton={<SaveButton section="prep" onClick={() => save('prep', { prepVideos: links.prepVideos, prepVideoDates: links.prepVideoDates, prepContent: links.prepContent })} />}
         />
 
         {/* ── After Care ──────────────────────────────────────── */}
@@ -463,10 +503,12 @@ export default function AdminPage() {
           title="After Care"
           description="Video + Markdown shown on each service page (after Pre-Treatment, before the footer)."
           videos={links.afterCareVideos}
+          dates={links.afterCareVideoDates}
           content={links.afterCareContent}
-          onVideo={(id, v) => updateMap('afterCareVideos', id, v)}
+          onVideo={(id, v) => updateGuideVideo('afterCare', id, v)}
+          onDate={(id, v) => updateGuideDate('afterCare', id, v)}
           onContent={(id, v) => updateMap('afterCareContent', id, v)}
-          saveButton={<SaveButton section="aftercare" onClick={() => save('aftercare', { afterCareVideos: links.afterCareVideos, afterCareContent: links.afterCareContent })} />}
+          saveButton={<SaveButton section="aftercare" onClick={() => save('aftercare', { afterCareVideos: links.afterCareVideos, afterCareVideoDates: links.afterCareVideoDates, afterCareContent: links.afterCareContent })} />}
         />
 
       </div>

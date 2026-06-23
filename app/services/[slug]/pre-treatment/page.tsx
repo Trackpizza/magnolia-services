@@ -29,6 +29,7 @@ export default async function PreTreatmentPage({ params }: Props) {
       service={service}
       guideTitle={GUIDE_TITLE}
       videoUrl={links.prepVideos[service.id] ?? ''}
+      videoDate={links.prepVideoDates[service.id] ?? ''}
       markdown={links.prepContent[service.id] ?? ''}
       links={links}
     />

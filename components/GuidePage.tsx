@@ -1,23 +1,42 @@
 import Link from 'next/link'
 import type { ServiceEntry } from '@/config/services'
 import type { ServiceLinks } from '@/lib/types'
-import { getYouTubeEmbedUrl } from '@/lib/youtube'
+import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import ServiceContent from '@/components/ServiceContent'
 
 interface GuidePageProps {
   service: ServiceEntry
   guideTitle: string
   videoUrl: string
+  videoDate: string
   markdown: string
   links: ServiceLinks
 }
 
-export default function GuidePage({ service, guideTitle, videoUrl, markdown, links }: GuidePageProps) {
+export default function GuidePage({ service, guideTitle, videoUrl, videoDate, markdown, links }: GuidePageProps) {
   const embedUrl = getYouTubeEmbedUrl(videoUrl)
   const backHref = `/services/${service.slug}`
 
+  // VideoObject structured data so Google can credit the guide video to this page.
+  const videoThumb = getYouTubeThumbnail(videoUrl)
+  const videoLd = embedUrl && videoThumb ? {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: `${service.name} — ${guideTitle} | Magnolia Skin Center`,
+    description: `${guideTitle} for ${service.name} at Magnolia Skin Center in Burbank, CA.`,
+    thumbnailUrl: videoThumb,
+    embedUrl,
+    ...(videoDate ? { uploadDate: videoDate } : {}),
+  } : null
+
   return (
     <div className="min-h-screen bg-cream-100">
+      {videoLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }}
+        />
+      )}
 
       {/* Header */}
       <header className="bg-plum-900">

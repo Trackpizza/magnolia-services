@@ -29,6 +29,7 @@ export default async function AfterCarePage({ params }: Props) {
       service={service}
       guideTitle={GUIDE_TITLE}
       videoUrl={links.afterCareVideos[service.id] ?? ''}
+      videoDate={links.afterCareVideoDates[service.id] ?? ''}
       markdown={links.afterCareContent[service.id] ?? ''}
       links={links}
     />
