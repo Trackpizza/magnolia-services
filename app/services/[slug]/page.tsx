@@ -5,7 +5,7 @@ import { getLinks } from '@/lib/links'
 import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
-import { getYouTubeEmbedUrl } from '@/lib/youtube'
+import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 
 // Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
 // background at most once per minute, and immediately when the admin saves (revalidate hook).
@@ -39,8 +39,27 @@ export default async function ServicePage({ params }: Props) {
   const customContent = links.content[service.id] ?? ''
   // Guide links always show; each guide page handles its own (possibly "coming soon") content.
 
+  // VideoObject structured data so Google can credit the embedded treatment video to this page.
+  const videoThumb = getYouTubeThumbnail(videoUrl)
+  const uploadDate = links.videoDates[service.id] ?? ''
+  const videoLd = embedUrl && videoThumb ? {
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    name: `${service.name} at Magnolia Skin Center`,
+    description: service.searchDescription,
+    thumbnailUrl: videoThumb,
+    embedUrl,
+    ...(uploadDate ? { uploadDate } : {}),
+  } : null
+
   return (
     <div className="min-h-screen bg-cream-100">
+      {videoLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(videoLd) }}
+        />
+      )}
 
       {/* Header */}
       <header className="bg-plum-900">

@@ -20,6 +20,7 @@ export interface ServiceLinks {
     customLinks: FooterLink[]  // named links shown in the footer of every service detail page
   }
   videos: Record<string, string>  // id → main treatment YouTube URL (empty = show placeholder)
+  videoDates: Record<string, string>  // id → upload date (YYYY-MM-DD) for VideoObject structured data
   content: Record<string, string>  // id → markdown shown under "How it works" (empty = hide)
   prepVideos: Record<string, string>     // id → Pre-Treatment & Planning Guide video
   prepContent: Record<string, string>    // id → Pre-Treatment & Planning Guide markdown
@@ -44,6 +45,7 @@ export const DEFAULT_LINKS: ServiceLinks = {
     customLinks: [],
   },
   videos: {},
+  videoDates: {},
   content: {},
   prepVideos: {},
   prepContent: {},

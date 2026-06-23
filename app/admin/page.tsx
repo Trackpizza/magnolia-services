@@ -9,6 +9,21 @@ import { SERVICES } from '@/config/services'
 // edited freely in config without touching video/content mappings here.
 const SERVICE_LIST = SERVICES.map(s => ({ id: s.id, name: s.name }))
 
+const todayISO = () => new Date().toISOString().slice(0, 10)
+
+// For any service that has a video URL but no saved upload date, default the date to
+// today (editable before saving) so every video gets a VideoObject uploadDate for SEO.
+function backfillVideoDates(
+  videos: Record<string, string>,
+  dates: Record<string, string>,
+): Record<string, string> {
+  const out = { ...dates }
+  for (const [id, url] of Object.entries(videos)) {
+    if (url && url.trim() && !out[id]) out[id] = todayISO()
+  }
+  return out
+}
+
 function Input({ label, value, onChange, placeholder, hint }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string; hint?: string
 }) {
@@ -155,6 +170,7 @@ export default function AdminPage() {
         mainFooter: { ...prev.mainFooter, ...(data.mainFooter ?? {}) },
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
+        videoDates: backfillVideoDates(data.videos ?? {}, data.videoDates ?? {}),
         content: data.content ?? {},
         prepVideos: data.prepVideos ?? {},
         prepContent: data.prepContent ?? {},
@@ -175,6 +191,7 @@ export default function AdminPage() {
         mainFooter: { ...prev.mainFooter, ...(data.mainFooter ?? {}) },
         serviceFooter: { ...prev.serviceFooter, ...(data.serviceFooter ?? {}) },
         videos: data.videos ?? {},
+        videoDates: backfillVideoDates(data.videos ?? {}, data.videoDates ?? {}),
         content: data.content ?? {},
         prepVideos: data.prepVideos ?? {},
         prepContent: data.prepContent ?? {},
@@ -224,7 +241,17 @@ export default function AdminPage() {
     setLinks(l => ({ ...l, serviceFooter: { ...l.serviceFooter, [key]: val } }))
 
   const updateVideo = (slug: string, url: string) =>
-    setLinks(l => ({ ...l, videos: { ...l.videos, [slug]: url } }))
+    setLinks(l => ({
+      ...l,
+      videos: { ...l.videos, [slug]: url },
+      // Auto-stamp today's upload date when a video is first added (editable below).
+      videoDates: url.trim() && !l.videoDates[slug]
+        ? { ...l.videoDates, [slug]: todayISO() }
+        : l.videoDates,
+    }))
+
+  const updateVideoDate = (slug: string, date: string) =>
+    setLinks(l => ({ ...l, videoDates: { ...l.videoDates, [slug]: date } }))
 
   const updateContent = (slug: string, md: string) =>
     setLinks(l => ({ ...l, content: { ...l.content, [slug]: md } }))
@@ -356,25 +383,36 @@ export default function AdminPage() {
               <h2 className="text-lg font-bold text-gray-900">Service Video URLs</h2>
               <p className="text-sm text-gray-500 mt-0.5">Paste a YouTube URL to replace the video placeholder on that service page. Leave blank to keep the placeholder.</p>
             </div>
-            <SaveButton section="videos" onClick={() => save('videos', { videos: links.videos })} />
+            <SaveButton section="videos" onClick={() => save('videos', { videos: links.videos, videoDates: links.videoDates })} />
           </div>
-          <p className="text-xs text-gray-400 mb-5">Accepts full YouTube URL (e.g. https://youtube.com/watch?v=...) or short link (https://youtu.be/...)</p>
+          <p className="text-xs text-gray-400 mb-5">Accepts full YouTube URL (e.g. https://youtube.com/watch?v=...) or short link (https://youtu.be/...). The <strong>Uploaded</strong> date powers Google video search — it auto-fills to today when you add a video; set it to the actual YouTube upload date if you know it.</p>
           <div className="space-y-3">
-            {SERVICE_LIST.map(({ id, name }) => (
-              <div key={id} className="grid grid-cols-5 gap-3 items-center">
-                <label className="col-span-2 text-sm text-gray-700 font-medium leading-tight">{name}</label>
-                <input
-                  type="text"
-                  value={links.videos[id] ?? ''}
-                  onChange={e => updateVideo(id, e.target.value)}
-                  placeholder="https://youtube.com/watch?v=..."
-                  className="col-span-3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-              </div>
-            ))}
+            {SERVICE_LIST.map(({ id, name }) => {
+              const hasVideo = (links.videos[id] ?? '').trim() !== ''
+              return (
+                <div key={id} className="grid grid-cols-6 gap-3 items-center">
+                  <label className="col-span-2 text-sm text-gray-700 font-medium leading-tight">{name}</label>
+                  <input
+                    type="text"
+                    value={links.videos[id] ?? ''}
+                    onChange={e => updateVideo(id, e.target.value)}
+                    placeholder="https://youtube.com/watch?v=..."
+                    className="col-span-3 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                  />
+                  <input
+                    type="date"
+                    value={links.videoDates[id] ?? ''}
+                    onChange={e => updateVideoDate(id, e.target.value)}
+                    disabled={!hasVideo}
+                    title="Video upload date (used for Google video search)"
+                    className="col-span-1 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-300"
+                  />
+                </div>
+              )
+            })}
           </div>
           <div className="mt-5 flex justify-end">
-            <SaveButton section="videos" onClick={() => save('videos', { videos: links.videos })} />
+            <SaveButton section="videos" onClick={() => save('videos', { videos: links.videos, videoDates: links.videoDates })} />
           </div>
         </section>
 

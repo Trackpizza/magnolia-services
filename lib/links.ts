@@ -21,6 +21,7 @@ export async function getLinks(): Promise<ServiceLinks> {
       mainFooter,
       serviceFooter,
       videos: data.videos ?? {},
+      videoDates: data.videoDates ?? {},
       content: data.content ?? {},
       prepVideos: data.prepVideos ?? {},
       prepContent: data.prepContent ?? {},
