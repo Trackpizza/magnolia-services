@@ -6,6 +6,7 @@ import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
+import { serviceLd } from '@/lib/schema'
 
 // Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
 // background at most once per minute, and immediately when the admin saves (revalidate hook).
@@ -52,8 +53,19 @@ export default async function ServicePage({ params }: Props) {
     ...(uploadDate ? { uploadDate } : {}),
   } : null
 
+  const svcLd = serviceLd({
+    name: service.name,
+    description: service.searchDescription,
+    slug: service.slug,
+    category: service.category,
+  })
+
   return (
     <div className="min-h-screen bg-cream-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(svcLd) }}
+      />
       {videoLd && (
         <script
           type="application/ld+json"

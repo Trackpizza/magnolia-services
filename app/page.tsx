@@ -1,6 +1,7 @@
 import { getLinks } from '@/lib/links'
 import { SERVICE_CATEGORIES, SERVICES } from '@/config/services'
 import ServicesSearch from '@/components/ServicesSearch'
+import { localBusinessLd } from '@/lib/schema'
 
 // Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
 // background at most once per minute, and immediately when the admin saves (revalidate hook).
@@ -21,8 +22,17 @@ export default async function ServicesPage() {
 
   const { mainFooter: f } = links
 
+  const businessLd = localBusinessLd({
+    telephone: f.phone,
+    sameAs: f.customLinks.map(l => l.url),
+  })
+
   return (
     <div className="min-h-screen bg-cream-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(businessLd) }}
+      />
 
       {/* Header */}
       <header className="bg-plum-900">
