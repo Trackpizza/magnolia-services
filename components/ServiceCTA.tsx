@@ -11,7 +11,7 @@ export default function ServiceCTA({ headline, address, bookingUrl, membershipUr
   return (
     <section className="bg-plum-900 py-16 mt-10">
       <div className="max-w-4xl mx-auto px-6 text-center">
-        <h2 className="text-3xl font-semibold text-white mb-3" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+        <h2 className="text-3xl font-semibold text-white mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           {headline}
         </h2>
         <p className="text-white/60 mb-8 max-w-md mx-auto">{address}</p>

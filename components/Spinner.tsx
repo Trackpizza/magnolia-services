@@ -91,7 +91,7 @@ export default function Spinner({ services }: { services: SpinService[] }) {
 
       <main className="flex-1 w-full max-w-xl mx-auto px-6 py-10 flex flex-col items-center text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-2">Magnolia Skin Center</p>
-        <h1 className="text-4xl font-semibold text-plum-900 mb-2" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Guess the Treatment</h1>
+        <h1 className="text-4xl font-semibold text-plum-900 mb-2" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>Guess the Treatment</h1>
         <p className="text-gray-500 mb-6">Spin to reveal a set of concerns — then guess which treatment we&rsquo;re featuring.</p>
 
         {/* Stage */}
@@ -114,7 +114,7 @@ export default function Spinner({ services }: { services: SpinService[] }) {
               {phase === 'revealed' && current && (
                 <div className="w-full mt-2 bg-brand-50 rounded-2xl p-5" style={{ backgroundColor: '#E1F5EE' }}>
                   <p className="text-xs font-semibold uppercase tracking-widest mb-1" style={{ color: '#0F6E56' }}>These all point to</p>
-                  <p className="text-2xl font-semibold mb-3" style={{ color: '#04342C', fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{current.name}</p>
+                  <p className="text-2xl font-semibold mb-3" style={{ color: '#04342C', fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{current.name}</p>
                   <Link
                     href={`/services/${current.slug}`}
                     className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"

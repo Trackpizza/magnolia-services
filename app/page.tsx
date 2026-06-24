@@ -57,7 +57,7 @@ export default async function ServicesPage() {
       <section className="max-w-6xl mx-auto px-6 py-16 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">Magnolia Skin Center</p>
         <h1 className="text-5xl font-semibold text-plum-900 mb-4"
-          style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+          style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           Our Services
         </h1>
         <p className="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
@@ -72,7 +72,7 @@ export default async function ServicesPage() {
       <section className="bg-plum-900 py-16">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-semibold text-white mb-3"
-            style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+            style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
             Ready to invest in yourself?
           </h2>
           <p className="text-white/60 mb-8 max-w-md mx-auto">

@@ -34,7 +34,7 @@ const config: Config = {
       },
       fontFamily: {
         sans:  ['Inter', 'system-ui', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+        serif: ['var(--font-cormorant)', 'Cormorant Garamond', 'Georgia', 'serif'],
       },
     },
   },

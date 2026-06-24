@@ -96,7 +96,7 @@ export default async function ServicePage({ params }: Props) {
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 pt-14 pb-8 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{service.category}</p>
-        <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+        <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           {service.name}
         </h1>
         <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
@@ -137,7 +137,7 @@ export default async function ServicePage({ params }: Props) {
 
           {/* Highlights */}
           <div className="flex-1">
-            <h2 className="text-3xl font-semibold text-plum-900 mb-6" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+            <h2 className="text-3xl font-semibold text-plum-900 mb-6" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
               Why patients choose {service.name}
             </h2>
             <div className="space-y-3">
@@ -158,7 +158,7 @@ export default async function ServicePage({ params }: Props) {
       {/* What it treats */}
       <section className="max-w-5xl mx-auto px-6 py-6">
         <div className="bg-white rounded-2xl border border-gray-100 p-8">
-          <h2 className="text-2xl font-semibold text-plum-900 mb-6" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+          <h2 className="text-2xl font-semibold text-plum-900 mb-6" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
             What this treatment addresses
           </h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -178,7 +178,7 @@ export default async function ServicePage({ params }: Props) {
       {/* How it works */}
       <section className="max-w-5xl mx-auto px-6 py-6">
         <div className="bg-plum-900/5 rounded-2xl border border-plum-900/10 p-8">
-          <h2 className="text-2xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+          <h2 className="text-2xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
             How it works
           </h2>
           <div className="space-y-6">
@@ -206,14 +206,14 @@ export default async function ServicePage({ params }: Props) {
           <Link href={`/services/${service.slug}/pre-treatment`} className="group flex items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-300 hover:shadow-sm transition-all">
             <div>
               <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Guide</p>
-              <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>Pre-Treatment &amp; Planning Guide</p>
+              <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>Pre-Treatment &amp; Planning Guide</p>
             </div>
             <span className="text-brand-600 text-xl shrink-0 group-hover:translate-x-1 transition-transform">&rarr;</span>
           </Link>
           <Link href={`/services/${service.slug}/after-care`} className="group flex items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-300 hover:shadow-sm transition-all">
             <div>
               <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-1">Guide</p>
-              <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>After Care</p>
+              <p className="text-lg font-semibold text-plum-900" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>After Care</p>
             </div>
             <span className="text-brand-600 text-xl shrink-0 group-hover:translate-x-1 transition-transform">&rarr;</span>
           </Link>

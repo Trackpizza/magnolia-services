@@ -20,7 +20,7 @@ export default function ServiceContent({ markdown = '', title, videoUrl = '' }: 
     <section className="max-w-5xl mx-auto px-6 py-6">
       <div className="bg-white rounded-2xl border border-gray-100 p-8 text-gray-600 text-base leading-relaxed">
         {title && (
-          <h2 className="text-2xl font-semibold text-plum-900 mb-5" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+          <h2 className="text-2xl font-semibold text-plum-900 mb-5" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
             {title}
           </h2>
         )}
@@ -39,8 +39,8 @@ export default function ServiceContent({ markdown = '', title, videoUrl = '' }: 
           <ReactMarkdown
             remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
-              h1: ({ children }) => <h2 className="text-2xl font-semibold text-plum-900 mt-2 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{children}</h2>,
-              h2: ({ children }) => <h3 className="text-xl font-semibold text-plum-900 mt-6 mb-3" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>{children}</h3>,
+              h1: ({ children }) => <h2 className="text-2xl font-semibold text-plum-900 mt-2 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{children}</h2>,
+              h2: ({ children }) => <h3 className="text-xl font-semibold text-plum-900 mt-6 mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{children}</h3>,
               h3: ({ children }) => <h4 className="text-base font-semibold text-gray-900 mt-5 mb-2">{children}</h4>,
               p: ({ children }) => <p className="mb-4">{children}</p>,
               strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,

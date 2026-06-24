@@ -58,7 +58,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 pt-14 pb-8 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{service.name}</p>
-        <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+        <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           {guideTitle}
         </h1>
       </section>

@@ -276,7 +276,7 @@ export default function ServicesSearch({ categories, membershipUrl }: {
               <div key={category.name}>
                 <div className="mb-8 pb-4 border-b border-gray-200">
                   <h3 className="text-3xl font-semibold text-plum-900 mb-1"
-                    style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
+                    style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
                     {category.name}
                   </h3>
                   <p className="text-gray-500 text-base">{category.description}</p>
