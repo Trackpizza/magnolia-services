@@ -25,6 +25,7 @@ export default async function ServicesPage() {
   const businessLd = localBusinessLd({
     telephone: f.phone,
     sameAs: f.customLinks.map(l => l.url),
+    hours: links.hours,
   })
 
   return (

@@ -23,9 +23,30 @@ function normalizePhone(raw?: string): string {
   return BUSINESS.defaultTelephone
 }
 
+const DAY_SCHEMA: Record<string, string> = {
+  monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
+  friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+}
+
+type HoursInput = Record<string, { open: string; close: string; closed: boolean }>
+
+// Build openingHoursSpecification, skipping closed days and any without both times.
+function openingHoursSpec(hours?: HoursInput) {
+  if (!hours) return []
+  return Object.entries(hours)
+    .filter(([, h]) => h && !h.closed && h.open && h.close)
+    .map(([day, h]) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: DAY_SCHEMA[day] ?? day,
+      opens: h.open,
+      closes: h.close,
+    }))
+}
+
 // MedicalBusiness (a LocalBusiness subtype) for the homepage.
-export function localBusinessLd(opts?: { telephone?: string; sameAs?: string[] }) {
+export function localBusinessLd(opts?: { telephone?: string; sameAs?: string[]; hours?: HoursInput }) {
   const sameAs = (opts?.sameAs ?? []).filter(u => u && u.trim() !== '')
+  const spec = openingHoursSpec(opts?.hours)
   return {
     '@context': 'https://schema.org',
     '@type': 'MedicalBusiness',
@@ -43,6 +64,7 @@ export function localBusinessLd(opts?: { telephone?: string; sameAs?: string[] }
       addressCountry: BUSINESS.addressCountry,
     },
     areaServed: { '@type': 'City', name: 'Burbank' },
+    ...(spec.length ? { openingHoursSpecification: spec } : {}),
     ...(sameAs.length ? { sameAs } : {}),
   }
 }

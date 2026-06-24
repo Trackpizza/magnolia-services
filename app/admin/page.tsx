@@ -1,8 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
-import type { ServiceLinks } from '@/lib/types'
-import { DEFAULT_LINKS } from '@/lib/types'
+import type { ServiceLinks, DayKey, DayHours } from '@/lib/types'
+import { DEFAULT_LINKS, DAY_KEYS, DEFAULT_HOURS } from '@/lib/types'
 import { SERVICES } from '@/config/services'
+
+const DAY_LABELS: Record<DayKey, string> = {
+  monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
+  friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+}
 
 // Single source of truth: the editable service list is derived from config/services.ts.
 // Keyed by the stable `id` (which never changes); the SEO `slug` (the page URL) can be
@@ -190,6 +195,9 @@ export default function AdminPage() {
         afterCareVideos: data.afterCareVideos ?? {},
         afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
         afterCareContent: data.afterCareContent ?? {},
+        hours: Object.fromEntries(
+          DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
+        ) as Record<DayKey, DayHours>,
       }))
     } else {
       setAuthError('Incorrect password')
@@ -213,6 +221,9 @@ export default function AdminPage() {
         afterCareVideos: data.afterCareVideos ?? {},
         afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
         afterCareContent: data.afterCareContent ?? {},
+        hours: Object.fromEntries(
+          DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
+        ) as Record<DayKey, DayHours>,
       }))
     }
     setLoading(false)
@@ -268,6 +279,9 @@ export default function AdminPage() {
 
   const updateVideoDate = (slug: string, date: string) =>
     setLinks(l => ({ ...l, videoDates: { ...l.videoDates, [slug]: date } }))
+
+  const updateHours = (day: DayKey, key: keyof DayHours, val: string | boolean) =>
+    setLinks(l => ({ ...l, hours: { ...l.hours, [day]: { ...l.hours[day], [key]: val } } }))
 
   const updateContent = (slug: string, md: string) =>
     setLinks(l => ({ ...l, content: { ...l.content, [slug]: md } }))
@@ -412,6 +426,55 @@ export default function AdminPage() {
             onUpdate={(i, k, v) => updateCustomLink('serviceFooter', i, k, v)}
             onRemove={i => removeCustomLink('serviceFooter', i)}
           />
+        </section>
+
+        {/* ── Business Hours ──────────────────────────────────── */}
+        <section className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Business Hours</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Powers the &ldquo;opening hours&rdquo; in Google search. Make these match your Google Business Profile exactly.</p>
+            </div>
+            <SaveButton section="hours" onClick={() => save('hours', { hours: links.hours })} />
+          </div>
+          <p className="text-xs text-gray-400 mb-5">Use 24-hour time. Tick &ldquo;Closed&rdquo; for days you&rsquo;re not open — those days are simply left out of the schema.</p>
+          <div className="space-y-2 max-w-xl">
+            {DAY_KEYS.map(day => {
+              const h = links.hours[day]
+              return (
+                <div key={day} className="grid grid-cols-12 gap-3 items-center">
+                  <label className="col-span-3 text-sm text-gray-700 font-medium">{DAY_LABELS[day]}</label>
+                  <input
+                    type="time"
+                    value={h.open}
+                    onChange={e => updateHours(day, 'open', e.target.value)}
+                    disabled={h.closed}
+                    className="col-span-3 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-300"
+                  />
+                  <span className="col-span-1 text-center text-sm text-gray-400">to</span>
+                  <input
+                    type="time"
+                    value={h.close}
+                    onChange={e => updateHours(day, 'close', e.target.value)}
+                    disabled={h.closed}
+                    className="col-span-3 rounded-lg border border-gray-300 px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 disabled:bg-gray-50 disabled:text-gray-300"
+                  />
+                  <label className="col-span-2 flex items-center gap-1.5 text-sm text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={h.closed}
+                      onChange={e => updateHours(day, 'closed', e.target.checked)}
+                      className="rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                    />
+                    Closed
+                  </label>
+                </div>
+              )
+            })}
+          </div>
+          <div className="mt-5 flex justify-end">
+            <SaveButton section="hours" onClick={() => save('hours', { hours: links.hours })} />
+          </div>
         </section>
 
         {/* ── Video URLs ──────────────────────────────────────── */}

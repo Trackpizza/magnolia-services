@@ -3,6 +3,19 @@ export interface FooterLink {
   url: string
 }
 
+export type DayKey = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday'
+
+export interface DayHours {
+  open: string   // "HH:MM" 24h (empty = not set)
+  close: string  // "HH:MM" 24h (empty = not set)
+  closed: boolean
+}
+
+export const DAY_KEYS: DayKey[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+
+export const DEFAULT_HOURS: Record<DayKey, DayHours> =
+  Object.fromEntries(DAY_KEYS.map(d => [d, { open: '', close: '', closed: false }])) as Record<DayKey, DayHours>
+
 export interface ServiceLinks {
   mainFooter: {
     address: string
@@ -28,6 +41,7 @@ export interface ServiceLinks {
   afterCareVideos: Record<string, string>  // id → After Care video
   afterCareVideoDates: Record<string, string> // id → after-care video upload date for VideoObject
   afterCareContent: Record<string, string> // id → After Care markdown
+  hours: Record<DayKey, DayHours>  // business hours → openingHoursSpecification schema
 }
 
 export const DEFAULT_LINKS: ServiceLinks = {
@@ -55,4 +69,5 @@ export const DEFAULT_LINKS: ServiceLinks = {
   afterCareVideos: {},
   afterCareVideoDates: {},
   afterCareContent: {},
+  hours: DEFAULT_HOURS,
 }

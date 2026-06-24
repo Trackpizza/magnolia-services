@@ -1,6 +1,6 @@
 import { adminDb } from './firebase/admin'
-import type { ServiceLinks } from './types'
-import { DEFAULT_LINKS } from './types'
+import type { ServiceLinks, DayKey, DayHours } from './types'
+import { DEFAULT_LINKS, DAY_KEYS, DEFAULT_HOURS } from './types'
 
 export async function getLinks(): Promise<ServiceLinks> {
   try {
@@ -17,6 +17,11 @@ export async function getLinks(): Promise<ServiceLinks> {
     mainFooter.customLinks = cleanLinks(mainFooter.customLinks)
     const serviceFooter = { ...DEFAULT_LINKS.serviceFooter, ...(data.serviceFooter ?? {}) }
     serviceFooter.customLinks = cleanLinks(serviceFooter.customLinks)
+    // Merge stored hours over defaults so all 7 days are always present and well-formed
+    const storedHours = (data.hours ?? {}) as Partial<Record<DayKey, Partial<DayHours>>>
+    const hours = Object.fromEntries(
+      DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...(storedHours[d] ?? {}) }])
+    ) as Record<DayKey, DayHours>
     return {
       mainFooter,
       serviceFooter,
@@ -29,6 +34,7 @@ export async function getLinks(): Promise<ServiceLinks> {
       afterCareVideos: data.afterCareVideos ?? {},
       afterCareVideoDates: data.afterCareVideoDates ?? {},
       afterCareContent: data.afterCareContent ?? {},
+      hours,
     }
   } catch {
     return DEFAULT_LINKS
