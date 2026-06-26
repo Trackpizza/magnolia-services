@@ -394,7 +394,7 @@ export default function AdminPage() {
             <Input label="Phone" value={links.mainFooter.phone} onChange={v => updateMainFooter('phone', v)} placeholder="(747) 305-8973" />
             <Input label="Email" value={links.mainFooter.email} onChange={v => updateMainFooter('email', v)} placeholder="hello@magnoliaskincenter.com" />
             <Input label="Booking / Consultation URL" value={links.mainFooter.bookingUrl} onChange={v => updateMainFooter('bookingUrl', v)} placeholder="https://..." hint="The 'Book a Complimentary Call' button" />
-            <Input label="Membership Site URL" value={links.mainFooter.membershipUrl} onChange={v => updateMainFooter('membershipUrl', v)} placeholder="https://membership.magnoliaskincenter.com" hint="Where 'View Memberships' links to" />
+            <Input label="Membership Site URL" value={links.mainFooter.membershipUrl} onChange={v => updateMainFooter('membershipUrl', v)} placeholder="https://www.magnoliaskincenter.com" hint="Every 'Memberships' / 'View Memberships' link across the whole site points here" />
             <Input label="Main Website URL" value={links.mainFooter.websiteUrl} onChange={v => updateMainFooter('websiteUrl', v)} placeholder="https://www.magnoliaskincenter.com" hint="The logo link" />
           </div>
 
@@ -417,7 +417,6 @@ export default function AdminPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Input label="Booking / Consultation URL" value={links.serviceFooter.bookingUrl} onChange={v => updateServiceFooter('bookingUrl', v)} placeholder="https://..." hint="'Book a Complimentary 15 Minute Video Call' button" />
-            <Input label="Membership Site URL" value={links.serviceFooter.membershipUrl} onChange={v => updateServiceFooter('membershipUrl', v)} placeholder="https://membership.magnoliaskincenter.com" hint="'View Memberships' button" />
             <Input label="Phone" value={links.serviceFooter.phone} onChange={v => updateServiceFooter('phone', v)} placeholder="(747) 305-8973" />
           </div>
           <FooterLinksEditor

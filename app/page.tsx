@@ -83,7 +83,7 @@ export default async function ServicesPage() {
               className="bg-white text-plum-900 text-sm font-semibold px-6 py-3 rounded-xl hover:bg-cream-100 transition-colors">
               View Memberships
             </a>
-            <a href={`${f.membershipUrl}/signup`}
+            <a href={f.membershipUrl}
               className="bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-brand-700 transition-colors">
               Join Now
             </a>

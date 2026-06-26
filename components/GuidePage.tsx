@@ -117,7 +117,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
                 className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
             ))}
             <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
-            <a href={links.serviceFooter.membershipUrl} className="text-white/50 hover:text-white transition-colors">Memberships</a>
+            <a href={links.mainFooter.membershipUrl} className="text-white/50 hover:text-white transition-colors">Memberships</a>
           </div>
         </div>
       </footer>

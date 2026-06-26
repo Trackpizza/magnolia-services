@@ -1,5 +1,3 @@
-import Link from 'next/link'
-
 interface ServiceCTAProps {
   headline: string
   address: string
@@ -22,12 +20,12 @@ export default function ServiceCTA({ headline, address, bookingUrl, membershipUr
           >
             View Memberships
           </a>
-          <Link
-            href="/signup"
+          <a
+            href={membershipUrl}
             className="bg-brand-600 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-brand-700 transition-colors"
           >
             Join Now
-          </Link>
+          </a>
         </div>
 
         <div className="border border-white/15 rounded-2xl px-8 py-6 max-w-lg mx-auto flex flex-col items-center gap-4 text-center">
