@@ -2,6 +2,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import { getYouTubeEmbedUrl } from '@/lib/youtube'
+import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 interface ServiceContentProps {
   markdown?: string
@@ -25,15 +26,7 @@ export default function ServiceContent({ markdown = '', title, videoUrl = '' }: 
           </h2>
         )}
         {embedUrl && (
-          <div className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden mb-6" style={{ aspectRatio: '9/16' }}>
-            <iframe
-              src={embedUrl}
-              title={title ? `${title} video` : 'Treatment video'}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
+          <YouTubeEmbed url={videoUrl} title={title ? `${title} video` : 'Treatment video'} className="mb-6" />
         )}
         {hasText && (
           <ReactMarkdown

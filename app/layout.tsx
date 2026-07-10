@@ -21,6 +21,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Video posters come from YouTube's thumbnail CDN, and the poster is usually the
+            LCP element, so warm the connection before the image request goes out. */}
+        <link rel="preconnect" href="https://i.ytimg.com" />
+      </head>
       <body className={`${inter.className} ${cormorant.variable} antialiased bg-cream-100`}>
         {children}
       </body>

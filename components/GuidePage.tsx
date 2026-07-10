@@ -3,6 +3,7 @@ import type { ServiceEntry } from '@/config/services'
 import type { ServiceLinks } from '@/lib/types'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import ServiceContent from '@/components/ServiceContent'
+import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 interface GuidePageProps {
   service: ServiceEntry
@@ -67,15 +68,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
       <section className="max-w-5xl mx-auto px-6 pb-2">
         <div className="w-full lg:w-72 mx-auto">
           {embedUrl ? (
-            <div className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden" style={{ aspectRatio: '9/16' }}>
-              <iframe
-                src={embedUrl}
-                title={`${service.name} — ${guideTitle} video`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 w-full h-full"
-              />
-            </div>
+            <YouTubeEmbed url={videoUrl} title={`${service.name} — ${guideTitle} video`} priority />
           ) : (
             <div
               className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden bg-plum-900/10 border-2 border-dashed border-plum-900/20 flex flex-col items-center justify-center text-center p-8"

@@ -5,6 +5,7 @@ import { getLinks } from '@/lib/links'
 import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
+import YouTubeEmbed from '@/components/YouTubeEmbed'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import { serviceLd } from '@/lib/schema'
 
@@ -111,15 +112,7 @@ export default async function ServicePage({ params }: Props) {
           {/* Video */}
           <div className="w-full lg:w-72 shrink-0 mx-auto lg:mx-0">
             {embedUrl ? (
-              <div className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden" style={{ aspectRatio: '9/16' }}>
-                <iframe
-                  src={embedUrl}
-                  title={`${service.name} treatment video`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="absolute inset-0 w-full h-full"
-                />
-              </div>
+              <YouTubeEmbed url={videoUrl} title={`${service.name} treatment video`} priority />
             ) : (
               <div
                 className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden bg-plum-900/10 border-2 border-dashed border-plum-900/20 flex flex-col items-center justify-center text-center p-8"
