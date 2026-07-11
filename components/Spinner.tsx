@@ -117,6 +117,7 @@ export default function Spinner({ services }: { services: SpinService[] }) {
                   <p className="text-2xl font-semibold mb-3" style={{ color: '#04342C', fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{current.name}</p>
                   <Link
                     href={`/services/${current.slug}`}
+                    aria-label={`Learn more about ${current.name} at Magnolia Skin Center in Burbank`}
                     className="inline-flex items-center gap-2 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
                     style={{ backgroundColor: '#0F6E56' }}
                   >

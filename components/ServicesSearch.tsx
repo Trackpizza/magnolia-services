@@ -260,6 +260,7 @@ export default function ServicesSearch({ categories, membershipUrl }: {
                       <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
                       {service.href && (
                         <Link href={service.href}
+                          aria-label={`Learn more about ${service.name} at Magnolia Skin Center in Burbank`}
                           className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
                           Learn more →
                         </Link>
@@ -289,6 +290,7 @@ export default function ServicesSearch({ categories, membershipUrl }: {
                       <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
                       {service.href && (
                         <Link href={service.href}
+                          aria-label={`Learn more about ${service.name} at Magnolia Skin Center in Burbank`}
                           className="mt-4 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
                           Learn more →
                         </Link>
