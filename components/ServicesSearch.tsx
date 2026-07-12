@@ -74,9 +74,9 @@ const CONCERN_GROUPS: { group: string; concerns: Concern[] }[] = [
   ] },
 ]
 
-export default function ServicesSearch({ categories, membershipUrl }: {
+export default function ServicesSearch({ categories, bookingUrl }: {
   categories: ServiceCategory[]
-  membershipUrl: string
+  bookingUrl: string
 }) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string[]>([])
@@ -299,9 +299,9 @@ export default function ServicesSearch({ categories, membershipUrl }: {
                   ))}
                 </div>
                 <div className="mt-6 text-right">
-                  <a href={membershipUrl}
+                  <a href={bookingUrl} target="_blank" rel="noopener noreferrer"
                     className="text-sm text-brand-600 hover:text-brand-700 transition-colors">
-                    Apply membership credits toward these services →
+                    Not sure what treatment is right for you? →
                   </a>
                 </div>
               </div>

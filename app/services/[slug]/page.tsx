@@ -84,9 +84,6 @@ export default async function ServicePage({ params }: Props) {
             <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               &larr; All Services
             </Link>
-            <a href={links.mainFooter.membershipUrl} className="text-sm text-white/70 hover:text-white font-medium transition-colors">
-              Memberships
-            </a>
             <a href={links.mainFooter.bookingUrl} target="_blank" rel="noopener noreferrer" className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
               Book Now
             </a>
@@ -218,7 +215,6 @@ export default async function ServicePage({ params }: Props) {
         headline={`Ready to experience ${service.name}?`}
         address={`Magnolia Skin Center — ${links.mainFooter.address}`}
         bookingUrl={links.mainFooter.bookingUrl}
-        membershipUrl={links.mainFooter.membershipUrl}
       />
 
       {/* Disclaimer */}
@@ -244,7 +240,6 @@ export default async function ServicePage({ params }: Props) {
                 className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
             ))}
             <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
-            <a href={links.mainFooter.membershipUrl} className="text-white/50 hover:text-white transition-colors">Memberships</a>
           </div>
         </div>
       </footer>

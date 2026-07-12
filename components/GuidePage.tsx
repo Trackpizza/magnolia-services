@@ -49,9 +49,6 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
             <Link href={backHref} className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               &larr; Back to {service.name}
             </Link>
-            <a href={links.mainFooter.membershipUrl} className="text-sm text-white/70 hover:text-white font-medium transition-colors">
-              Memberships
-            </a>
           </div>
         </div>
       </header>
@@ -110,7 +107,6 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
                 className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
             ))}
             <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
-            <a href={links.mainFooter.membershipUrl} className="text-white/50 hover:text-white transition-colors">Memberships</a>
           </div>
         </div>
       </footer>

@@ -22,13 +22,11 @@ export interface ServiceLinks {
     phone: string
     email: string
     bookingUrl: string
-    membershipUrl: string
     websiteUrl: string
     customLinks: FooterLink[]  // arbitrary named links shown in the footer link row
   }
   serviceFooter: {
     bookingUrl: string
-    membershipUrl: string
     phone: string
     customLinks: FooterLink[]  // named links shown in the footer of every service detail page
   }
@@ -50,13 +48,11 @@ export const DEFAULT_LINKS: ServiceLinks = {
     phone: '(747) 305-8973',
     email: '',
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',
-    membershipUrl: 'https://www.magnoliaskincenter.com',
     websiteUrl: 'https://www.magnoliaskincenter.com',
     customLinks: [],
   },
   serviceFooter: {
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',
-    membershipUrl: 'https://www.magnoliaskincenter.com',
     phone: '(747) 305-8973',
     customLinks: [],
   },
