@@ -393,7 +393,7 @@ export default function AdminPage() {
             </div>
             <Input label="Phone" value={links.mainFooter.phone} onChange={v => updateMainFooter('phone', v)} placeholder="(747) 305-8973" />
             <Input label="Email" value={links.mainFooter.email} onChange={v => updateMainFooter('email', v)} placeholder="hello@magnoliaskincenter.com" />
-            <Input label="Video Call Booking URL" value={links.mainFooter.bookingUrl} onChange={v => updateMainFooter('bookingUrl', v)} placeholder="https://..." hint="Where every 'Book a Complimentary 15 Minute Video Call' button across the whole site points — the homepage CTA, every service page, and the 'Book Now' buttons" />
+            <Input label="Video Call Booking URL" value={links.mainFooter.bookingUrl} onChange={v => updateMainFooter('bookingUrl', v)} placeholder="https://..." hint="Where every 'Book a Video Call' button across the whole site points — the header buttons, the homepage CTA, and every service page CTA" />
             <Input label="Main Website URL" value={links.mainFooter.websiteUrl} onChange={v => updateMainFooter('websiteUrl', v)} placeholder="https://www.magnoliaskincenter.com" hint="The logo link" />
           </div>
 

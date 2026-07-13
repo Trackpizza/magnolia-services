@@ -42,8 +42,11 @@ export default async function ServicesPage() {
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-end">
           <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
-            className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
-            Book Now
+            className="inline-flex items-center gap-1.5 bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
+            <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+            </svg>
+            Book a Video Call
           </a>
         </div>
       </header>
