@@ -5,6 +5,7 @@ import { getLinks } from '@/lib/links'
 import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
+import InlineConsultCTA from '@/components/InlineConsultCTA'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import { serviceLd } from '@/lib/schema'
@@ -144,6 +145,9 @@ export default async function ServicePage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {/* Inline consultation prompt — surfaced early so it isn't buried under long content */}
+      <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} />
 
       {/* What it treats */}
       <section className="max-w-5xl mx-auto px-6 py-6">
