@@ -35,31 +35,40 @@ export default async function ServicesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(businessLd) }}
       />
 
-      {/* Header */}
+      {/* Preload the hero wordmark (it's the first thing painted) so it doesn't wait on discovery. */}
+      <link rel="preload" as="image" href="/wordmark-plum.webp" />
+
+      {/* Header — brand mark lives in the hero below, so this bar is just the booking CTA. */}
       <header className="bg-plum-900">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href={f.websiteUrl || 'https://www.magnoliaskincenter.com'}>
-            <img src="/logo.avif" alt="Magnolia Skin Center" className="h-10 w-auto" />
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-end">
+          <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
+            className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
+            Book Now
           </a>
-          <div className="flex items-center gap-3">
-            <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
-              className="bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
-              Book Now
-            </a>
-          </div>
         </div>
       </header>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 py-16 text-center">
-        <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">Magnolia Skin Center</p>
-        <h1 className="text-5xl font-semibold text-plum-900 mb-4"
-          style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
-          Our Services
-        </h1>
-        <p className="text-lg text-gray-500 max-w-xl mx-auto leading-relaxed">
-          Browse all treatments, search by concern, or tap any service to watch Dr. David and Nurse Eileen explain it in detail.
-        </p>
+      <section className="max-w-6xl mx-auto px-6 py-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-center sm:text-left">
+          <img
+            src="/wordmark-plum.webp"
+            alt="Magnolia Skin Center"
+            width={600}
+            height={222}
+            fetchPriority="high"
+            className="w-56 sm:w-72 h-auto shrink-0"
+          />
+          <div className="sm:border-l sm:border-plum-900/15 sm:pl-10 max-w-xl">
+            <h1 className="text-5xl font-semibold text-plum-900 mb-3"
+              style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+              Our Services
+            </h1>
+            <p className="text-lg text-gray-500 leading-relaxed">
+              Browse all treatments, search by concern, or tap any service to watch Dr. David and Nurse Eileen explain it in detail.
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Search + Results */}

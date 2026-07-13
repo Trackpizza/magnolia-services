@@ -53,7 +53,7 @@ export function localBusinessLd(opts?: { telephone?: string; sameAs?: string[]; 
     '@id': BUSINESS_ID,
     name: BUSINESS.name,
     url: SITE_URL,
-    image: `${SITE_URL}/logo.avif`,
+    image: `${SITE_URL}/icon.png`,
     telephone: normalizePhone(opts?.telephone),
     address: {
       '@type': 'PostalAddress',

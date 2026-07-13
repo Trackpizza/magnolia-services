@@ -84,7 +84,7 @@ export default function Spinner({ services }: { services: SpinService[] }) {
     <div className="min-h-screen bg-cream-100 flex flex-col">
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/"><img src="/logo.avif" alt="Magnolia Skin Center" className="h-10 w-auto" /></Link>
+          <Link href="/"><img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} className="h-9 w-auto" /></Link>
           <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">&larr; All Services</Link>
         </div>
       </header>

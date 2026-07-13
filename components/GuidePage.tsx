@@ -43,7 +43,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href={links.mainFooter.websiteUrl || 'https://www.magnoliaskincenter.com'}>
-            <img src="/logo.avif" alt="Magnolia Skin Center" className="h-10 w-auto" />
+            <img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} fetchPriority="high" className="h-9 w-auto" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href={backHref} className="text-sm text-white/70 hover:text-white font-medium transition-colors">
