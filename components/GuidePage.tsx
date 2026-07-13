@@ -3,6 +3,7 @@ import type { ServiceEntry } from '@/config/services'
 import type { ServiceLinks } from '@/lib/types'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import ServiceContent from '@/components/ServiceContent'
+import InlineConsultCTA from '@/components/InlineConsultCTA'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 interface GuidePageProps {
@@ -84,6 +85,11 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
 
       {/* Markdown text (hidden if empty) */}
       <ServiceContent markdown={markdown} />
+
+      {/* Consultation prompt */}
+      <div className="mt-6">
+        <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} />
+      </div>
 
       {/* Back link */}
       <div className="max-w-5xl mx-auto px-6 py-8 text-center">
