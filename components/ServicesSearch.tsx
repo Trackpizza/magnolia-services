@@ -200,7 +200,7 @@ export default function ServicesSearch({ categories, bookingUrl }: {
           <div className="mt-4 space-y-3">
             {CONCERN_GROUPS.map(g => (
               <div key={g.group} className="flex flex-wrap items-center justify-center gap-2">
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest w-full text-center sm:w-auto sm:text-left">{g.group}</span>
+                <span className="w-full text-center text-sm font-semibold text-[#79a191] uppercase tracking-widest">{g.group}</span>
                 {g.concerns.map(c => {
                   const on = selected.includes(c.label)
                   return (
