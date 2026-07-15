@@ -81,7 +81,7 @@ export default async function BookingsPage() {
         <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
           <CameraIcon className="w-5 h-5 shrink-0" />
-          Book a Free 15-Minute Video Call
+          Book a Complimentary 15-Minute Video Call
         </a>
         {f.phone && (
           <p className="text-sm text-gray-500 mt-5">
