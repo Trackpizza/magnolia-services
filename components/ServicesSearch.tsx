@@ -2,6 +2,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Fuse from 'fuse.js'
+import InlineConsultCTA from '@/components/InlineConsultCTA'
 
 interface Service {
   name: string
@@ -217,6 +218,12 @@ export default function ServicesSearch({ categories, bookingUrl }: {
           </div>
         )}
       </div>
+
+      {/* Consultation prompt — only while the concern picker is open, sitting right
+          above the treatment listing. Same inline CTA used on the service pages. */}
+      {pickerOpen && (
+        <InlineConsultCTA bookingUrl={bookingUrl} question="Not sure what treatment is right for you?" />
+      )}
 
       {/* Results */}
       <div ref={resultsRef} className="scroll-mt-4">

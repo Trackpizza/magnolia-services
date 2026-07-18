@@ -1,18 +1,21 @@
 interface InlineConsultCTAProps {
   bookingUrl: string
+  /** Bold lead question. Defaults to the service-page wording. */
+  question?: string
 }
 
 /**
  * Slim inline consultation prompt placed high on the service page (after the
  * highlights), so visitors see the video-call offer without scrolling past the
- * long content to reach the full CTA at the bottom.
+ * long content to reach the full CTA at the bottom. Also reused on the homepage
+ * (above the treatment listing) with a custom lead question.
  */
-export default function InlineConsultCTA({ bookingUrl }: InlineConsultCTAProps) {
+export default function InlineConsultCTA({ bookingUrl, question = "Not sure if it's the right treatment?" }: InlineConsultCTAProps) {
   return (
     <section className="max-w-5xl mx-auto px-6 py-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-plum-900/5 border border-plum-900/10 rounded-2xl px-6 py-5">
         <p className="text-sm sm:text-base leading-snug">
-          <span className="font-semibold text-plum-900">Not sure if it&apos;s the right treatment?</span>{' '}
+          <span className="font-semibold text-plum-900">{question}</span>{' '}
           <span className="text-gray-600">Book a complimentary 15-minute video consultation with our team.</span>
         </p>
         <a
