@@ -8,12 +8,25 @@ runConfig:
 # - Legacy backend (magscmembership): supplies these via per-backend overrideEnv,
 #   which overrides this file, so it is unaffected.
 env:
+  # These three are needed at BUILD time too: the service/guide pages read
+  # Firestore (getLinks) during prerender, so the real content — including the
+  # pre-treatment/after-care videos — gets baked into the static HTML instead of
+  # falling back to defaults and only self-healing later via ISR.
   - variable: FIREBASE_PROJECT_ID
     secret: FIREBASE_PROJECT_ID
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: FIREBASE_CLIENT_EMAIL
     secret: FIREBASE_CLIENT_EMAIL
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: FIREBASE_PRIVATE_KEY_BASE64
     secret: FIREBASE_PRIVATE_KEY_BASE64
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: ADMIN_PASSWORD
     secret: ADMIN_PASSWORD
   - variable: NEXT_PUBLIC_MEMBERSHIP_URL
