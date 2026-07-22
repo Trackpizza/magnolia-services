@@ -35,8 +35,8 @@ export default async function ServicesPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(businessLd) }}
       />
 
-      {/* Preload the hero wordmark (it's the first thing painted) so it doesn't wait on discovery. */}
-      <link rel="preload" as="image" href="/wordmark-plum.webp" />
+      {/* Preload the hero logo (it's the first thing painted) so it doesn't wait on discovery. */}
+      <link rel="preload" as="image" href="/logo-msc.webp" />
 
       {/* Header — brand mark lives in the hero below, so this bar is just the booking CTA. */}
       <header className="bg-plum-900">
@@ -55,12 +55,12 @@ export default async function ServicesPage() {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-center sm:text-left">
           <img
-            src="/wordmark-plum.webp"
-            alt="Magnolia Skin Center"
-            width={600}
-            height={222}
+            src="/logo-msc.webp"
+            alt="Magnolia Skin Center — Med Spa, Skin Rejuvenation, Non-Surgical Face Lift"
+            width={900}
+            height={238}
             fetchPriority="high"
-            className="w-56 sm:w-72 h-auto shrink-0"
+            className="w-64 sm:w-80 h-auto shrink-0"
           />
           <div className="sm:border-l sm:border-plum-900/15 sm:pl-10 max-w-xl">
             <h1 className="text-5xl font-semibold text-plum-900 mb-3"
