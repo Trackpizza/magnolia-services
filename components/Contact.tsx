@@ -48,14 +48,23 @@ export function TextUsButton({ phone, variant = 'dark', className = '' }: { phon
   )
 }
 
-/** "Prefer to call or text?" + Call Us / Text Us pills, placed under a booking CTA. */
+/**
+ * "Prefer to call or text?" block placed under a booking CTA: the real phone
+ * number shown as text (so it's readable on desktop, where tel:/sms: links
+ * often do nothing) plus tappable Call Us / Text Us pills for phones.
+ */
 export function CallTextPills({
-  phone, variant = 'light', lead = 'Prefer to call or text?', className = '',
-}: { phone: string; variant?: Variant; lead?: string | false; className?: string }) {
+  phone, variant = 'light', className = '',
+}: { phone: string; variant?: Variant; className?: string }) {
   if (!phone) return null
+  const leadColor = variant === 'dark' ? 'text-white/70' : 'text-gray-600'
+  const numColor = variant === 'dark' ? 'text-white' : 'text-plum-900'
   return (
-    <div className={`flex flex-col sm:flex-row items-center justify-center gap-x-4 gap-y-3 ${className}`}>
-      {lead && <span className={variant === 'dark' ? 'text-sm text-white/60' : 'text-sm text-gray-500'}>{lead}</span>}
+    <div className={`flex flex-col items-center gap-3 ${className}`}>
+      <p className={`text-sm ${leadColor}`}>
+        Prefer to call or text?{' '}
+        <a href={telHref(phone)} className={`font-semibold ${numColor} hover:underline`}>{phone}</a>
+      </p>
       <div className="flex items-center gap-3">
         <a href={telHref(phone)} className={pillClass(variant)}>
           <PhoneIcon className="w-4 h-4 shrink-0" /> Call Us
