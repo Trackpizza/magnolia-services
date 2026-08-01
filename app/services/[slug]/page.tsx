@@ -6,6 +6,7 @@ import AlsoKnownAs from '@/components/AlsoKnownAs'
 import ServiceCTA from '@/components/ServiceCTA'
 import ServiceContent from '@/components/ServiceContent'
 import InlineConsultCTA from '@/components/InlineConsultCTA'
+import { TextUsButton } from '@/components/Contact'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import { serviceLd } from '@/lib/schema'
@@ -85,6 +86,7 @@ export default async function ServicePage({ params }: Props) {
             <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               &larr; All Services
             </Link>
+            <TextUsButton phone={links.mainFooter.phone} variant="dark" className="hidden sm:inline-flex" />
             <a href={links.mainFooter.bookingUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
               <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
@@ -150,7 +152,7 @@ export default async function ServicePage({ params }: Props) {
       </section>
 
       {/* Inline consultation prompt — surfaced early so it isn't buried under long content */}
-      <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} />
+      <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} phone={links.mainFooter.phone} />
 
       {/* What it treats */}
       <section className="max-w-5xl mx-auto px-6 py-6">
@@ -222,6 +224,7 @@ export default async function ServicePage({ params }: Props) {
         headline={`Ready to experience ${service.name}?`}
         address={`Magnolia Skin Center — ${links.mainFooter.address}`}
         bookingUrl={links.mainFooter.bookingUrl}
+        phone={links.mainFooter.phone}
       />
 
       {/* Disclaimer */}

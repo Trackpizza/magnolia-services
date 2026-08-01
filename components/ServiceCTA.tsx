@@ -1,10 +1,13 @@
+import { CallTextPills } from '@/components/Contact'
+
 interface ServiceCTAProps {
   headline: string
   address: string
   bookingUrl: string
+  phone?: string
 }
 
-export default function ServiceCTA({ headline, address, bookingUrl }: ServiceCTAProps) {
+export default function ServiceCTA({ headline, address, bookingUrl, phone }: ServiceCTAProps) {
   return (
     <section className="bg-plum-900 py-16 mt-10">
       <div className="max-w-2xl mx-auto px-6 text-center">
@@ -25,7 +28,8 @@ export default function ServiceCTA({ headline, address, bookingUrl }: ServiceCTA
           </svg>
           Book a Complimentary 15 Minute Video Call
         </a>
-        <p className="text-white/40 text-xs mt-5">{address}</p>
+        {phone && <CallTextPills phone={phone} variant="dark" className="mt-6" />}
+        <p className="text-white/40 text-xs mt-6">{address}</p>
       </div>
     </section>
   )

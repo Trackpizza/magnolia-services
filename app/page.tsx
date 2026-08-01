@@ -1,6 +1,7 @@
 import { getLinks } from '@/lib/links'
 import { SERVICE_CATEGORIES, SERVICES } from '@/config/services'
 import ServicesSearch from '@/components/ServicesSearch'
+import { TextUsButton, CallTextPills } from '@/components/Contact'
 import { localBusinessLd } from '@/lib/schema'
 
 // Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
@@ -38,9 +39,10 @@ export default async function ServicesPage() {
       {/* Preload the hero logo (it's the first thing painted) so it doesn't wait on discovery. */}
       <link rel="preload" as="image" href="/logo-msc.webp" />
 
-      {/* Header — brand mark lives in the hero below, so this bar is just the booking CTA. */}
+      {/* Header — brand mark lives in the hero below, so this bar is just the CTAs. */}
       <header className="bg-plum-900">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-end">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-end gap-2 sm:gap-3">
+          <TextUsButton phone={f.phone} variant="dark" />
           <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 bg-brand-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-brand-700 transition-colors">
             <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -75,7 +77,7 @@ export default async function ServicesPage() {
       </section>
 
       {/* Search + Results */}
-      <ServicesSearch categories={builtCategories} bookingUrl={f.bookingUrl} />
+      <ServicesSearch categories={builtCategories} bookingUrl={f.bookingUrl} phone={f.phone} />
 
       {/* CTA */}
       <section className="bg-plum-900 py-16">
@@ -94,6 +96,7 @@ export default async function ServicesPage() {
             </svg>
             Book a Complimentary 15 Minute Video Call
           </a>
+          <CallTextPills phone={f.phone} variant="dark" className="mt-6" />
         </div>
       </section>
 

@@ -75,9 +75,10 @@ const CONCERN_GROUPS: { group: string; concerns: Concern[] }[] = [
   ] },
 ]
 
-export default function ServicesSearch({ categories, bookingUrl }: {
+export default function ServicesSearch({ categories, bookingUrl, phone }: {
   categories: ServiceCategory[]
   bookingUrl: string
+  phone?: string
 }) {
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<string[]>([])
@@ -222,7 +223,7 @@ export default function ServicesSearch({ categories, bookingUrl }: {
       {/* Consultation prompt — only while the concern picker is open, sitting right
           above the treatment listing. Same inline CTA used on the service pages. */}
       {pickerOpen && (
-        <InlineConsultCTA bookingUrl={bookingUrl} question="Not sure what treatment is right for you?" />
+        <InlineConsultCTA bookingUrl={bookingUrl} question="Not sure what treatment is right for you?" phone={phone} />
       )}
 
       {/* Results */}

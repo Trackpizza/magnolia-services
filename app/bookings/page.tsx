@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLinks } from '@/lib/links'
+import { TextUsButton, CallTextPills } from '@/components/Contact'
 import { localBusinessLd } from '@/lib/schema'
 import { DAY_KEYS, type DayKey } from '@/lib/types'
 
@@ -63,9 +64,12 @@ export default async function BookingsPage() {
           <Link href="/">
             <img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} fetchPriority="high" className="h-9 w-auto" />
           </Link>
-          <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
-            All Services
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
+              All Services
+            </Link>
+            <TextUsButton phone={f.phone} variant="dark" className="hidden sm:inline-flex" />
+          </div>
         </div>
       </header>
 
@@ -83,14 +87,7 @@ export default async function BookingsPage() {
           <CameraIcon className="w-5 h-5 shrink-0" />
           Book a Complimentary 15-Minute Video Call
         </a>
-        {f.phone && (
-          <p className="text-sm text-gray-500 mt-5">
-            Prefer to talk?{' '}
-            <a href={`tel:${f.phone.replace(/\D/g, '')}`} className="text-brand-600 hover:text-brand-700 font-medium">
-              Call {f.phone}
-            </a>
-          </p>
-        )}
+        {f.phone && <CallTextPills phone={f.phone} variant="light" className="mt-6" />}
       </section>
 
       {/* What to expect */}
@@ -134,8 +131,9 @@ export default async function BookingsPage() {
           {/* Phone */}
           {f.phone && (
             <div className="bg-white rounded-2xl border border-gray-100 p-6">
-              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Call us</p>
-              <a href={`tel:${f.phone.replace(/\D/g, '')}`} className="text-sm text-gray-700 hover:text-brand-600 transition-colors">{f.phone}</a>
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Call or text us</p>
+              <a href={`tel:+1${f.phone.replace(/\D/g, '').slice(-10)}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors">Call {f.phone}</a>
+              <a href={`sms:+1${f.phone.replace(/\D/g, '').slice(-10)}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors mt-1">Text {f.phone}</a>
               {f.email && (
                 <a href={`mailto:${f.email}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors mt-1">{f.email}</a>
               )}
@@ -182,6 +180,7 @@ export default async function BookingsPage() {
               Browse all services
             </Link>
           </div>
+          {f.phone && <CallTextPills phone={f.phone} variant="dark" className="mt-8" />}
         </div>
       </section>
 

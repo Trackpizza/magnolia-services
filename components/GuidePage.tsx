@@ -4,6 +4,7 @@ import type { ServiceLinks } from '@/lib/types'
 import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import ServiceContent from '@/components/ServiceContent'
 import InlineConsultCTA from '@/components/InlineConsultCTA'
+import { TextUsButton } from '@/components/Contact'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 interface GuidePageProps {
@@ -50,6 +51,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
             <Link href={backHref} className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               &larr; Back to {service.name}
             </Link>
+            <TextUsButton phone={links.mainFooter.phone} variant="dark" className="hidden sm:inline-flex" />
           </div>
         </div>
       </header>
@@ -88,7 +90,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
 
       {/* Consultation prompt */}
       <div className="mt-6">
-        <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} />
+        <InlineConsultCTA bookingUrl={links.mainFooter.bookingUrl} phone={links.mainFooter.phone} />
       </div>
 
       {/* Back link */}
