@@ -188,12 +188,15 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
           </div>
         )}
 
-        {/* Picker toggle */}
-        <div className="mt-4 flex justify-center">
+        {/* Picker toggle — prominent green pill so visitors notice the concern finder */}
+        <div className="mt-5 flex justify-center">
           <button onClick={() => setPickerOpen(o => !o)}
-            className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 hover:text-brand-700 transition-colors">
-            {selected.length > 0 ? 'Add or edit concerns' : 'Not sure? Find your treatment by concern'}
-            <svg className={`w-4 h-4 transition-transform ${pickerOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            className="inline-flex items-center gap-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm sm:text-base font-semibold px-5 sm:px-6 py-3 rounded-full shadow-sm hover:shadow-md transition-all">
+            <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+            <span className="text-center leading-snug">{selected.length > 0 ? 'Add or edit concerns' : 'Not sure? Find your treatment by concern'}</span>
+            <svg className={`w-5 h-5 shrink-0 transition-transform ${pickerOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
           </button>
         </div>
 
