@@ -74,13 +74,14 @@ export default async function BookingsPage() {
         </div>
       </header>
 
+      <main>
       {/* Hero */}
       <section className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">Appointments</p>
         <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           Book Your Appointment
         </h1>
-        <p className="text-xl text-gray-500 leading-relaxed mb-8 max-w-xl mx-auto">
+        <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto">
           Start with a complimentary 15-minute video consultation. Pick a time that works for you and we&apos;ll help you find the treatment that&apos;s right for you.
         </p>
         <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
@@ -106,7 +107,7 @@ export default async function BookingsPage() {
               <div key={step.n} className="text-center">
                 <div className="mx-auto w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-semibold mb-4">{step.n}</div>
                 <p className="font-semibold text-gray-900 mb-1">{step.title}</p>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.body}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{step.body}</p>
               </div>
             ))}
           </div>
@@ -148,7 +149,7 @@ export default async function BookingsPage() {
               <dl className="space-y-1">
                 {DAY_KEYS.map(d => (
                   <div key={d} className="flex justify-between gap-3 text-sm">
-                    <dt className="text-gray-500">{DAY_LABELS[d]}</dt>
+                    <dt className="text-gray-600">{DAY_LABELS[d]}</dt>
                     <dd className="text-gray-700 font-medium">
                       {hours[d].closed || !hours[d].open || !hours[d].close
                         ? 'Closed'
@@ -184,6 +185,7 @@ export default async function BookingsPage() {
           {f.phone && <CallTextPills phone={f.phone} variant="dark" className="mt-8" />}
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-plum-900 border-t border-white/10 py-10">

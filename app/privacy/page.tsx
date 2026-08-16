@@ -37,7 +37,7 @@ export default function PrivacyPage() {
         <h1 className="text-4xl sm:text-5xl font-semibold text-plum-900 mb-3" style={serif}>
           Privacy Policy &amp; Accessibility Statement
         </h1>
-        <p className="text-sm text-gray-500 mb-8">Last updated: August 15, 2026</p>
+        <p className="text-sm text-gray-600 mb-8">Last updated: August 15, 2026</p>
 
         {/* Jump nav */}
         <nav className="flex flex-wrap gap-3 mb-12">
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
         {/* ============ PART 1: PRIVACY POLICY ============ */}
         <section id="privacy" className="scroll-mt-24">
           <h2 className={h2} style={serif}>Part 1: Privacy Policy</h2>
-          <p className="text-sm text-gray-500 mt-1 mb-6">Last updated: August 15, 2026</p>
+          <p className="text-sm text-gray-600 mt-1 mb-6">Last updated: August 15, 2026</p>
 
           <h3 className={h3}>Introduction</h3>
           <div className="space-y-4">
@@ -163,7 +163,7 @@ export default function PrivacyPage() {
         {/* ============ PART 2: ACCESSIBILITY STATEMENT ============ */}
         <section id="accessibility" className="scroll-mt-24 mt-16 pt-10 border-t border-plum-900/10">
           <h2 className={h2} style={serif}>Part 2: Accessibility Statement</h2>
-          <p className="text-sm text-gray-500 mt-1 mb-6">Last updated: August 15, 2026</p>
+          <p className="text-sm text-gray-600 mt-1 mb-6">Last updated: August 15, 2026</p>
 
           <h3 className={h3}>Our Commitment to Universal Accessibility</h3>
           <p className={p}>

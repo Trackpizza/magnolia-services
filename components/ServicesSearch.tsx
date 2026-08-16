@@ -152,7 +152,7 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
       {/* Search bar */}
       <div className="max-w-2xl mx-auto px-6 pb-4">
         <div className="relative">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none"
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 pointer-events-none"
             fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
           </svg>
@@ -161,11 +161,12 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search a concern, e.g. jowls, melasma, hair loss…"
-            className="w-full pl-12 pr-10 py-4 rounded-2xl border border-gray-200 bg-white text-gray-900 text-base placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
+            aria-label="Search treatments by concern"
+            className="w-full pl-12 pr-10 py-4 rounded-2xl border border-gray-200 bg-white text-gray-900 text-base placeholder-gray-500 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition"
           />
           {query && (
             <button onClick={() => setQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-600 transition-colors"
               aria-label="Clear search">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -184,7 +185,7 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             ))}
-            <button onClick={() => setSelected([])} className="text-sm font-medium text-gray-500 hover:text-gray-700 px-2 transition-colors">Clear all</button>
+            <button onClick={() => setSelected([])} className="text-sm font-medium text-gray-600 hover:text-gray-700 px-2 transition-colors">Clear all</button>
           </div>
         )}
 
@@ -203,7 +204,7 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
           <div className="space-y-3">
             {(showMore ? CONCERN_GROUPS : CONCERN_GROUPS.slice(0, 1)).map(g => (
               <div key={g.group} className="flex flex-wrap items-center justify-center gap-2">
-                <span className="w-full text-center text-sm font-semibold text-[#79a191] uppercase tracking-widest">{g.group}</span>
+                <span className="w-full text-center text-sm font-semibold text-brand-600 uppercase tracking-widest">{g.group}</span>
                 {g.concerns.map(c => {
                   const on = selected.includes(c.label)
                   return (
@@ -244,13 +245,14 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
         {isFiltering ? (
           ranked.length === 0 ? (
             <div className="max-w-6xl mx-auto px-6 pb-24 text-center py-10">
-              <p className="text-gray-400 mb-3">No treatments match — try fewer or different concerns</p>
+              <p className="text-gray-600 mb-3">No treatments match — try fewer or different concerns</p>
               <button onClick={() => { setQuery(''); setSelected([]) }}
                 className="text-sm text-brand-600 hover:text-brand-700 font-medium transition-colors">Clear all</button>
             </div>
           ) : (
             <section className="max-w-6xl mx-auto px-6 pb-24">
-              <p className="text-sm text-gray-500 text-center mb-6">
+              <h2 className="sr-only">Matching treatments</h2>
+              <p className="text-sm text-gray-600 text-center mb-6">
                 {ranked.length} treatment{ranked.length !== 1 ? 's' : ''}{selected.length ? ' for your concerns' : ''}
               </p>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -259,7 +261,7 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
                   return (
                     <div key={service.name}
                       className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
-                      <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h3>
                       {hits.length > 0 && (
                         <div className="mb-3">
                           {selected.length > 1 && (
@@ -297,17 +299,17 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
             {categories.map(category => (
               <div key={category.name}>
                 <div className="mb-8 pb-4 border-b border-gray-200">
-                  <h3 className="text-3xl font-semibold text-plum-900 mb-1"
+                  <h2 className="text-3xl font-semibold text-plum-900 mb-1"
                     style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
                     {category.name}
-                  </h3>
-                  <p className="text-gray-500 text-base">{category.description}</p>
+                  </h2>
+                  <p className="text-gray-600 text-base">{category.description}</p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {category.services.map(service => (
                     <div key={service.name}
                       className="bg-white rounded-xl border border-gray-100 p-6 hover:shadow-md transition-shadow flex flex-col">
-                      <h4 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h4>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{service.name}</h3>
                       <p className="text-gray-600 text-base leading-relaxed flex-1">{service.description}</p>
                       {service.href && (
                         <Link href={service.href}

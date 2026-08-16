@@ -54,6 +54,7 @@ export default async function ServicesPage() {
         </div>
       </header>
 
+      <main>
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-10 text-center sm:text-left">
@@ -70,7 +71,7 @@ export default async function ServicesPage() {
               style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
               Our Services
             </h1>
-            <p className="text-lg text-gray-500 leading-relaxed">
+            <p className="text-lg text-gray-600 leading-relaxed">
               Browse all treatments, search by concern, or tap any service to watch Dr. David and Nurse Eileen explain it in detail.
             </p>
           </div>
@@ -100,6 +101,7 @@ export default async function ServicesPage() {
           <CallTextPills phone={f.phone} variant="dark" className="mt-6" />
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="bg-plum-900 border-t border-white/10 py-10">

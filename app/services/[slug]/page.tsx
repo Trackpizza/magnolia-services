@@ -98,13 +98,14 @@ export default async function ServicePage({ params }: Props) {
         </div>
       </header>
 
+      <main>
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 pt-14 pb-8 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{service.category}</p>
         <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
           {service.name}
         </h1>
-        <p className="text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
           {service.tagline}
         </p>
       </section>
@@ -126,8 +127,8 @@ export default async function ServicePage({ params }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-plum-900/40 text-sm font-medium">Video coming soon</p>
-                <p className="text-plum-900/30 text-xs mt-1">Treatment walkthrough will appear here</p>
+                <p className="text-plum-900/70 text-sm font-medium">Video coming soon</p>
+                <p className="text-plum-900/70 text-xs mt-1">Treatment walkthrough will appear here</p>
               </div>
             )}
           </div>
@@ -143,7 +144,7 @@ export default async function ServicePage({ params }: Props) {
                   <div className="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center text-white text-xs font-bold">&#10003;</div>
                   <div>
                     <p className="font-semibold text-sm text-gray-900 mb-0.5">{item.title}</p>
-                    <p className="text-sm text-gray-500 leading-relaxed">{item.body}</p>
+                    <p className="text-sm text-gray-600 leading-relaxed">{item.body}</p>
                   </div>
                 </div>
               ))}
@@ -231,10 +232,11 @@ export default async function ServicePage({ params }: Props) {
       {/* Disclaimer */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="border-t border-gray-200 pt-6">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Disclaimer</p>
-          <p className="text-sm text-gray-500 leading-relaxed">{service.disclaimer}</p>
+          <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-2">Disclaimer</p>
+          <p className="text-sm text-gray-600 leading-relaxed">{service.disclaimer}</p>
         </div>
       </div>
+      </main>
 
       {/* Footer */}
       <footer className="bg-plum-900 border-t border-white/10 py-10">

@@ -57,6 +57,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
         </div>
       </header>
 
+      <main>
       {/* Hero */}
       <section className="max-w-4xl mx-auto px-6 pt-14 pb-8 text-center">
         <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{service.name}</p>
@@ -79,8 +80,8 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-plum-900/40 text-sm font-medium">Video coming soon</p>
-              <p className="text-plum-900/30 text-xs mt-1">Walkthrough will appear here</p>
+              <p className="text-plum-900/70 text-sm font-medium">Video coming soon</p>
+              <p className="text-plum-900/70 text-xs mt-1">Walkthrough will appear here</p>
             </div>
           )}
         </div>
@@ -100,6 +101,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
           &larr; Back to {service.name}
         </Link>
       </div>
+      </main>
 
       {/* Footer */}
       <footer className="bg-plum-900 border-t border-white/10 py-10">

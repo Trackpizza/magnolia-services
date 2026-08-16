@@ -33,8 +33,8 @@ export default function ServiceContent({ markdown = '', title, videoUrl = '' }: 
             remarkPlugins={[remarkGfm, remarkBreaks]}
             components={{
               h1: ({ children }) => <h2 className="text-2xl font-semibold text-plum-900 mt-2 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{children}</h2>,
-              h2: ({ children }) => <h3 className="text-xl font-semibold text-plum-900 mt-6 mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{children}</h3>,
-              h3: ({ children }) => <h4 className="text-base font-semibold text-gray-900 mt-5 mb-2">{children}</h4>,
+              h2: ({ children }) => <h2 className="text-xl font-semibold text-plum-900 mt-6 mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>{children}</h2>,
+              h3: ({ children }) => <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">{children}</h3>,
               p: ({ children }) => <p className="mb-4">{children}</p>,
               strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
               em: ({ children }) => <em className="italic">{children}</em>,
@@ -50,7 +50,7 @@ export default function ServiceContent({ markdown = '', title, videoUrl = '' }: 
                   </li>
                 )
               },
-              blockquote: ({ children }) => <blockquote className="border-l-4 border-brand-200 pl-4 italic text-gray-500 my-4">{children}</blockquote>,
+              blockquote: ({ children }) => <blockquote className="border-l-4 border-brand-200 pl-4 italic text-gray-600 my-4">{children}</blockquote>,
               hr: () => <hr className="border-gray-200 my-6" />,
             }}
           >

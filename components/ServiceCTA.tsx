@@ -29,7 +29,7 @@ export default function ServiceCTA({ headline, address, bookingUrl, phone }: Ser
           Book a Complimentary 15 Minute Video Call
         </a>
         {phone && <CallTextPills phone={phone} variant="dark" className="mt-6" />}
-        <p className="text-white/40 text-xs mt-6">{address}</p>
+        <p className="text-white/60 text-xs mt-6">{address}</p>
       </div>
     </section>
   )
