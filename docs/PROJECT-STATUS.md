@@ -6,6 +6,9 @@ Public marketing / services site for Magnolia Skin Center (Burbank, CA). Browse 
 treatments, search by concern, watch per-treatment videos, read pre-treatment &
 after-care guides, and book a complimentary video consultation.
 
+**Related docs:** [`README.md`](../README.md) (dev/deploy quickstart) ·
+[`docs/ACCESSIBILITY-CHECKLIST.md`](ACCESSIBILITY-CHECKLIST.md) (WCAG 2.2 AA audit).
+
 ---
 
 ## 1. At a glance
@@ -32,6 +35,7 @@ after-care guides, and book a complimentary video consultation.
 | `/services/[slug]/pre-treatment` | Pre-Treatment & Planning guide (video + checklist) |
 | `/services/[slug]/after-care` | After-Care guide (video + checklist) |
 | `/bookings` | Booking landing page (used as the Google Business Profile "Book" link) |
+| `/privacy` | Privacy Policy + Accessibility Statement (one page; `#accessibility` anchor) |
 | `/admin` | Content editor (Firestore-backed) — **unlisted, token-gated** |
 | `/spin` | Internal content tool — **unlisted** (excluded from robots/sitemap) |
 | `/api/admin/links` | GET/PUT the `serviceLinks/config` doc (auth: `x-admin-token`) |
@@ -101,6 +105,13 @@ Docs-only changes (like this file) don't need a rollout.
   for performance; posters come from the YouTube thumbnail CDN.
 - **SEO:** `lib/schema.ts` (MedicalBusiness + Service + VideoObject), `app/sitemap.ts`,
   `app/robots.ts` (admin + spin disallowed). Canonical host is hardcoded there.
+- **Accessibility (WCAG 2.2 AA).** Audited & remediated (commit `99a01c8`): `<main>`
+  landmarks on all public pages, no heading-level skips, AA color contrast (the concern
+  category labels use `brand-600`, **not** the old sage `#79a191`, which failed contrast),
+  `aria-label` on the search input, and a `prefers-reduced-motion` rule in `globals.css`.
+  The published Accessibility Statement lives at `/privacy#accessibility`; the audit +
+  per-criterion status is in [`docs/ACCESSIBILITY-CHECKLIST.md`](ACCESSIBILITY-CHECKLIST.md).
+  Re-run that audit after significant UI changes. `/admin` and `/spin` were out of scope.
 
 ---
 
@@ -111,12 +122,14 @@ app/page.tsx                         Home (hero + ServicesSearch)
 app/services/[slug]/page.tsx         Treatment detail
 app/services/[slug]/{pre-treatment,after-care}/page.tsx  → GuidePage
 app/bookings/page.tsx                Booking landing page
+app/privacy/page.tsx                 Privacy Policy + Accessibility Statement
 app/admin/page.tsx                   Content editor
 config/services.ts                   39 services (names, slugs, copy) — source of truth
 lib/links.ts                         getLinks(): Firestore serviceLinks/config (+ defaults)
 lib/types.ts                         ServiceLinks shape + DEFAULT_LINKS
 lib/schema.ts                        Structured data builders
 components/Contact.tsx               TextUsButton + CallTextPills (tel:/sms:)
+components/LegalLinks.tsx            Privacy + Accessibility footer links (all footers)
 components/ServicesSearch.tsx        Concern finder + search + directory (client)
 components/InlineConsultCTA.tsx      Slim "book a consult" prompt
 components/ServiceCTA.tsx            Bottom booking CTA
@@ -141,11 +154,19 @@ apphosting.yaml                      App Hosting config (env/secrets, incl. BUIL
 - **Concern finder** opens to the Face & Aging category by default; a green
   "Find more concerns" pill reveals the rest.
 - Build-time Firestore baking + full-path revalidation (fixes the stale-content issue).
+- **`/privacy`** page (Privacy Policy + Accessibility Statement) with Privacy +
+  Accessibility links in every footer.
+- **Accessibility remediation** to WCAG 2.2 AA (see §5 and the checklist doc).
+- `README.md` rewritten (points to these docs).
 
 **Pending / needs the client:**
 - Guide **videos for the 3 remaining services** (weight-loss-consultation,
   weight-loss-program, cherry-payment-plans) — none provided yet.
 - Real long-form content for those same 3 where placeholders remain.
+- **Confirm the YouTube Terms link** on `/privacy` (points to `youtube.com/t/terms`),
+  and optionally **enable closed captions** on the uploaded videos.
+- Recommended accessibility follow-ups (non-blocking): manual keyboard + screen-reader
+  spot-check; optional "skip to content" link — see the checklist doc.
 
 **Future / at final handoff:**
 - Move the `magnolia-services` Firebase project into the med spa's own Google account and
