@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     { url: BASE_URL, lastModified: now, changeFrequency: 'weekly', priority: 1 },
     { url: `${BASE_URL}/bookings`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },
     ...getAllSlugs().map(slug => ({
       url: `${BASE_URL}/services/${slug}`,
       lastModified: now,

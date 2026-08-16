@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import { TextUsButton, CallTextPills } from '@/components/Contact'
+import LegalLinks from '@/components/LegalLinks'
 import { localBusinessLd } from '@/lib/schema'
 import { DAY_KEYS, type DayKey } from '@/lib/types'
 
@@ -208,6 +209,7 @@ export default async function BookingsPage() {
                 className="text-white/50 hover:text-white transition-colors">magnoliaskincenter.com</a>
             )}
             <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
+            <LegalLinks />
           </div>
         </div>
       </footer>

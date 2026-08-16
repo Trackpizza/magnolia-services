@@ -2,6 +2,7 @@ import { getLinks } from '@/lib/links'
 import { SERVICE_CATEGORIES, SERVICES } from '@/config/services'
 import ServicesSearch from '@/components/ServicesSearch'
 import { TextUsButton, CallTextPills } from '@/components/Contact'
+import LegalLinks from '@/components/LegalLinks'
 import { localBusinessLd } from '@/lib/schema'
 
 // Cached/ISR: served instantly from the CDN (no cold-start wait). Regenerates in the
@@ -123,6 +124,7 @@ export default async function ServicesPage() {
               <a href={f.websiteUrl} target="_blank" rel="noopener noreferrer"
                 className="text-white/50 hover:text-white transition-colors">magnoliaskincenter.com</a>
             )}
+            <LegalLinks />
           </div>
         </div>
       </footer>

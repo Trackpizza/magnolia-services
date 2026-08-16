@@ -5,6 +5,7 @@ import { getYouTubeEmbedUrl, getYouTubeThumbnail } from '@/lib/youtube'
 import ServiceContent from '@/components/ServiceContent'
 import InlineConsultCTA from '@/components/InlineConsultCTA'
 import { TextUsButton } from '@/components/Contact'
+import LegalLinks from '@/components/LegalLinks'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 interface GuidePageProps {
@@ -115,6 +116,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
                 className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
             ))}
             <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
+            <LegalLinks />
           </div>
         </div>
       </footer>
