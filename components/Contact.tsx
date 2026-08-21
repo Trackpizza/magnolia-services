@@ -55,22 +55,32 @@ export function TextUsButton({ phone, variant = 'dark', className = '' }: { phon
  */
 export function CallTextPills({
   phone, variant = 'light', className = '',
-}: { phone: string; variant?: Variant; className?: string }) {
+  lead = 'Prefer to call or text?',
+  callLabel = 'Call Us',
+  textLabel = 'Text Us',
+}: {
+  phone: string; variant?: Variant; className?: string
+  /** Lead text before the number (e.g. "Prefer to call or text Dr. David?"). */
+  lead?: string
+  /** Override the pill labels (e.g. show the number instead of "Call Us"). */
+  callLabel?: string
+  textLabel?: string
+}) {
   if (!phone) return null
   const leadColor = variant === 'dark' ? 'text-white/70' : 'text-gray-600'
   const numColor = variant === 'dark' ? 'text-white' : 'text-plum-900'
   return (
     <div className={`flex flex-col items-center gap-3 ${className}`}>
       <p className={`text-sm ${leadColor}`}>
-        Prefer to call or text?{' '}
+        {lead}{' '}
         <a href={telHref(phone)} className={`font-semibold ${numColor} hover:underline`}>{phone}</a>
       </p>
       <div className="flex items-center gap-3">
         <a href={telHref(phone)} className={pillClass(variant)}>
-          <PhoneIcon className="w-4 h-4 shrink-0" /> Call Us
+          <PhoneIcon className="w-4 h-4 shrink-0" /> {callLabel}
         </a>
         <a href={smsHref(phone)} className={pillClass(variant)}>
-          <ChatIcon className="w-4 h-4 shrink-0" /> Text Us
+          <ChatIcon className="w-4 h-4 shrink-0" /> {textLabel}
         </a>
       </div>
     </div>

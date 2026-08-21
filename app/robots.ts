@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/spin'],
+      disallow: ['/admin', '/spin', '/dr-davids-rejuvenation'],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,
   }
