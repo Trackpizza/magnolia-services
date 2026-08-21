@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { getYouTubeId } from '@/lib/youtube'
 
 /**
- * Landscape (16:9) click-to-play video for Dr. David's rejuvenation page.
+ * Portrait (9:16) click-to-play video for Dr. David's rejuvenation page.
  * When `url` is empty it renders a styled "video coming soon" placeholder, so the
  * page can ship before the clip is uploaded — drop a YouTube URL into VIDEO_URL on
  * the page and it becomes a real click-to-load facade (same pattern as YouTubeEmbed).
@@ -18,8 +18,8 @@ export default function RejuvenationVideo({ url, title }: { url: string; title: 
   if (!id) {
     return (
       <div
-        className="relative w-full rounded-2xl overflow-hidden bg-plum-900 flex flex-col items-center justify-center text-center px-6"
-        style={{ aspectRatio: '16/9' }}
+        className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden bg-plum-900 flex flex-col items-center justify-center text-center px-6"
+        style={{ aspectRatio: '9/16' }}
       >
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 mb-4">
           <svg className="w-7 h-7 translate-x-0.5 text-white/80" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -33,7 +33,7 @@ export default function RejuvenationVideo({ url, title }: { url: string; title: 
   }
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden bg-plum-900" style={{ aspectRatio: '16/9' }}>
+    <div className="relative w-full max-w-xs mx-auto rounded-2xl overflow-hidden bg-plum-900" style={{ aspectRatio: '9/16' }}>
       {playing ? (
         <iframe
           src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&playsinline=1`}
