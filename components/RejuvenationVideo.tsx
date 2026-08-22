@@ -4,12 +4,23 @@ import { useState } from 'react'
 import { getYouTubeId } from '@/lib/youtube'
 
 /**
- * Portrait (9:16) click-to-play video for Dr. David's rejuvenation page.
+ * Portrait (9:16) click-to-play video for the provider rejuvenation pages.
  * When `url` is empty it renders a styled "video coming soon" placeholder, so the
  * page can ship before the clip is uploaded — drop a YouTube URL into VIDEO_URL on
  * the page and it becomes a real click-to-load facade (same pattern as YouTubeEmbed).
+ *
+ * `subject` names whose story it is, because both provider pages share this
+ * component and the placeholder would otherwise credit the wrong person.
  */
-export default function RejuvenationVideo({ url, title }: { url: string; title: string }) {
+export default function RejuvenationVideo({
+  url,
+  title,
+  subject,
+}: {
+  url: string
+  title: string
+  subject: string
+}) {
   const id = getYouTubeId(url)
   const [playing, setPlaying] = useState(false)
   const [poster, setPoster] = useState(id ? `https://i.ytimg.com/vi/${id}/maxresdefault.jpg` : '')
@@ -26,7 +37,7 @@ export default function RejuvenationVideo({ url, title }: { url: string; title: 
             <path d="M8 5v14l11-7z" />
           </svg>
         </span>
-        <p className="text-white font-medium">Dr. David&rsquo;s story — video coming soon</p>
+        <p className="text-white font-medium">{subject}&rsquo;s story — video coming soon</p>
         <p className="text-white/50 text-sm mt-1">Check back shortly to watch the full journey.</p>
       </div>
     )

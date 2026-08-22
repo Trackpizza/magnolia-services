@@ -8,19 +8,22 @@ import LegalLinks from '@/components/LegalLinks'
 // Cached/ISR: served instantly from the CDN, regenerated at most once a minute.
 export const revalidate = 60
 
-// Dr. David's direct line for the patients he emails (distinct from the main
-// business phone). Update here if it ever changes.
-const DR_DAVID_PHONE = '310-409-5887'
-
-// Paste Dr. David's YouTube video URL here when the clip is ready. While empty,
-// RejuvenationVideo renders a "video coming soon" placeholder.
+// Paste Nurse Eileen's YouTube video URL here when the clip is ready. While
+// empty, RejuvenationVideo renders a "video coming soon" placeholder.
 const VIDEO_URL = ''
 
-// Emailed directly to weight-loss patients — keep it out of search indexes.
+// PLACEHOLDER COPY — replace with Eileen's own words before sending this out.
+// Dr. David's page leads with a specific personal claim ("Rebuilding My Skin at
+// 67"). The equivalent for Eileen has to come from her, so these are written to
+// read correctly as-is rather than inventing a story or an age for her.
+const HEADLINE = 'My Personal Rejuvenation Journey.'
+const SUBHEAD =
+  "A personal look at how Nurse Eileen, RN, approached her own skin using Magnolia Skin Center's non-surgical technologies."
+
+// Emailed directly to patients — keep it out of search indexes.
 export const metadata: Metadata = {
-  title: 'Rebuilding My Skin at 67 | Dr. David McDonough',
-  description:
-    "A personal look at how Medical Director David McDonough, MD, addressed facial laxity using Magnolia Skin Center's non-surgical technologies.",
+  title: 'My Personal Rejuvenation Journey | Nurse Eileen, RN',
+  description: SUBHEAD,
   robots: { index: false, follow: false },
 }
 
@@ -30,9 +33,14 @@ const CameraIcon = ({ className }: { className: string }) => (
   </svg>
 )
 
-export default async function DrDavidRejuvenationPage() {
+export default async function NurseEileenRejuvenationPage() {
   const links = await getLinks()
   const { mainFooter: f } = links
+
+  // The business line, not a personal one — unlike Dr. David's page, which uses
+  // his direct number. Read from admin config so it follows any change made in
+  // /admin rather than being pinned here.
+  const phone = f.phone
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -46,7 +54,7 @@ export default async function DrDavidRejuvenationPage() {
             <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
               All Services
             </Link>
-            <TextUsButton phone={DR_DAVID_PHONE} variant="dark" className="hidden sm:inline-flex" />
+            <TextUsButton phone={phone} variant="dark" className="hidden sm:inline-flex" />
           </div>
         </div>
       </header>
@@ -54,18 +62,18 @@ export default async function DrDavidRejuvenationPage() {
       <main>
         {/* Hero */}
         <section className="max-w-3xl mx-auto px-6 pt-16 pb-8 text-center">
-          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">A note from Dr. David</p>
+          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">A note from Nurse Eileen</p>
           <h1 className="text-4xl sm:text-5xl font-semibold text-plum-900 mb-5 leading-tight" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
-            Rebuilding My Skin at 67: My Personal Rejuvenation Journey.
+            {HEADLINE}
           </h1>
           <p className="text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto">
-            A personal look at how Medical Director David McDonough, MD, addressed facial laxity using Magnolia Skin Center&apos;s non-surgical technologies.
+            {SUBHEAD}
           </p>
         </section>
 
         {/* Video */}
         <section className="max-w-3xl mx-auto px-6 pb-12">
-          <RejuvenationVideo url={VIDEO_URL} title="Dr. David McDonough — My Personal Rejuvenation Journey" subject="Dr. David" />
+          <RejuvenationVideo url={VIDEO_URL} title="Nurse Eileen, RN — My Personal Rejuvenation Journey" subject="Nurse Eileen" />
         </section>
 
         {/* Booking CTA */}
@@ -82,12 +90,12 @@ export default async function DrDavidRejuvenationPage() {
             Book a Complimentary 15-Minute Video Call
           </a>
           <CallTextPills
-            phone={DR_DAVID_PHONE}
+            phone={phone}
             variant="light"
             className="mt-6"
-            lead="Prefer to call or text Dr. David?"
-            callLabel={DR_DAVID_PHONE}
-            textLabel={DR_DAVID_PHONE}
+            lead="Prefer to call or text us?"
+            callLabel={phone}
+            textLabel={phone}
           />
         </section>
       </main>
@@ -97,8 +105,10 @@ export default async function DrDavidRejuvenationPage() {
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left space-y-1">
             {f.address && <p className="text-white/50 text-sm">{f.address}</p>}
-            <a href={`tel:+1${DR_DAVID_PHONE.replace(/\D/g, '').slice(-10)}`}
-              className="block text-white/50 hover:text-white/70 text-sm transition-colors">{DR_DAVID_PHONE}</a>
+            {phone && (
+              <a href={`tel:+1${phone.replace(/\D/g, '').slice(-10)}`}
+                className="block text-white/50 hover:text-white/70 text-sm transition-colors">{phone}</a>
+            )}
             {f.email && (
               <a href={`mailto:${f.email}`}
                 className="block text-white/50 hover:text-white/70 text-sm transition-colors">{f.email}</a>
