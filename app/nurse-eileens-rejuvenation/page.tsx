@@ -12,17 +12,13 @@ export const revalidate = 60
 // empty, RejuvenationVideo renders a "video coming soon" placeholder.
 const VIDEO_URL = ''
 
-// PLACEHOLDER COPY — replace with Eileen's own words before sending this out.
-// Dr. David's page leads with a specific personal claim ("Rebuilding My Skin at
-// 67"). The equivalent for Eileen has to come from her, so these are written to
-// read correctly as-is rather than inventing a story or an age for her.
-const HEADLINE = 'My Personal Rejuvenation Journey.'
+const HEADLINE = 'Rebuilding My Skin from Within: My Personal Rejuvenation Journey.'
 const SUBHEAD =
-  "A personal look at how Nurse Eileen, RN, approached her own skin using Magnolia Skin Center's non-surgical technologies."
+  "An inside look at how Lead Practitioner Eileen Kenny, RN, addressed her own skin concerns using Magnolia Skin Center's non-surgical technologies."
 
 // Emailed directly to patients — keep it out of search indexes.
 export const metadata: Metadata = {
-  title: 'My Personal Rejuvenation Journey | Nurse Eileen, RN',
+  title: 'Rebuilding My Skin from Within | Eileen Kenny, RN',
   description: SUBHEAD,
   robots: { index: false, follow: false },
 }
@@ -73,7 +69,7 @@ export default async function NurseEileenRejuvenationPage() {
 
         {/* Video */}
         <section className="max-w-3xl mx-auto px-6 pb-12">
-          <RejuvenationVideo url={VIDEO_URL} title="Nurse Eileen, RN — My Personal Rejuvenation Journey" subject="Nurse Eileen" />
+          <RejuvenationVideo url={VIDEO_URL} title="Eileen Kenny, RN — Rebuilding My Skin from Within" subject="Nurse Eileen" />
         </section>
 
         {/* Booking CTA */}
