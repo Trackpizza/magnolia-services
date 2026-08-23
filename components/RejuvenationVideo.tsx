@@ -16,10 +16,13 @@ export default function RejuvenationVideo({
   url,
   title,
   subject,
+  placeholderNote = 'Check back shortly to watch the full journey.',
 }: {
   url: string
   title: string
   subject: string
+  /** Second line of the placeholder. Override where "journey" doesn't fit. */
+  placeholderNote?: string
 }) {
   const id = getYouTubeId(url)
   const [playing, setPlaying] = useState(false)
@@ -38,7 +41,7 @@ export default function RejuvenationVideo({
           </svg>
         </span>
         <p className="text-white font-medium">{subject}&rsquo;s story — video coming soon</p>
-        <p className="text-white/50 text-sm mt-1">Check back shortly to watch the full journey.</p>
+        <p className="text-white/50 text-sm mt-1">{placeholderNote}</p>
       </div>
     )
   }
