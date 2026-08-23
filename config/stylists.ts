@@ -54,7 +54,7 @@ export const STYLISTS: Stylist[] = [
     salonPhone: '(818) 567-0700',
     promoCode: 'LUCY20',
     discount: '20%',
-    bookingUrl: '',
+    bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
     reviewUrl: '',
     videoUrl: '',
   },
