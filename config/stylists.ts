@@ -20,10 +20,16 @@ export interface Salon {
   reviewUrl: string
   bookingUrl: string
   /**
-   * Shown under the booking button. Boulevard keeps the chosen location in
-   * session state rather than in the URL, so a multi-location salon's widget
-   * always opens on its location picker and cannot be deep-linked past it.
-   * This tells the guest which one to tap. Empty → nothing renders.
+   * Shown under the booking button. `{name}` is replaced with the stylist's
+   * name, since this is shared across a salon's stylists.
+   *
+   * Phrase it as a statement of fact, not an instruction about the next screen:
+   * Boulevard remembers the chosen location in session state, so the picker
+   * appears on a guest's first visit but is skipped on every one after — and it
+   * can't be deep-linked past either way. "Lucy is at the Burbank location"
+   * stays true in both cases; "choose Burbank next" is wrong the second time.
+   *
+   * Empty → nothing renders (single-location salons need no note).
    */
   bookingNote: string
 }
@@ -48,7 +54,7 @@ export const DYLAN_KEITH: Salon = {
   phone: '(818) 567-0700',
   reviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJ1cfVcH-VwoAREMugw_cBZ74',
   bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
-  bookingNote: 'On the next screen, choose the Burbank location — 3508 W Magnolia Blvd.',
+  bookingNote: '{name} is at the Burbank location — 3508 W Magnolia Blvd (choose it if asked).',
 }
 
 /** Magnolia Skin Center half of the page — identical across every stylist. */

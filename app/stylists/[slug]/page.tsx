@@ -130,12 +130,13 @@ export default async function StylistPage({ params }: { params: { slug: string }
                   <CalendarIcon className="w-5 h-5 shrink-0" />
                   Book with {stylist.name} — save {stylist.discount}
                 </a>
-                {/* The salon's booking widget opens on a two-location picker that
-                    can't be deep-linked past, so name the right one up front. */}
+                {/* The salon's booking widget shows a location picker on a first
+                    visit and skips it afterwards, so this states where the
+                    stylist works rather than describing the next screen. */}
                 {salon.bookingNote && (
                   <p className="flex items-start justify-center gap-1.5 text-sm text-gray-600 mt-2.5 px-2">
                     <PinIcon className="w-4 h-4 shrink-0 mt-0.5 text-brand-600" />
-                    <span>{salon.bookingNote}</span>
+                    <span>{salon.bookingNote.replace('{name}', stylist.name)}</span>
                   </p>
                 )}
               </div>
