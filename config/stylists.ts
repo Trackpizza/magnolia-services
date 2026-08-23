@@ -5,9 +5,28 @@
  * the back of their business cards, so **a slug here is permanent once cards go
  * to print**. Add a stylist by appending an entry; nothing else needs changing.
  *
+ * Salon-level details (phone, booking, Google review link) live on the Salon
+ * object rather than on each stylist — Google reviews attach to the business
+ * listing, so every stylist at a salon shares one review link.
+ *
  * Empty bookingUrl / reviewUrl / videoUrl are expected: the page hides or
  * placeholders those pieces until the real ones arrive.
  */
+
+export interface Salon {
+  name: string
+  phone: string
+  /** Shared by every stylist — Google reviews attach to the business listing. */
+  reviewUrl: string
+  bookingUrl: string
+  /**
+   * Shown under the booking button. Boulevard keeps the chosen location in
+   * session state rather than in the URL, so a multi-location salon's widget
+   * always opens on its location picker and cannot be deep-linked past it.
+   * This tells the guest which one to tap. Empty → nothing renders.
+   */
+  bookingNote: string
+}
 
 export interface Stylist {
   /** URL segment — printed on business cards. Never change after printing. */
@@ -15,18 +34,21 @@ export interface Stylist {
   name: string
   /** Role line shown after the name, e.g. "Master Stylist & Colorist". */
   role: string
-  salonName: string
-  salonPhone: string
+  salon: Salon
   /** Promo code the guest mentions at checkout. */
   promoCode: string
   /** Hair discount, as it appears in copy (e.g. "20%"). */
   discount: string
-  /** Stylist's own booking portal. Empty → the button is hidden. */
-  bookingUrl: string
-  /** Google review link for the salon. Empty → the button is hidden. */
-  reviewUrl: string
   /** 9:16 YouTube URL. Empty → "video coming soon" placeholder. */
   videoUrl: string
+}
+
+export const DYLAN_KEITH: Salon = {
+  name: 'Dylan Keith Salon & Spa',
+  phone: '(818) 567-0700',
+  reviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJ1cfVcH-VwoAREMugw_cBZ74',
+  bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
+  bookingNote: 'On the next screen, choose the Burbank location — 3508 W Magnolia Blvd.',
 }
 
 /** Magnolia Skin Center half of the page — identical across every stylist. */
@@ -50,12 +72,9 @@ export const STYLISTS: Stylist[] = [
     slug: 'dylan-keith-lucy',
     name: 'Lucy',
     role: 'Master Stylist & Colorist',
-    salonName: 'Dylan Keith Salon & Spa',
-    salonPhone: '(818) 567-0700',
+    salon: DYLAN_KEITH,
     promoCode: 'LUCY20',
     discount: '20%',
-    bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
-    reviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJ1cfVcH-VwoAREMugw_cBZ74',
     videoUrl: '',
   },
 ]

@@ -19,8 +19,8 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   const stylist = getStylistBySlug(params.slug)
   if (!stylist) return {}
   return {
-    title: `Meet ${stylist.name} | ${stylist.salonName} × Magnolia Skin Center`,
-    description: `${stylist.discount} off your first service with ${stylist.name} at ${stylist.salonName}, plus ${MSC_OFFER.discount} off your first clinical treatment at Magnolia Skin Center down the hall.`,
+    title: `Meet ${stylist.name} | ${stylist.salon.name} × Magnolia Skin Center`,
+    description: `${stylist.discount} off your first service with ${stylist.name} at ${stylist.salon.name}, plus ${MSC_OFFER.discount} off your first clinical treatment at Magnolia Skin Center down the hall.`,
     // Reached by QR code from a printed card — keeping it out of search stops the
     // promo codes from being scraped into coupon sites.
     robots: { index: false, follow: false },
@@ -40,6 +40,12 @@ const StarIcon = ({ className }: { className: string }) => (
 const PhoneIcon = ({ className }: { className: string }) => (
   <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+  </svg>
+)
+const PinIcon = ({ className }: { className: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 )
 const SearchIcon = ({ className }: { className: string }) => (
@@ -67,10 +73,11 @@ export default async function StylistPage({ params }: { params: { slug: string }
 
   const links = await getLinks()
   const { mainFooter: f } = links
-  const salonTel = `tel:+1${stylist.salonPhone.replace(/\D/g, '').slice(-10)}`
+  const salon = stylist.salon
+  const salonTel = `tel:+1${salon.phone.replace(/\D/g, '').slice(-10)}`
 
-  const shareTitle = `${stylist.salonName} × Magnolia Skin Center VIP Pass`
-  const shareMessage = `Here's a VIP pass for ${stylist.salonName} and Magnolia Skin Center: ${stylist.discount} off hair with ${stylist.name} (code ${stylist.promoCode}), plus ${MSC_OFFER.discount} off your first clinical skin treatment down the hall.`
+  const shareTitle = `${salon.name} × Magnolia Skin Center VIP Pass`
+  const shareMessage = `Here's a VIP pass for ${salon.name} and Magnolia Skin Center: ${stylist.discount} off hair with ${stylist.name} (code ${stylist.promoCode}), plus ${MSC_OFFER.discount} off your first clinical skin treatment down the hall.`
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -92,7 +99,7 @@ export default async function StylistPage({ params }: { params: { slug: string }
       <main>
         {/* ───────────── Salon half ───────────── */}
         <section className="max-w-2xl mx-auto px-6 pt-14 pb-10 text-center">
-          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{stylist.salonName}</p>
+          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">{salon.name}</p>
           <h1 className="text-4xl sm:text-5xl font-semibold text-plum-900 mb-5 leading-tight" style={serif}>
             Meet {stylist.name}: {stylist.role}
           </h1>
@@ -111,33 +118,43 @@ export default async function StylistPage({ params }: { params: { slug: string }
 
           <RejuvenationVideo
             url={stylist.videoUrl}
-            title={`${stylist.name} — ${stylist.role} at ${stylist.salonName}`}
+            title={`${stylist.name} — ${stylist.role} at ${salon.name}`}
             subject={stylist.name}
             placeholderNote={`A quick hello from ${stylist.name} is on the way.`}
           />
 
           <div className="mt-8 space-y-3">
-            {stylist.bookingUrl && (
-              <a href={stylist.bookingUrl} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
-                <CalendarIcon className="w-5 h-5 shrink-0" />
-                Book with {stylist.name} — save {stylist.discount}
-              </a>
+            {salon.bookingUrl && (
+              <div>
+                <a href={salon.bookingUrl} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
+                  <CalendarIcon className="w-5 h-5 shrink-0" />
+                  Book with {stylist.name} — save {stylist.discount}
+                </a>
+                {/* The salon's booking widget opens on a two-location picker that
+                    can't be deep-linked past, so name the right one up front. */}
+                {salon.bookingNote && (
+                  <p className="flex items-start justify-center gap-1.5 text-sm text-gray-600 mt-2.5 px-2">
+                    <PinIcon className="w-4 h-4 shrink-0 mt-0.5 text-brand-600" />
+                    <span>{salon.bookingNote}</span>
+                  </p>
+                )}
+              </div>
             )}
 
             <div className="grid sm:grid-cols-2 gap-3">
-              {stylist.reviewUrl && (
-                <a href={stylist.reviewUrl} target="_blank" rel="noopener noreferrer" className={outlineBtn}>
+              {salon.reviewUrl && (
+                <a href={salon.reviewUrl} target="_blank" rel="noopener noreferrer" className={outlineBtn}>
                   <StarIcon className="w-4 h-4 shrink-0 text-brand-600" />
                   Leave {stylist.name} a review
                 </a>
               )}
               <a href={salonTel} className={outlineBtn}>
                 <PhoneIcon className="w-4 h-4 shrink-0" />
-                Call {stylist.salonPhone}
+                Call {salon.phone}
               </a>
             </div>
 
-            <ShareVipPass salonName={stylist.salonName} title={shareTitle} message={shareMessage} />
+            <ShareVipPass salonName={salon.name} title={shareTitle} message={shareMessage} />
           </div>
         </section>
 
