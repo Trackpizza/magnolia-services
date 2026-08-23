@@ -55,7 +55,7 @@ export const STYLISTS: Stylist[] = [
     promoCode: 'LUCY20',
     discount: '20%',
     bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
-    reviewUrl: '',
+    reviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJ1cfVcH-VwoAREMugw_cBZ74',
     videoUrl: '',
   },
 ]
