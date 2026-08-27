@@ -11,7 +11,7 @@ export const revalidate = 60
 // Both practitioners' own rejuvenation videos. Empty → "coming soon" placeholder.
 const VIDEOS = [
   {
-    url: 'https://youtu.be/CCnqij06_gs',
+    url: 'https://youtu.be/tVJwuEpdXvQ',
     name: 'David McDonough, MD',
     subject: 'Dr. David',
     role: 'Medical Director',
