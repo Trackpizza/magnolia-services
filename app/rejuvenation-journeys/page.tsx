@@ -18,7 +18,7 @@ const VIDEOS = [
     caption: 'Watch Dr. David address his heavy brows and under-eye bags without surgery.',
   },
   {
-    url: 'https://youtu.be/POZHNnnFUUI',
+    url: 'https://youtu.be/UkaYO_MHa3g',
     name: 'Eileen Kenny, RN',
     subject: 'Nurse Eileen',
     role: 'Lead Practitioner',
