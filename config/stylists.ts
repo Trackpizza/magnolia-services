@@ -79,7 +79,7 @@ export const STYLISTS: Stylist[] = [
     name: 'Lucy',
     role: 'Master Stylist & Colorist',
     salon: DYLAN_KEITH,
-    promoCode: 'LUCY20',
+    promoCode: 'BURBANK20',
     discount: '20%',
     videoUrl: '',
   },
