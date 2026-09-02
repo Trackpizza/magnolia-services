@@ -20,7 +20,7 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   if (!stylist) return {}
   return {
     title: `Meet ${stylist.name} | ${stylist.salon.name} × Magnolia Skin Center`,
-    description: `${stylist.discount} off your first service with ${stylist.name} at ${stylist.salon.name}, plus ${MSC_OFFER.discount} off your first clinical treatment at Magnolia Skin Center down the hall.`,
+    description: `${stylist.salon.discount} off your first service with ${stylist.name} at ${stylist.salon.name}, plus ${MSC_OFFER.discount} off your first clinical treatment at Magnolia Skin Center down the hall.`,
     // Reached by QR code from a printed card — keeping it out of search stops the
     // promo codes from being scraped into coupon sites.
     robots: { index: false, follow: false },
@@ -77,7 +77,7 @@ export default async function StylistPage({ params }: { params: { slug: string }
   const salonTel = `tel:+1${salon.phone.replace(/\D/g, '').slice(-10)}`
 
   const shareTitle = `${salon.name} × Magnolia Skin Center VIP Pass`
-  const shareMessage = `Here's a VIP pass for ${salon.name} and Magnolia Skin Center: ${stylist.discount} off hair with ${stylist.name} (code ${stylist.promoCode}), plus ${MSC_OFFER.discount} off your first clinical skin treatment down the hall.`
+  const shareMessage = `Here's a VIP pass for ${salon.name} and Magnolia Skin Center: ${salon.discount} off hair with ${stylist.name} (code ${salon.promoCode}), plus ${MSC_OFFER.discount} off your first clinical skin treatment down the hall.`
 
   return (
     <div className="min-h-screen bg-cream-100">
@@ -107,12 +107,12 @@ export default async function StylistPage({ params }: { params: { slug: string }
           {/* Promo callout */}
           <div className="inline-block rounded-2xl border border-brand-200 bg-brand-50 px-6 py-4 mb-8">
             <p className="text-base text-plum-900">
-              <span className="font-semibold">Friends &amp; Family Pass:</span> enjoy {stylist.discount} off your
+              <span className="font-semibold">Friends &amp; Family Pass:</span> enjoy {salon.discount} off your
               first hair service with {stylist.name}.
             </p>
             <p className="text-sm text-gray-600 mt-1">
               Mention or enter code{' '}
-              <span className="font-semibold tracking-wider text-brand-700">{stylist.promoCode}</span> at checkout.
+              <span className="font-semibold tracking-wider text-brand-700">{salon.promoCode}</span> at checkout.
             </p>
           </div>
 
@@ -128,7 +128,7 @@ export default async function StylistPage({ params }: { params: { slug: string }
               <div>
                 <a href={salon.bookingUrl} target="_blank" rel="noopener noreferrer" className={primaryBtn}>
                   <CalendarIcon className="w-5 h-5 shrink-0" />
-                  Book with {stylist.name} — save {stylist.discount}
+                  Book with {stylist.name} — save {salon.discount}
                 </a>
                 {/* The salon's booking widget shows a location picker on a first
                     visit and skips it afterwards, so this states where the

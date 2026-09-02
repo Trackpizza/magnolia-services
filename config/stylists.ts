@@ -20,6 +20,15 @@ export interface Salon {
   reviewUrl: string
   bookingUrl: string
   /**
+   * One code for the whole location, shared by every stylist here. It carries no
+   * per-stylist information: the salon attributes the booking to whoever the
+   * client picked at checkout, so a personal code would be extra setup for them
+   * and one more thing to get wrong.
+   */
+  promoCode: string
+  /** Hair discount, as it appears in copy (e.g. "20%"). */
+  discount: string
+  /**
    * Shown under the booking button. `{name}` is replaced with the stylist's
    * name, since this is shared across a salon's stylists.
    *
@@ -41,10 +50,6 @@ export interface Stylist {
   /** Role line shown after the name, e.g. "Master Stylist & Colorist". */
   role: string
   salon: Salon
-  /** Promo code the guest mentions at checkout. */
-  promoCode: string
-  /** Hair discount, as it appears in copy (e.g. "20%"). */
-  discount: string
   /** 9:16 YouTube URL. Empty → "video coming soon" placeholder. */
   videoUrl: string
 }
@@ -54,6 +59,8 @@ export const DYLAN_KEITH: Salon = {
   phone: '(818) 567-0700',
   reviewUrl: 'https://search.google.com/local/writereview?placeid=ChIJ1cfVcH-VwoAREMugw_cBZ74',
   bookingUrl: 'https://www.joinblvd.com/b/24773965-e963-4fcf-8282-512c10437d15/widget#/cart/menu',
+  promoCode: 'BURBANK20',
+  discount: '20%',
   bookingNote: '{name} is at the Burbank location — 3508 W Magnolia Blvd (choose it if asked).',
 }
 
@@ -79,8 +86,6 @@ export const STYLISTS: Stylist[] = [
     name: 'Lucy',
     role: 'Master Stylist & Colorist',
     salon: DYLAN_KEITH,
-    promoCode: 'BURBANK20',
-    discount: '20%',
     videoUrl: '',
   },
 ]
