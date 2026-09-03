@@ -77,8 +77,10 @@ export default function ShareVipPass({ salonName, message, title }: ShareVipPass
       // Android (which wants ?body). On iOS this opens Messages/iMessage.
       { label: 'Text', href: `sms:?&body=${body}`, Icon: ChatIcon },
       { label: 'WhatsApp', href: `https://wa.me/?text=${body}`, Icon: WhatsAppIcon },
+      // No separate Gmail entry: mailto already lets the phone offer Gmail as a
+      // handler, while a mail.google.com compose link forces mobile web Gmail,
+      // which nags to install the app even when it's already installed.
       { label: 'Email', href: `mailto:?subject=${subject}&body=${body}`, Icon: MailIcon },
-      { label: 'Gmail', href: `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, Icon: MailIcon },
     ]
   }
 
@@ -102,7 +104,7 @@ export default function ShareVipPass({ salonName, message, title }: ShareVipPass
           <p className="text-sm text-gray-600 mb-3">
             Send the {salonName} &amp; Magnolia Skin Center pass:
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {targets().map(({ label, href, Icon }) => (
               <a key={label} href={href} target="_blank" rel="noopener noreferrer" className={option}>
                 <Icon className="w-4 h-4 shrink-0" />
