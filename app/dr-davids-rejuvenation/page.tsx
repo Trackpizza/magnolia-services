@@ -12,9 +12,10 @@ export const revalidate = 60
 // business phone). Update here if it ever changes.
 const DR_DAVID_PHONE = '310-409-5887'
 
-// Paste Dr. David's YouTube video URL here when the clip is ready. While empty,
-// RejuvenationVideo renders a "video coming soon" placeholder.
-const VIDEO_URL = ''
+// Same clip as on /rejuvenation-journeys. This is the corrected re-upload — the
+// original (CCnqij06_gs) did not process correctly on YouTube. Empty here would
+// fall back to RejuvenationVideo's "video coming soon" placeholder.
+const VIDEO_URL = 'https://youtu.be/tVJwuEpdXvQ'
 
 // Emailed directly to weight-loss patients — keep it out of search indexes.
 export const metadata: Metadata = {
