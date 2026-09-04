@@ -8,9 +8,10 @@ import LegalLinks from '@/components/LegalLinks'
 // Cached/ISR: served instantly from the CDN, regenerated at most once a minute.
 export const revalidate = 60
 
-// Paste Nurse Eileen's YouTube video URL here when the clip is ready. While
-// empty, RejuvenationVideo renders a "video coming soon" placeholder.
-const VIDEO_URL = ''
+// Same clip as on /rejuvenation-journeys. This is the corrected re-upload — the
+// original (POZHNnnFUUI) shipped with the wrong captions. Empty here would fall
+// back to RejuvenationVideo's "video coming soon" placeholder.
+const VIDEO_URL = 'https://youtu.be/UkaYO_MHa3g'
 
 const HEADLINE = 'Rebuilding My Skin from Within: My Personal Rejuvenation Journey.'
 const SUBHEAD =
