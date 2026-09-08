@@ -26,6 +26,14 @@ const VIDEOS = [
   },
 ]
 
+// Teaser for the wider walkthrough library, shown under the booking CTA. A
+// Shorts URL — getYouTubeId handles that shape, and Shorts are already 9:16 so
+// they fit RejuvenationVideo's frame without letterboxing.
+const WALKTHROUGH = {
+  url: 'https://youtube.com/shorts/sKw-M0pHrh8',
+  caption: 'Non-Surgical Facelift Results: 1-Month Patient Walkthrough',
+}
+
 // Emailed directly to patients — keep it out of search indexes.
 export const metadata: Metadata = {
   title: 'Rebuilding Our Skin | Magnolia Skin Center',
@@ -119,6 +127,25 @@ export default async function RejuvenationJourneysPage() {
             Book a Complimentary 15-Minute Video Call
           </a>
           {f.phone && <CallTextPills phone={f.phone} variant="light" className="mt-6" />}
+        </section>
+
+        {/* Walkthrough library teaser */}
+        <section className="max-w-3xl mx-auto px-6 pb-16 text-center">
+          <h2 className="text-3xl sm:text-4xl font-semibold text-plum-900 mb-4" style={serif}>
+            Watch Dr. David&apos;s Video Walkthroughs
+          </h2>
+          <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto">
+            Explore our library of clinical before-and-after breakdowns to see how we target skin laxity and facial
+            aging without surgery.
+          </p>
+          <RejuvenationVideo
+            url={WALKTHROUGH.url}
+            title={WALKTHROUGH.caption}
+            subject="Dr. David"
+          />
+          <p className="text-base text-gray-600 leading-relaxed mt-4 max-w-xs mx-auto">
+            {WALKTHROUGH.caption}
+          </p>
         </section>
       </main>
 

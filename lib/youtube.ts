@@ -1,4 +1,12 @@
-// Extract the YouTube video ID from a watch/short/embed URL. Returns null if not recognized.
+// Extract the YouTube video ID from a youtu.be / watch / embed / shorts URL.
+// Returns null if not recognized.
+//
+// Shorts matter here: the clinic films vertical, so a "youtube.com/shorts/<id>"
+// link is what gets pasted into /admin most often now. Without this case it
+// returned null and the page silently fell back to the "video coming soon"
+// placeholder with no error anywhere — which reads as "the video is missing"
+// rather than "that URL shape isn't supported". Shorts share the normal video
+// id space, so the id works unchanged in the embed and thumbnail URLs.
 export function getYouTubeId(url: string): string | null {
   if (!url) return null
   const shortMatch = url.match(/youtu\.be\/([a-zA-Z0-9_-]+)/)
@@ -7,6 +15,8 @@ export function getYouTubeId(url: string): string | null {
   if (longMatch) return longMatch[1]
   const embedMatch = url.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/)
   if (embedMatch) return embedMatch[1]
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/)
+  if (shortsMatch) return shortsMatch[1]
   return null
 }
 
