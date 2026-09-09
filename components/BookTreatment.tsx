@@ -17,7 +17,7 @@ import { useSearchParams } from 'next/navigation'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
-interface Treatment { id: string; name: string; durationMin: number }
+interface Treatment { id: string; name: string; durationMin: number; category?: string }
 interface Slot { date: string; start: string; end: string }
 interface Provider { id: string; name: string }
 type Step = 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'done'
@@ -168,6 +168,24 @@ function BookTreatmentInner() {
     }
   }
 
+  // Grouped in the order the API returns them, which is the order the clinic set
+  // in Scheduler Setup. Sorting alphabetically would scatter a category the
+  // clinic deliberately kept together.
+  const byCategory = useMemo(() => {
+    const out: { category: string; items: Treatment[] }[] = []
+    for (const t of treatments) {
+      const c = t.category?.trim() || 'Treatments'
+      const last = out[out.length - 1]
+      if (last && last.category === c) last.items.push(t)
+      else {
+        const existing = out.find(g => g.category === c)
+        if (existing) existing.items.push(t)
+        else out.push({ category: c, items: [t] })
+      }
+    }
+    return out
+  }, [treatments])
+
   const byDate = useMemo(() => {
     const out: Record<string, Slot[]> = {}
     for (const s of slots) {
@@ -236,14 +254,23 @@ function BookTreatmentInner() {
       {step === 'treatment' && (
         <div>
           <p className="text-sm text-gray-600 mb-3">What would you like to book?</p>
-          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-          {treatments.map(t => (
-            <button key={t.id} onClick={() => { setTreatmentId(t.id); setStep('provider') }}
-              className="w-full text-left flex items-center justify-between gap-4 border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
-              <span className="font-medium text-gray-900">{t.name}</span>
-              <span className="text-sm text-gray-600 shrink-0">{t.durationMin} min</span>
-            </button>
-          ))}
+          <div className="space-y-5 max-h-96 overflow-y-auto pr-1">
+            {byCategory.map(group => (
+              <div key={group.category}>
+                <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">
+                  {group.category}
+                </p>
+                <div className="space-y-2">
+                  {group.items.map(t => (
+                    <button key={t.id} onClick={() => { setTreatmentId(t.id); setStep('provider') }}
+                      className="w-full text-left flex items-center justify-between gap-4 border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
+                      <span className="font-medium text-gray-900">{t.name}</span>
+                      <span className="text-sm text-gray-600 shrink-0">{t.durationMin} min</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
