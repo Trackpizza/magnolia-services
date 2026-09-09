@@ -19,7 +19,8 @@ const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
 interface Treatment { id: string; name: string; durationMin: number }
 interface Slot { date: string; start: string; end: string }
-type Step = 'treatment' | 'visit' | 'time' | 'details' | 'done'
+interface Provider { id: string; name: string }
+type Step = 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'done'
 
 function to12h(hhmm: string): string {
   const [h, m] = hhmm.split(':').map(Number)
@@ -44,6 +45,9 @@ function BookTreatmentInner() {
   const preselect = useSearchParams().get('treatment') ?? undefined
   const [treatments, setTreatments] = useState<Treatment[]>([])
   const [consultMin, setConsultMin] = useState(30)
+  const [providers, setProviders] = useState<Provider[]>([])
+  // '' means no preference, which offers the most times.
+  const [providerId, setProviderId] = useState('')
   const [enabled, setEnabled] = useState<boolean | null>(null)
   const [step, setStep] = useState<Step>('treatment')
   const [treatmentId, setTreatmentId] = useState('')
@@ -55,24 +59,28 @@ function BookTreatmentInner() {
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
-  const [confirmed, setConfirmed] = useState<{ date: string; start: string; consultMin: number } | null>(null)
+  const [confirmed, setConfirmed] = useState<{ date: string; start: string; consultMin: number; providerName?: string } | null>(null)
 
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
+  // Never "our nurse": both providers are co-owners and either may take the
+  // appointment, so the copy names whoever the patient actually chose.
+  const consultWith = providers.find(p => p.id === providerId)?.name ?? 'your provider'
 
   useEffect(() => {
     let live = true
     fetch(`${API}/api/public/treatments`)
       .then(r => r.json())
-      .then((d: { enabled: boolean; treatments: Treatment[]; newClientConsultMin?: number }) => {
+      .then((d: { enabled: boolean; treatments: Treatment[]; providers?: Provider[]; newClientConsultMin?: number }) => {
         if (!live) return
         setEnabled(d.enabled)
         setTreatments(d.treatments ?? [])
+        setProviders(d.providers ?? [])
         if (d.newClientConsultMin) setConsultMin(d.newClientConsultMin)
         // Deep link from a service page. An unknown id falls back to the
         // picker rather than erroring.
         if (preselect && (d.treatments ?? []).some(t => t.id === preselect)) {
           setTreatmentId(preselect)
-          setStep('visit')
+          setStep('provider')
         }
       })
       .catch(() => { if (live) setEnabled(false) })
@@ -86,7 +94,7 @@ function BookTreatmentInner() {
       const res = await fetch(`${API}/api/public/slots`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ procedureId: treatmentId, isNewClient: newClient }),
+        body: JSON.stringify({ procedureId: treatmentId, isNewClient: newClient, providerId: providerId || undefined }),
       })
       const d = await res.json()
       if (!res.ok) throw new Error(d.error ?? 'failed')
@@ -110,6 +118,7 @@ function BookTreatmentInner() {
         body: JSON.stringify({
           procedureId: treatmentId,
           isNewClient: isNewClient === true,
+          providerId: providerId || undefined,
           date: slot.date,
           start: slot.start,
           name: name.trim(),
@@ -130,7 +139,7 @@ function BookTreatmentInner() {
         }
         throw new Error(d.error ?? 'failed')
       }
-      setConfirmed({ date: d.date, start: d.start, consultMin: d.consultMin ?? 0 })
+      setConfirmed({ date: d.date, start: d.start, consultMin: d.consultMin ?? 0, providerName: d.providerName })
       setStep('done')
     } catch {
       setError('Something went wrong saving your booking. Please call or text us so we can help.')
@@ -158,11 +167,14 @@ function BookTreatmentInner() {
     return (
       <div className={card}>
         <h2 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>You are booked</h2>
-        <p className="text-gray-700 mb-2">{longDate(confirmed.date)} at {to12h(confirmed.start)}</p>
+        <p className="text-gray-700 mb-2">
+          {longDate(confirmed.date)} at {to12h(confirmed.start)}
+          {confirmed.providerName ? ` with ${confirmed.providerName}` : ''}
+        </p>
         {confirmed.consultMin > 0 && (
           <p className="text-gray-700 mb-2">
-            Your first visit includes {confirmed.consultMin} minutes with our nurse before your
-            treatment. There is nothing to fill in beforehand.
+            Your first visit includes {confirmed.consultMin} minutes with {confirmed.providerName || consultWith} before
+            your treatment. There is nothing to fill in beforehand.
           </p>
         )}
         <p className="text-sm text-gray-600">
@@ -186,12 +198,34 @@ function BookTreatmentInner() {
         <div className="space-y-2">
           <p className="text-sm text-gray-600 mb-3">What would you like to book?</p>
           {treatments.map(t => (
-            <button key={t.id} onClick={() => { setTreatmentId(t.id); setStep('visit') }}
+            <button key={t.id} onClick={() => { setTreatmentId(t.id); setStep('provider') }}
               className="w-full text-left flex items-center justify-between gap-4 border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
               <span className="font-medium text-gray-900">{t.name}</span>
               <span className="text-sm text-gray-600 shrink-0">{t.durationMin} min</span>
             </button>
           ))}
+        </div>
+      )}
+
+      {step === 'provider' && treatment && (
+        <div className="space-y-3">
+          <p className="text-sm text-gray-600 mb-3">
+            <span className="font-medium text-gray-900">{treatment.name}</span> &mdash; who would you like to see?
+          </p>
+          {providers.map(p => (
+            <button key={p.id} onClick={() => { setProviderId(p.id); setStep('visit') }}
+              className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
+              <span className="font-medium text-gray-900">{p.name}</span>
+            </button>
+          ))}
+          <button onClick={() => { setProviderId(''); setStep('visit') }}
+            className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
+            <span className="block font-medium text-gray-900">No preference</span>
+            <span className="block text-sm text-gray-600 mt-1">Shows the most available times.</span>
+          </button>
+          <button onClick={() => setStep('treatment')} className="text-sm text-brand-600 hover:text-brand-700 mt-2">
+            &larr; Choose a different treatment
+          </button>
         </div>
       )}
 
@@ -204,7 +238,7 @@ function BookTreatmentInner() {
             className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors disabled:opacity-50">
             <span className="block font-medium text-gray-900">This is my first visit</span>
             <span className="block text-sm text-gray-600 mt-1">
-              Includes {consultMin} minutes with our nurse before your treatment. Nothing to fill in now.
+              Includes {consultMin} minutes with {consultWith} before your treatment. Nothing to fill in now.
             </span>
           </button>
           <button onClick={() => { setIsNewClient(false); loadSlots(false) }} disabled={loading}
@@ -212,8 +246,8 @@ function BookTreatmentInner() {
             <span className="block font-medium text-gray-900">I have been treated here before</span>
             <span className="block text-sm text-gray-600 mt-1">Straight to your treatment.</span>
           </button>
-          <button onClick={() => setStep('treatment')} className="text-sm text-brand-600 hover:text-brand-700 mt-2">
-            &larr; Choose a different treatment
+          <button onClick={() => setStep('provider')} className="text-sm text-brand-600 hover:text-brand-700 mt-2">
+            &larr; Choose someone else
           </button>
         </div>
       )}
@@ -253,7 +287,7 @@ function BookTreatmentInner() {
         <form onSubmit={e => { e.preventDefault(); book() }} className="space-y-4">
           <p className="text-sm text-gray-700">
             <span className="font-medium text-gray-900">{longDate(slot.date)} at {to12h(slot.start)}</span>
-            {isNewClient ? ` \u00b7 includes ${consultMin} min with our nurse` : ''}
+            {isNewClient ? ` \u00b7 includes ${consultMin} min with ${consultWith}` : ''}
           </p>
           <label className="block text-sm font-medium text-gray-900">
             Your name
