@@ -12,7 +12,7 @@
  * Nothing about a patient is ever fetched or shown here. The API returns free
  * times and nothing else.
  */
-import { Suspense, useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
@@ -50,6 +50,7 @@ function BookTreatmentInner() {
   const [providerId, setProviderId] = useState('')
   const [enabled, setEnabled] = useState<boolean | null>(null)
   const [open, setOpen] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
   const [step, setStep] = useState<Step>('treatment')
   const [treatmentId, setTreatmentId] = useState('')
   const [isNewClient, setIsNewClient] = useState<boolean | null>(null)
@@ -95,6 +96,14 @@ function BookTreatmentInner() {
       .catch(() => { if (live) setEnabled(false) })
     return () => { live = false }
   }, [preselect])
+
+  // Each step replaces the card's contents but the page does not move, so
+  // picking a treatment from the bottom of a long list leaves you staring at the
+  // footer while the next question sits off-screen above you.
+  useEffect(() => {
+    if (!open) return
+    cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [step, open])
 
   const loadSlots = async (newClient: boolean) => {
     setLoading(true)
@@ -171,7 +180,7 @@ function BookTreatmentInner() {
   if (enabled === null) return null
   if (!enabled || treatments.length === 0) return null
 
-  const card = 'bg-white rounded-2xl border border-gray-100 p-8'
+  const card = 'bg-white rounded-2xl border border-gray-100 p-8 scroll-mt-6'
   const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
 
   // Collapsed by default. A list of treatments sitting open under the video-call
@@ -194,7 +203,7 @@ function BookTreatmentInner() {
 
   if (step === 'done' && confirmed) {
     return (
-      <div className={card}>
+      <div ref={cardRef} className={card}>
         <h2 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>You are booked</h2>
         <p className="text-gray-700 mb-2">
           {longDate(confirmed.date)} at {to12h(confirmed.start)}
@@ -215,7 +224,7 @@ function BookTreatmentInner() {
   }
 
   return (
-    <div className={card}>
+    <div ref={cardRef} className={card}>
       <h2 className="text-2xl font-semibold text-plum-900 mb-6" style={heading}>
         Book a service or in-person consult
       </h2>
@@ -225,8 +234,9 @@ function BookTreatmentInner() {
       )}
 
       {step === 'treatment' && (
-        <div className="space-y-2">
+        <div>
           <p className="text-sm text-gray-600 mb-3">What would you like to book?</p>
+          <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
           {treatments.map(t => (
             <button key={t.id} onClick={() => { setTreatmentId(t.id); setStep('provider') }}
               className="w-full text-left flex items-center justify-between gap-4 border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
@@ -234,6 +244,7 @@ function BookTreatmentInner() {
               <span className="text-sm text-gray-600 shrink-0">{t.durationMin} min</span>
             </button>
           ))}
+          </div>
         </div>
       )}
 
