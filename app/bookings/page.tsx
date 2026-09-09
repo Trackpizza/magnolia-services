@@ -106,9 +106,9 @@ export default async function BookingsPage() {
           </h2>
           <div className="grid sm:grid-cols-3 gap-6">
             {[
-              { n: '1', title: 'Pick a time', body: 'Choose an available slot on our online calendar — it only takes a minute.' },
-              { n: '2', title: 'Get your video link', body: 'You’ll receive a confirmation with a secure video link for your call.' },
-              { n: '3', title: 'Meet our team', body: 'Join from anywhere and get personalized guidance on the right treatment for you.' },
+              { n: '1', title: 'Pick a time', body: 'Book a complimentary video consultation, or go straight to a treatment you already know you want.' },
+              { n: '2', title: 'We confirm by email', body: 'Your confirmation arrives straight away, followed by reminders the day before and an hour before.' },
+              { n: '3', title: 'We see you', body: 'Video consultations are by link. A first in-person visit includes 30 minutes with your provider before treatment.' },
             ].map(step => (
               <div key={step.n} className="text-center">
                 <div className="mx-auto w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-semibold mb-4">{step.n}</div>

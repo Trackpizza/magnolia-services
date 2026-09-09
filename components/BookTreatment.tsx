@@ -178,7 +178,8 @@ function BookTreatmentInner() {
           </p>
         )}
         <p className="text-sm text-gray-600">
-          We have emailed your confirmation. If you need to change it, that email has a link.
+          We have emailed your confirmation. You will get a reminder the day before and again an
+          hour before. If you need to change or cancel, that email has a link.
         </p>
       </div>
     )
@@ -311,6 +312,11 @@ function BookTreatmentInner() {
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
             {loading ? 'Booking\u2026' : 'Confirm booking'}
           </button>
+          <p className="text-xs text-gray-600">
+            We will email your confirmation straight away, then remind you the day before and
+            an hour before. By booking you agree to our{' '}
+            <a href="/privacy" className="text-brand-600 hover:text-brand-700 underline">privacy policy</a>.
+          </p>
           <button type="button" onClick={() => setStep('time')} className="text-sm text-brand-600 hover:text-brand-700">
             &larr; Pick a different time
           </button>
