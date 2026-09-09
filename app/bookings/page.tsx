@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import { TextUsButton, CallTextPills } from '@/components/Contact'
 import LegalLinks from '@/components/LegalLinks'
-import BookTreatment from '@/components/BookTreatment'
 import { localBusinessLd } from '@/lib/schema'
 import { DAY_KEYS, type DayKey } from '@/lib/types'
 
@@ -83,7 +82,7 @@ export default async function BookingsPage() {
           Book Your Appointment
         </h1>
         <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto">
-          Not sure where to start? Book a complimentary 15-minute video consultation. Already know what you would like? Book it below.
+          Start with a complimentary 15-minute video consultation. Pick a time that works for you and we’ll help you find the treatment that’s right for you.
         </p>
         <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
@@ -91,11 +90,6 @@ export default async function BookingsPage() {
           Book a Complimentary 15-Minute Video Call
         </a>
         {f.phone && <CallTextPills phone={f.phone} variant="light" className="mt-6" />}
-      </section>
-
-      {/* Book a treatment or in-person consult */}
-      <section className="max-w-3xl mx-auto px-6 pb-6">
-        <BookTreatment />
       </section>
 
       {/* What to expect */}
