@@ -389,7 +389,7 @@ export default function AdminPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <Input label="Address" value={links.mainFooter.address} onChange={v => updateMainFooter('address', v)} placeholder="3506½ W Magnolia Blvd, Burbank, CA 91505" />
+              <Input label="Address" value={links.mainFooter.address} onChange={v => updateMainFooter('address', v)} placeholder="3508½ W Magnolia Blvd, Burbank, CA 91505" />
             </div>
             <Input label="Phone" value={links.mainFooter.phone} onChange={v => updateMainFooter('phone', v)} placeholder="(747) 305-8973" />
             <Input label="Email" value={links.mainFooter.email} onChange={v => updateMainFooter('email', v)} placeholder="hello@magnoliaskincenter.com" />

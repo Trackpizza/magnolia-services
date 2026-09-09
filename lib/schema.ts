@@ -7,7 +7,7 @@ export const BUSINESS_ID = `${SITE_URL}/#business`
 
 const BUSINESS = {
   name: 'Magnolia Skin Center',
-  streetAddress: '3506 1/2 W Magnolia Blvd',
+  streetAddress: '3508 1/2 W Magnolia Blvd',
   addressLocality: 'Burbank',
   addressRegion: 'CA',
   postalCode: '91505',

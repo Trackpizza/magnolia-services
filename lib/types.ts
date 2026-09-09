@@ -44,7 +44,7 @@ export interface ServiceLinks {
 
 export const DEFAULT_LINKS: ServiceLinks = {
   mainFooter: {
-    address: '3506½ W Magnolia Blvd, Burbank, CA 91505',
+    address: '3508½ W Magnolia Blvd, Burbank, CA 91505',
     phone: '(747) 305-8973',
     email: '',
     bookingUrl: 'https://www.magnoliaskincenter.com/zoom',

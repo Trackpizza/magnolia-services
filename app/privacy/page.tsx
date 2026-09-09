@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 const EMAIL = 'rejuv@magnoliaskincenter.com'
 const PHONE = '(747) 305-8973'
-const ADDRESS = '3506 1/2 W. Magnolia Blvd, Burbank, CA 91505'
+const ADDRESS = '3508 1/2 W. Magnolia Blvd, Burbank, CA 91505'
 
 // Shared prose element styles
 const h2 = 'text-2xl sm:text-3xl font-semibold text-plum-900'
