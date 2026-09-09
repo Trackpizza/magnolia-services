@@ -56,12 +56,19 @@ function BookTreatmentInner() {
   const [slot, setSlot] = useState<Slot | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [name, setName] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [confirmed, setConfirmed] = useState<{ date: string; start: string; consultMin: number; providerName?: string } | null>(null)
 
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
+  // Count as they type rather than rejecting on submit: someone who has typed
+  // nine digits wants to know now, not after pressing the button.
+  const digits = phone.replace(/\D/g, '')
+  const phoneOk = digits.length === 10
+  const phoneMsg =
+    digits.length === 0 ? '' : digits.length < 10 ? `${10 - digits.length} more to go` : phoneOk ? '' : 'That is too many digits'
   // Never "our nurse": both providers are co-owners and either may take the
   // appointment, so the copy names whoever the patient actually chose.
   const consultWith = providers.find(p => p.id === providerId)?.name ?? 'your provider'
@@ -121,8 +128,10 @@ function BookTreatmentInner() {
           providerId: providerId || undefined,
           date: slot.date,
           start: slot.start,
-          name: name.trim(),
-          phone: phone.trim(),
+          name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          phone: digits,
           email: email.trim(),
         }),
       })
@@ -290,15 +299,28 @@ function BookTreatmentInner() {
             <span className="font-medium text-gray-900">{longDate(slot.date)} at {to12h(slot.start)}</span>
             {isNewClient ? ` \u00b7 includes ${consultMin} min with ${consultWith}` : ''}
           </p>
-          <label className="block text-sm font-medium text-gray-900">
-            Your name
-            <input required value={name} onChange={e => setName(e.target.value)} autoComplete="name"
-              className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
-          </label>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <label className="block text-sm font-medium text-gray-900">
+              First name
+              <input required value={firstName} onChange={e => setFirstName(e.target.value)} autoComplete="given-name"
+                className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+            </label>
+            <label className="block text-sm font-medium text-gray-900">
+              Last name
+              <input required value={lastName} onChange={e => setLastName(e.target.value)} autoComplete="family-name"
+                className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+            </label>
+          </div>
           <label className="block text-sm font-medium text-gray-900">
             Mobile number
-            <input required type="tel" value={phone} onChange={e => setPhone(e.target.value)} autoComplete="tel"
-              className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+            <input required type="tel" inputMode="numeric" value={phone} placeholder="5551117777"
+              onChange={e => setPhone(e.target.value)} autoComplete="tel"
+              className={`mt-1 w-full border rounded-xl px-4 py-3 text-base ${
+                phoneMsg ? 'border-red-400' : 'border-gray-300'
+              }`} />
+            <span className={`block text-xs font-normal mt-1 ${phoneMsg ? 'text-red-700' : 'text-gray-600'}`}>
+              {phoneMsg || '10 digits, so we can reach you about your appointment.'}
+            </span>
           </label>
           <label className="block text-sm font-medium text-gray-900">
             Email
@@ -308,7 +330,7 @@ function BookTreatmentInner() {
               Your confirmation and reminders go here.
             </span>
           </label>
-          <button type="submit" disabled={loading}
+          <button type="submit" disabled={loading || !phoneOk}
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
             {loading ? 'Booking\u2026' : 'Confirm booking'}
           </button>
