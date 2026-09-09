@@ -15,6 +15,7 @@ import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import { TextUsButton, CallTextPills } from '@/components/Contact'
 import LegalLinks from '@/components/LegalLinks'
+import YouTubeEmbed from '@/components/YouTubeEmbed'
 import BookTreatment from '@/components/BookTreatment'
 import { localBusinessLd } from '@/lib/schema'
 import { DAY_KEYS, type DayKey } from '@/lib/types'
@@ -109,6 +110,33 @@ export default async function BookingPreviewPage() {
       {/* Book a treatment or in-person consult */}
       <section className="max-w-3xl mx-auto px-6 pb-6">
         <BookTreatment />
+      </section>
+
+
+      {/* Dr. David on what the video consultation actually covers */}
+      <section className="max-w-5xl mx-auto px-6 py-6">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <YouTubeEmbed
+              url="https://youtube.com/shorts/ekg4e-25db4"
+              title="Dr. David on the complimentary video consultation"
+            />
+            <div>
+              <h2 className="text-2xl font-semibold text-plum-900 mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+                What happens on the call
+              </h2>
+              <p className="text-gray-600 leading-relaxed mb-4">
+                Dr. David looks at whatever is on your mind &mdash; eyelids and hooded eyes,
+                neck laxity, facial volume, body contouring &mdash; and talks you through which
+                non-surgical treatments would suit it, and which would not.
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                You finish the call knowing what is appropriate for you before you ever set
+                foot in the clinic. It takes fifteen minutes and costs nothing.
+              </p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* What to expect */}
