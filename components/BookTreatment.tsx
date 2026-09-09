@@ -49,6 +49,7 @@ function BookTreatmentInner() {
   // '' means no preference, which offers the most times.
   const [providerId, setProviderId] = useState('')
   const [enabled, setEnabled] = useState<boolean | null>(null)
+  const [open, setOpen] = useState(false)
   const [step, setStep] = useState<Step>('treatment')
   const [treatmentId, setTreatmentId] = useState('')
   const [isNewClient, setIsNewClient] = useState<boolean | null>(null)
@@ -87,6 +88,7 @@ function BookTreatmentInner() {
         // picker rather than erroring.
         if (preselect && (d.treatments ?? []).some(t => t.id === preselect)) {
           setTreatmentId(preselect)
+          setOpen(true)
           setStep('provider')
         }
       })
@@ -171,6 +173,24 @@ function BookTreatmentInner() {
 
   const card = 'bg-white rounded-2xl border border-gray-100 p-8'
   const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
+
+  // Collapsed by default. A list of treatments sitting open under the video-call
+  // CTA competes with it and makes the page look like two half-finished things;
+  // as a banner it reads as the second of two ways to book, which is what it is.
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        aria-expanded={false}
+        className="w-full inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors"
+      >
+        Book a service or an in-person consult
+        <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+    )
+  }
 
   if (step === 'done' && confirmed) {
     return (
