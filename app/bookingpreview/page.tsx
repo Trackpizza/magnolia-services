@@ -107,15 +107,12 @@ export default async function BookingPreviewPage() {
         <div className="mt-4 max-w-md mx-auto text-left">
           <BookTreatment />
         </div>
-        <div className="mt-6 mx-auto max-w-sm flex items-center gap-4 text-left">
-          <div className="w-[104px] shrink-0">
-            <YouTubeEmbed
-              url="https://youtube.com/shorts/ekg4e-25db4"
-              title="Dr. David explains what to expect on your video call"
-              className="!max-w-none"
-            />
-          </div>
-          <p className="text-sm text-gray-600 leading-relaxed">
+        <div className="mt-8 max-w-xs mx-auto">
+          <YouTubeEmbed
+            url="https://youtube.com/shorts/ekg4e-25db4"
+            title="Dr. David explains what to expect on your video call"
+          />
+          <p className="text-sm text-gray-600 mt-3">
             Dr. David explains what to expect on your video call
           </p>
         </div>
