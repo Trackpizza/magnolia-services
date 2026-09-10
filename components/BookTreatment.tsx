@@ -153,6 +153,10 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       if (!res.ok) {
         // The one error worth explaining: someone took the time while this form
         // was open. Everything else gets the phone number, not an error code.
+        if (d.error === 'deposit_unavailable') {
+          setError('Card payments are not switched on yet, so this booking was not taken. Please call or text us.')
+          return
+        }
         if (d.error === 'slot_taken') {
           setError('Sorry, that time was just taken. Please choose another.')
           setSlot(null)
