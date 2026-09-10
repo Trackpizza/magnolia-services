@@ -1,0 +1,253 @@
+/**
+ * PREVIEW WITH A DEPOSIT — the same page, asking for one.
+ *
+ * Exists so both versions can be put side by side and compared, rather than
+ * argued about: /bookingpreview books straight away, this one sends the patient
+ * to Stripe first. Kept off the index and out of robots.txt, and linked from
+ * nowhere.
+ *
+ * The deposit flag lives on THIS PAGE only. Whether the clinic takes a deposit
+ * is a setting in the app, not a property of a URL — this exists to demonstrate
+ * the choice, not to make it.
+ *
+ * ⚠️ Bookings made here are REAL — the widget talks to the live API. The master
+ * switch (Settings → Scheduler Setup → "Let patients book online") is what
+ * decides whether anything can be booked at all; leave it off unless a demo is
+ * actually happening. See medspa_records/docs/PATIENT-BOOKING-SPEC.md.
+ */
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { getLinks } from '@/lib/links'
+import { TextUsButton, CallTextPills } from '@/components/Contact'
+import LegalLinks from '@/components/LegalLinks'
+import YouTubeEmbed from '@/components/YouTubeEmbed'
+import BookTreatment from '@/components/BookTreatment'
+import { localBusinessLd } from '@/lib/schema'
+import { DAY_KEYS, type DayKey } from '@/lib/types'
+
+// Cached/ISR: served instantly from the CDN. Regenerates in the background at most
+// once per minute, and immediately when the admin saves (revalidate hook).
+export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: 'Book an Appointment | Magnolia Skin Center',
+  robots: { index: false, follow: false },
+  description:
+    'Book your complimentary 15-minute video consultation with Magnolia Skin Center in Burbank, CA. Pick a time online and meet our team.',
+}
+
+const DAY_LABELS: Record<DayKey, string> = {
+  monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
+  friday: 'Friday', saturday: 'Saturday', sunday: 'Sunday',
+}
+
+// "14:30" -> "2:30 PM"
+function to12h(hhmm: string): string {
+  const [h, m] = hhmm.split(':').map(Number)
+  if (Number.isNaN(h) || Number.isNaN(m)) return hhmm
+  const period = h < 12 ? 'AM' : 'PM'
+  const hour = h % 12 === 0 ? 12 : h % 12
+  return `${hour}:${String(m).padStart(2, '0')} ${period}`
+}
+
+const CameraIcon = ({ className }: { className: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
+  </svg>
+)
+
+export default async function BookingPreviewDepositPage() {
+  const links = await getLinks()
+  const { mainFooter: f, hours } = links
+
+  const businessLd = localBusinessLd({
+    telephone: f.phone,
+    sameAs: f.customLinks.map(l => l.url),
+    hours,
+  })
+
+  const mapsUrl = f.address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`Magnolia Skin Center, ${f.address}`)}`
+    : null
+
+  const anyHoursSet = DAY_KEYS.some(d => !hours[d].closed && hours[d].open && hours[d].close)
+
+  return (
+    <div className="min-h-screen bg-cream-100">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(businessLd) }}
+      />
+
+      {/* Header */}
+      <header className="bg-plum-900">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/">
+            <img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} fetchPriority="high" className="h-9 w-auto" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/" className="text-sm text-white/70 hover:text-white font-medium transition-colors">
+              All Services
+            </Link>
+            <TextUsButton phone={f.phone} variant="dark" className="hidden sm:inline-flex" />
+          </div>
+        </div>
+      </header>
+
+      <main>
+      {/* Hero */}
+      <section className="max-w-3xl mx-auto px-6 pt-16 pb-10 text-center">
+        <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-3">Appointments</p>
+        <h1 className="text-5xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+          Book Your Appointment
+        </h1>
+        <p className="text-xl text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto">
+          Not sure where to start? Book a complimentary 15-minute video consultation. Already know what you would like? Book it below.
+        </p>
+        <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
+          <CameraIcon className="w-5 h-5 shrink-0" />
+          Book a Complimentary 15-Minute Video Call
+        </a>
+        <div className="mt-4 max-w-md mx-auto text-left">
+          <BookTreatment deposit />
+        </div>
+        <div className="mt-8 max-w-xs mx-auto">
+          <YouTubeEmbed
+            url="https://youtube.com/shorts/ekg4e-25db4"
+            title="Dr. David explains what to expect on your video call"
+          />
+          <p className="text-sm text-gray-600 mt-3">
+            Dr. David explains what to expect on your video call
+          </p>
+        </div>
+        {f.phone && <CallTextPills phone={f.phone} variant="light" className="mt-6" />}
+      </section>
+
+
+      {/* What to expect */}
+      <section className="max-w-5xl mx-auto px-6 py-6">
+        <div className="bg-white rounded-2xl border border-gray-100 p-8">
+          <h2 className="text-2xl font-semibold text-plum-900 mb-8 text-center" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+            What to expect
+          </h2>
+          <div className="grid sm:grid-cols-3 gap-6">
+            {[
+              { n: '1', title: 'Pick a time', body: 'Book a complimentary video consultation, or go straight to a treatment you already know you want.' },
+              { n: '2', title: 'We confirm by email', body: 'Your confirmation arrives straight away, followed by reminders the day before and an hour before.' },
+              { n: '3', title: 'We see you', body: 'Video consultations are by link. A first in-person visit includes 30 minutes with your provider before treatment.' },
+            ].map(step => (
+              <div key={step.n} className="text-center">
+                <div className="mx-auto w-10 h-10 rounded-full bg-brand-600 flex items-center justify-center text-white font-semibold mb-4">{step.n}</div>
+                <p className="font-semibold text-gray-900 mb-1">{step.title}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">{step.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Visit info */}
+      <section className="max-w-5xl mx-auto px-6 py-6">
+        <div className="grid sm:grid-cols-3 gap-4">
+          {/* Location */}
+          {f.address && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Location</p>
+              <p className="text-sm text-gray-700 leading-relaxed mb-3">{f.address}</p>
+              {mapsUrl && (
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-brand-600 hover:text-brand-700">
+                  Get directions &rarr;
+                </a>
+              )}
+            </div>
+          )}
+
+          {/* Phone */}
+          {f.phone && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Call or text us</p>
+              <a href={`tel:+1${f.phone.replace(/\D/g, '').slice(-10)}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors">Call {f.phone}</a>
+              <a href={`sms:+1${f.phone.replace(/\D/g, '').slice(-10)}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors mt-1">Text {f.phone}</a>
+              {f.email && (
+                <a href={`mailto:${f.email}`} className="block text-sm text-gray-700 hover:text-brand-600 transition-colors mt-1">{f.email}</a>
+              )}
+            </div>
+          )}
+
+          {/* Hours */}
+          {anyHoursSet && (
+            <div className="bg-white rounded-2xl border border-gray-100 p-6">
+              <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-2">Hours</p>
+              <dl className="space-y-1">
+                {DAY_KEYS.map(d => (
+                  <div key={d} className="flex justify-between gap-3 text-sm">
+                    <dt className="text-gray-600">{DAY_LABELS[d]}</dt>
+                    <dd className="text-gray-700 font-medium">
+                      {hours[d].closed || !hours[d].open || !hours[d].close
+                        ? 'Closed'
+                        : `${to12h(hours[d].open)} – ${to12h(hours[d].close)}`}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="bg-plum-900 py-16 mt-6">
+        <div className="max-w-2xl mx-auto px-6 text-center">
+          <h2 className="text-3xl font-semibold text-white mb-3" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+            Ready to invest in yourself?
+          </h2>
+          <p className="text-white/60 mb-8 max-w-md mx-auto">
+            Book your complimentary video consultation now, or browse our full menu of treatments first.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href={f.bookingUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-8 py-3.5 rounded-xl transition-colors">
+              <CameraIcon className="w-5 h-5 shrink-0" />
+              Book a Video Call
+            </a>
+            <Link href="/" className="inline-flex items-center gap-2 border border-white/25 text-white/80 hover:text-white hover:border-white/50 text-sm font-semibold px-8 py-3.5 rounded-xl transition-colors">
+              Browse all services
+            </Link>
+          </div>
+          {f.phone && <CallTextPills phone={f.phone} variant="dark" className="mt-8" />}
+        </div>
+      </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-plum-900 border-t border-white/10 py-10">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-center md:text-left space-y-1">
+            {f.address && <p className="text-white/50 text-sm">{f.address}</p>}
+            {f.phone && (
+              <a href={`tel:${f.phone.replace(/\D/g, '')}`}
+                className="block text-white/50 hover:text-white/70 text-sm transition-colors">{f.phone}</a>
+            )}
+            {f.email && (
+              <a href={`mailto:${f.email}`}
+                className="block text-white/50 hover:text-white/70 text-sm transition-colors">{f.email}</a>
+            )}
+          </div>
+          <div className="flex items-center gap-4 text-sm flex-wrap justify-center">
+            {f.customLinks.map((link, i) => (
+              <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="text-white/50 hover:text-white transition-colors">{link.label || link.url}</a>
+            ))}
+            {f.websiteUrl && (
+              <a href={f.websiteUrl} target="_blank" rel="noopener noreferrer"
+                className="text-white/50 hover:text-white transition-colors">magnoliaskincenter.com</a>
+            )}
+            <Link href="/" className="text-white/50 hover:text-white transition-colors">All Services</Link>
+            <LegalLinks />
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

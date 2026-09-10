@@ -41,7 +41,7 @@ function longDate(ymd: string): string {
  * server-side would force /bookings to render per request and lose the ISR
  * caching it has had all along -- for a value only this widget uses.
  */
-function BookTreatmentInner() {
+function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const preselect = useSearchParams().get('treatment') ?? undefined
   const [treatments, setTreatments] = useState<Treatment[]>([])
   const [consultMin, setConsultMin] = useState(30)
@@ -137,6 +137,9 @@ function BookTreatmentInner() {
           procedureId: treatmentId,
           isNewClient: isNewClient === true,
           providerId: providerId || undefined,
+          // Only the deposit preview asks for one. The real page never does —
+          // whether a deposit is taken is the clinic's setting, not a page's.
+          ...(deposit ? { deposit: true } : {}),
           date: slot.date,
           start: slot.start,
           name: `${firstName.trim()} ${lastName.trim()}`.trim(),
@@ -158,6 +161,12 @@ function BookTreatmentInner() {
           return
         }
         throw new Error(d.error ?? 'failed')
+      }
+      // A deposit booking is not confirmed here: Stripe is, and the webhook
+      // confirms it once the money lands. Hand the patient straight over.
+      if (d.checkoutUrl) {
+        window.location.href = d.checkoutUrl
+        return
       }
       setConfirmed({ date: d.date, start: d.start, consultMin: d.consultMin ?? 0, providerName: d.providerName })
       setStep('done')
@@ -406,10 +415,10 @@ function BookTreatmentInner() {
   )
 }
 
-export default function BookTreatment() {
+export default function BookTreatment({ deposit = false }: { deposit?: boolean }) {
   return (
     <Suspense fallback={null}>
-      <BookTreatmentInner />
+      <BookTreatmentInner deposit={deposit} />
     </Suspense>
   )
 }

@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/spin', '/bookingtesting', '/bookingpreview', '/bookings/cancel', '/dr-davids-rejuvenation', '/nurse-eileens-rejuvenation', '/rejuvenation-journeys', '/stylists'],
+      disallow: ['/admin', '/spin', '/bookingtesting', '/bookingpreview', '/bookingpreview-deposit', '/bookings/cancel', '/dr-davids-rejuvenation', '/nurse-eileens-rejuvenation', '/rejuvenation-journeys', '/stylists'],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,
   }
