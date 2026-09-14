@@ -501,7 +501,14 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           <p className="text-xs text-gray-600">
             We will email your confirmation straight away, then remind you the day before and
             an hour before. By booking you agree to our{' '}
-            <a href="/privacy" className="text-brand-600 hover:text-brand-700 underline">privacy policy</a>.
+            {/* New tab, always. This widget holds the whole booking in component
+                state, so navigating away and pressing Back does not return you
+                to the code step — it returns you to an empty form at step one,
+                having already spent a text. Nobody reads a privacy policy badly
+                enough to deserve that. */}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer"
+              className="text-brand-600 hover:text-brand-700 underline">privacy policy</a>
+            <span aria-hidden="true"> ↗</span>.
           </p>
           <button type="button" onClick={() => setStep('time')} className="text-sm text-brand-600 hover:text-brand-700">
             &larr; Pick a different time
