@@ -13,7 +13,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import BookingConfirmed from '@/components/BookingConfirmed'
+import BookingConfirmed, { WelcomeVideo } from '@/components/BookingConfirmed'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -147,6 +147,10 @@ export default function BookingConfirmedClient() {
           ? 'Your payment went through, and your confirmation email is on its way. If it has not arrived in a few minutes, call or text us and we will confirm it by hand — nothing is lost.'
           : 'If you have just booked, your confirmation email has the date, the time and a link to change or cancel.'}
       </p>
+      {/* Shown in both cases. Without it, someone who arrives here without a
+          Stripe session — a bookmark, a shared link, a stripped query string —
+          gets a page with two sentences and nowhere to go. */}
+      <WelcomeVideo />
       <Link href="/bookings" className="inline-block text-brand-600 hover:text-brand-700 underline">
         Back to booking
       </Link>

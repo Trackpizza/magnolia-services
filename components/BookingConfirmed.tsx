@@ -79,37 +79,49 @@ export default function BookingConfirmed({
         </p>
       </div>
 
-      {/* Placeholder until Dr. David and Eileen record one. Deliberately shown
-          rather than hidden: this is the moment a new patient is most curious
-          about who they are about to see, and an empty space says nothing while
-          a promised video says the clinic was expecting them. */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden">
-        {videoUrl ? (
-          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-            <iframe
-              src={videoUrl}
-              title="What to expect at your appointment"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full"
-            />
-          </div>
-        ) : (
-          <div className="bg-gray-50 px-5 py-8 text-center">
-            <div className="text-3xl mb-2" aria-hidden="true">🎥</div>
-            <p className="text-sm font-medium text-gray-800">What to expect — coming soon</p>
-            <p className="text-xs text-gray-600 mt-1 max-w-sm mx-auto">
-              Dr. David and Nurse Eileen are recording a short welcome video: what happens when you
-              arrive, and how to get the most from your treatment.
-            </p>
-          </div>
-        )}
-      </div>
+      <WelcomeVideo videoUrl={videoUrl} />
 
       <p className="text-sm text-gray-600">
         Anything you are unsure about before then, call or text us — we would far rather answer a
         question than have you wondering.
       </p>
+    </div>
+  )
+}
+
+/**
+ * The welcome video, or the promise of one.
+ *
+ * Its own export so the confirmation page can show it even when it has no
+ * booking to confirm — someone who lands there without a Stripe session gets
+ * a page that is still about their visit rather than a dead end. Deliberately
+ * shown rather than hidden while unrecorded: this is the moment a new patient
+ * is most curious about who they are about to see, and an empty space says
+ * nothing while a promised video says the clinic was expecting them.
+ */
+export function WelcomeVideo({ videoUrl }: { videoUrl?: string }) {
+  return (
+    <div className="rounded-xl border border-gray-200 overflow-hidden">
+      {videoUrl ? (
+        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+          <iframe
+            src={videoUrl}
+            title="What to expect at your appointment"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="absolute inset-0 w-full h-full"
+          />
+        </div>
+      ) : (
+        <div className="bg-gray-50 px-5 py-8 text-center">
+          <div className="text-3xl mb-2" aria-hidden="true">🎥</div>
+          <p className="text-sm font-medium text-gray-800">What to expect — coming soon</p>
+          <p className="text-xs text-gray-600 mt-1 max-w-sm mx-auto">
+            Dr. David and Nurse Eileen are recording a short welcome video: what happens when you
+            arrive, and how to get the most from your treatment.
+          </p>
+        </div>
+      )}
     </div>
   )
 }
