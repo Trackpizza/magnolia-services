@@ -14,6 +14,7 @@
  */
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import BookingConfirmed from '@/components/BookingConfirmed'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -355,24 +356,19 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   if (step === 'done' && confirmed) {
     return (
       <div ref={cardRef} className={card}>
-        <div className="flex items-start justify-between gap-4 mb-3">
-          <h2 className="text-2xl font-semibold text-plum-900" style={heading}>You are booked</h2>
+        <div className="flex justify-end mb-1">
           <CollapseButton onClick={() => setOpen(false)} />
         </div>
-        <p className="text-gray-700 mb-2">
-          {longDate(confirmed.date)} at {to12h(confirmed.start)}
-          {confirmed.providerName ? ` with ${confirmed.providerName}` : ''}
-        </p>
-        {confirmed.consultMin > 0 && (
-          <p className="text-gray-700 mb-2">
-            Your first visit includes {confirmed.consultMin} minutes with {confirmed.providerName || consultWith} before
-            your treatment. There is nothing to fill in beforehand.
-          </p>
-        )}
-        <p className="text-sm text-gray-600">
-          We have emailed your confirmation. You will get a reminder the day before and again an
-          hour before. If you need to change or cancel, that email has a link.
-        </p>
+        {/* The SAME component /booking-confirmed renders. A patient who paid a
+            deposit and one who did not should be told the same things — the
+            prep email, the reminders, the welcome video — and two copies of
+            that copy would drift apart within a month. */}
+        <BookingConfirmed
+          date={confirmed.date}
+          start={confirmed.start}
+          consultMin={confirmed.consultMin}
+          providerName={confirmed.providerName || consultWith}
+        />
       </div>
     )
   }
