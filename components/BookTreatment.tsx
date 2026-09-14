@@ -62,6 +62,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const [lastName, setLastName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
+  const [emailTouched, setEmailTouched] = useState(false)
   const [confirmed, setConfirmed] = useState<{ date: string; start: string; consultMin: number; providerName?: string } | null>(null)
   // Whether the clinic is asking for a texted code. Advisory: the records API
   // enforces it either way, so a stale value here cannot let a booking skip it.
@@ -81,6 +82,15 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const phoneOk = digits.length === 10
   const phoneMsg =
     digits.length === 0 ? '' : digits.length < 10 ? `${10 - digits.length} more to go` : phoneOk ? '' : 'That is too many digits'
+  const emailTrimmed = email.trim()
+  const emailOk = EMAIL_RE.test(emailTrimmed)
+  // Only complain once they have left the field. Telling someone their address
+  // is malformed while they are still on the third character is noise, and it
+  // trains people to ignore the line that will later say something true.
+  const emailMsg = emailTouched && emailTrimmed && !emailOk
+    ? 'That does not look like an email address — it needs an @ and a dot, like you@gmail.com.'
+    : ''
+  const emailSuggestion = emailOk ? suggestEmailDomain(emailTrimmed) : null
 
   /**
    * Reformat as they type.
@@ -96,6 +106,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
    *    1 only when pasting into an empty field — typing it as an area code is
    *    invalid anyway, but stripping mid-edit would corrupt a number in progress.
    */
+
   const onPhoneChange = (raw: string) => {
     let d = raw.replace(/\D/g, '')
     if (digits.length === 0 && d.length === 11 && d.startsWith('1')) d = d.slice(1)
@@ -510,13 +521,25 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           </label>
           <label className="block text-sm font-medium text-gray-900">
             Email
-            <input required type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email"
-              className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
-            <span className="block text-xs font-normal text-gray-600 mt-1">
-              Your confirmation and reminders go here.
-            </span>
+            <input required type="email" value={email} autoComplete="email"
+              onChange={e => setEmail(e.target.value)}
+              onBlur={() => setEmailTouched(true)}
+              className={`mt-1 w-full border rounded-xl px-4 py-3 text-base ${
+                emailMsg ? 'border-red-400' : 'border-gray-300'
+              }`} />
+            {emailSuggestion ? (
+              <span className="block text-xs font-normal text-amber-800 mt-1">
+                Did you mean{' '}
+                <button type="button" onClick={() => setEmail(emailSuggestion)}
+                  className="underline font-medium hover:text-amber-900">{emailSuggestion}</button>?
+              </span>
+            ) : (
+              <span className={`block text-xs font-normal mt-1 ${emailMsg ? 'text-red-700' : 'text-gray-600'}`}>
+                {emailMsg || 'Your confirmation and reminders go here.'}
+              </span>
+            )}
           </label>
-          <button type="submit" disabled={loading || !phoneOk}
+          <button type="submit" disabled={loading || !phoneOk || !emailOk}
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
             {loading
               ? (needsVerify && !verifyToken ? 'Texting you a code\u2026' : 'Booking\u2026')
@@ -619,6 +642,71 @@ function CollapseButton({ onClick }: { onClick: () => void }) {
       </svg>
     </button>
   )
+}
+
+/**
+ * The SAME test the booking API applies (app/api/public/book/route.ts).
+ *
+ * Copied deliberately rather than loosened: a form that accepts what the server
+ * rejects hands the patient a generic "something went wrong" for a typo the
+ * field could have pointed at. Deliberately not a full RFC 5322 pattern —
+ * those reject real addresses, and the only claim worth making here is "this
+ * has a name, an @, and a domain with a dot in it".
+ */
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+/** Domains this clinic's patients actually use. */
+const COMMON_DOMAINS = [
+  'gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com', 'icloud.com', 'me.com',
+  'aol.com', 'comcast.net', 'sbcglobal.net', 'att.net', 'verizon.net', 'live.com', 'msn.com',
+]
+
+/**
+ * Real providers that sit one keystroke from a common one.
+ *
+ * `mail.com` is a genuine mailbox provider and is a single inserted 'g' away
+ * from `gmail.com`; so are `ymail.com` and `email.com`. Nothing structural
+ * separates those from a typo, so they are listed. Telling a mail.com user
+ * their own address is wrong is the one outcome this feature must not produce.
+ */
+const KNOWN_REAL_LOOKALIKES = ['mail.com', 'ymail.com', 'email.com', 'googlemail.com', 'mac.com']
+
+function editDistance(a: string, b: string): number {
+  const prev = Array.from({ length: b.length + 1 }, (_, i) => i)
+  for (let i = 1; i <= a.length; i++) {
+    let diag = prev[0]
+    prev[0] = i
+    for (let j = 1; j <= b.length; j++) {
+      const tmp = prev[j]
+      prev[j] = Math.min(prev[j] + 1, prev[j - 1] + 1, diag + (a[i - 1] === b[j - 1] ? 0 : 1))
+      diag = tmp
+    }
+  }
+  return prev[b.length]
+}
+
+/**
+ * "gmial.com" → "gmail.com". A SUGGESTION, never a correction.
+ *
+ * An undeliverable address is the most expensive typo in this flow: no
+ * confirmation, no cancel link, no reminders and no intake form, and nobody
+ * finds out until the patient does not arrive. But auto-correcting someone's
+ * own address is worse — plenty of real domains look like near-misses — so this
+ * only ever asks.
+ */
+function suggestEmailDomain(email: string): string | null {
+  const at = email.lastIndexOf('@')
+  if (at < 1) return null
+  const domain = email.slice(at + 1).toLowerCase()
+  if (!domain || COMMON_DOMAINS.includes(domain)) return null
+  if (KNOWN_REAL_LOOKALIKES.includes(domain)) return null
+  for (const candidate of COMMON_DOMAINS) {
+    // Tight threshold: one slip on a short domain, two on a long one. Any
+    // looser and it starts second-guessing legitimate company addresses.
+    const limit = candidate.length > 8 ? 2 : 1
+    if (editDistance(domain, candidate) <= limit) return `${email.slice(0, at + 1)}${candidate}`
+  }
+  return null
 }
 
 /**
