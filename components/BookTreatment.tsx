@@ -75,10 +75,34 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
   // Count as they type rather than rejecting on submit: someone who has typed
   // nine digits wants to know now, not after pressing the button.
+  // `phone` holds the FORMATTED string; digits stay the single source of truth
+  // for validation and for everything sent to the API.
   const digits = phone.replace(/\D/g, '')
   const phoneOk = digits.length === 10
   const phoneMsg =
     digits.length === 0 ? '' : digits.length < 10 ? `${10 - digits.length} more to go` : phoneOk ? '' : 'That is too many digits'
+
+  /**
+   * Reformat as they type.
+   *
+   * Two things that break naive live formatting, both handled:
+   *
+   *  - Backspacing over a separator removes a character that is not a digit, so
+   *    the stripped value is unchanged and the field reformats straight back.
+   *    The key looks dead. Detect a shortening edit that left the digits alone
+   *    and drop a digit instead.
+   *  - Pasting "+1 818 555 3333" gives eleven digits, and truncating to ten
+   *    silently keeps the country code and loses the last digit. Strip a leading
+   *    1 only when pasting into an empty field — typing it as an area code is
+   *    invalid anyway, but stripping mid-edit would corrupt a number in progress.
+   */
+  const onPhoneChange = (raw: string) => {
+    let d = raw.replace(/\D/g, '')
+    if (digits.length === 0 && d.length === 11 && d.startsWith('1')) d = d.slice(1)
+    d = d.slice(0, 10)
+    if (raw.length < phone.length && d === digits) d = d.slice(0, -1)
+    setPhone(formatPhoneInput(d))
+  }
   // Never "our nurse": both providers are co-owners and either may take the
   // appointment, so the copy names whoever the patient actually chose.
   const consultWith = providers.find(p => p.id === providerId)?.name ?? 'your provider'
@@ -475,8 +499,8 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           </div>
           <label className="block text-sm font-medium text-gray-900">
             Mobile number
-            <input required type="tel" inputMode="numeric" value={phone} placeholder="5551117777"
-              onChange={e => setPhone(e.target.value)} autoComplete="tel"
+            <input required type="tel" inputMode="numeric" value={phone} placeholder="(555)-111-7777"
+              onChange={e => onPhoneChange(e.target.value)} autoComplete="tel" maxLength={14}
               className={`mt-1 w-full border rounded-xl px-4 py-3 text-base ${
                 phoneMsg ? 'border-red-400' : 'border-gray-300'
               }`} />
@@ -597,12 +621,30 @@ function CollapseButton({ onClick }: { onClick: () => void }) {
   )
 }
 
-/** (818) 555-0142 — so the patient can check at a glance that the code went to
- *  the number they meant, which is half the reason this step exists. */
+/**
+ * Digits → the shape the field shows, at every length along the way.
+ *
+ *   8          (8
+ *   818        (818)
+ *   818555     (818)-555
+ *   8185553333 (818)-555-3333
+ *
+ * The closing bracket lands the moment the area code is complete, so the field
+ * confirms it back before they have typed anything else.
+ */
+function formatPhoneInput(digits: string): string {
+  const d = digits.slice(0, 10)
+  if (d.length === 0) return ''
+  if (d.length < 3) return `(${d}`
+  if (d.length === 3) return `(${d})`
+  if (d.length <= 6) return `(${d.slice(0, 3)})-${d.slice(3)}`
+  return `(${d.slice(0, 3)})-${d.slice(3, 6)}-${d.slice(6)}`
+}
+
+/** The same shape, for reading back on the code step — so the number they are
+ *  checking looks like the number they typed rather than a second convention. */
 function formatUsPhone(tenDigits: string): string {
-  return tenDigits.length === 10
-    ? `(${tenDigits.slice(0, 3)}) ${tenDigits.slice(3, 6)}-${tenDigits.slice(6)}`
-    : tenDigits
+  return tenDigits.length === 10 ? formatPhoneInput(tenDigits) : tenDigits
 }
 
 export default function BookTreatment({ deposit = false }: { deposit?: boolean }) {
