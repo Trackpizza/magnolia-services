@@ -320,7 +320,10 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   if (step === 'done' && confirmed) {
     return (
       <div ref={cardRef} className={card}>
-        <h2 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>You are booked</h2>
+        <div className="flex items-start justify-between gap-4 mb-3">
+          <h2 className="text-2xl font-semibold text-plum-900" style={heading}>You are booked</h2>
+          <CollapseButton onClick={() => setOpen(false)} />
+        </div>
         <p className="text-gray-700 mb-2">
           {longDate(confirmed.date)} at {to12h(confirmed.start)}
           {confirmed.providerName ? ` with ${confirmed.providerName}` : ''}
@@ -341,9 +344,12 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
 
   return (
     <div ref={cardRef} className={card}>
-      <h2 className="text-2xl font-semibold text-plum-900 mb-6" style={heading}>
-        Book a service or in-person consult
-      </h2>
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <h2 className="text-2xl font-semibold text-plum-900" style={heading}>
+          Book a service or in-person consult
+        </h2>
+        <CollapseButton onClick={() => setOpen(false)} />
+      </div>
 
       {error && (
         <p className="mb-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>
@@ -563,6 +569,31 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
         </form>
       )}
     </div>
+  )
+}
+
+/**
+ * Closes the card back to the banner.
+ *
+ * Collapsing does NOT reset the booking: the step, the chosen time and any
+ * verification already done all survive, so reopening lands where you left off.
+ * Throwing it away would mean a mistaken tap costs a slot and — with
+ * verification on — a second text.
+ */
+function CollapseButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded
+      aria-label="Hide booking"
+      className="shrink-0 inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-800 transition-colors"
+    >
+      Hide
+      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+      </svg>
+    </button>
   )
 }
 
