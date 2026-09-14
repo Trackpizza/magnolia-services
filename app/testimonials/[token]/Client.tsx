@@ -206,13 +206,14 @@ export default function TestimonialUploader() {
         // Say WHICH thing failed. "Could not start the upload" sent us looking
         // at the camera when the answer was a missing IAM role on the server.
         const code = String(start.data.error ?? 'unknown')
+        const detail = String(start.data.detail ?? '')
         setStage('review')
         setMessage(
           code === 'bad_type'
             ? 'Your browser recorded a format we cannot accept yet. Please tell us — it helps us fix it.'
             : code === 'too_many'
               ? 'That is a lot of attempts. Please wait a few minutes, or call or text us.'
-              : `We could not start the upload (${code}). Please call or text us and we will sort it out.`,
+              : `We could not start the upload (${code}${detail ? `: ${detail}` : ''}). Please call or text us and we will sort it out.`,
         )
         return
       }
