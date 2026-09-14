@@ -20,7 +20,7 @@ const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 interface Treatment { id: string; name: string; durationMin: number; category?: string }
 interface Slot { date: string; start: string; end: string }
 interface Provider { id: string; name: string }
-type Step = 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'done'
+type Step = 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'verify' | 'done'
 
 function to12h(hhmm: string): string {
   const [h, m] = hhmm.split(':').map(Number)
@@ -63,6 +63,14 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [confirmed, setConfirmed] = useState<{ date: string; start: string; consultMin: number; providerName?: string } | null>(null)
+  // Whether the clinic is asking for a texted code. Advisory: the records API
+  // enforces it either way, so a stale value here cannot let a booking skip it.
+  const [needsVerify, setNeedsVerify] = useState(false)
+  const [code, setCode] = useState('')
+  // Kept so a retry after 'that time was just taken' does not cost a second
+  // text. The API burns it only once a booking actually lands.
+  const [verifyToken, setVerifyToken] = useState('')
+  const [codeResent, setCodeResent] = useState(false)
 
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
   // Count as they type rather than rejecting on submit: someone who has typed
@@ -79,9 +87,10 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
     let live = true
     fetch(`${API}/api/public/treatments`)
       .then(r => r.json())
-      .then((d: { enabled: boolean; treatments: Treatment[]; providers?: Provider[]; newClientConsultMin?: number }) => {
+      .then((d: { enabled: boolean; treatments: Treatment[]; providers?: Provider[]; newClientConsultMin?: number; phoneVerification?: boolean }) => {
         if (!live) return
         setEnabled(d.enabled)
+        setNeedsVerify(d.phoneVerification === true)
         setTreatments(d.treatments ?? [])
         setProviders(d.providers ?? [])
         if (d.newClientConsultMin) setConsultMin(d.newClientConsultMin)
@@ -125,7 +134,75 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
     }
   }
 
-  const book = async () => {
+  /** Ask the records API to text a code. Failing here BLOCKS the booking:
+   *  letting it through when the code could not be sent would mean verification
+   *  quietly stops happening and nothing says so. */
+  const sendCode = async (opts?: { silent?: boolean }) => {
+    setLoading(true)
+    if (!opts?.silent) setError(null)
+    try {
+      const res = await fetch(`${API}/api/public/verify/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: digits }),
+      })
+      const d = await res.json()
+      if (!res.ok) {
+        setError(d.error === 'too_many'
+          ? 'That is a lot of codes for one number. Please wait a little, or call or text us and we will book you in.'
+          : 'We could not text you a code just now, so your booking was not taken. Please call or text us.')
+        return false
+      }
+      setStep('verify')
+      return true
+    } catch {
+      setError('We could not text you a code just now, so your booking was not taken. Please call or text us.')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const verifyAndBook = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch(`${API}/api/public/verify/check`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: digits, code: code.replace(/\D/g, '') }),
+      })
+      const d = await res.json()
+      if (!res.ok) {
+        setError(d.error === 'too_many'
+          ? 'Too many tries. Please call or text us and we will book you in.'
+          : 'We could not check that code just now. Please call or text us.')
+        return
+      }
+      if (!d.ok) {
+        setError('That code did not match. Check the text and try again.')
+        return
+      }
+      setVerifyToken(d.token)
+      // Passed rather than read from state: setVerifyToken has not landed yet.
+      await book(d.token)
+    } catch {
+      setError('We could not check that code just now. Please call or text us.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /** Details form submitted. Book straight away unless a code is wanted and we
+   *  do not already hold a good one. */
+  const submitDetails = async () => {
+    if (!needsVerify) return book()
+    if (verifyToken) return book(verifyToken)
+    setCodeResent(false)
+    await sendCode()
+  }
+
+  const book = async (token?: string) => {
     if (!slot) return
     setLoading(true)
     setError(null)
@@ -147,6 +224,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           lastName: lastName.trim(),
           phone: digits,
           email: email.trim(),
+          ...(token ? { verifyToken: token } : {}),
         }),
       })
       const d = await res.json()
@@ -155,6 +233,13 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
         // was open. Everything else gets the phone number, not an error code.
         if (d.error === 'deposit_unavailable') {
           setError('Card payments are not switched on yet, so this booking was not taken. Please call or text us.')
+          return
+        }
+        if (d.error === 'verification_required') {
+          setVerifyToken('')
+          setCode('')
+          setError('That code has expired. We have sent you a new one.')
+          await sendCode({ silent: true })
           return
         }
         if (d.error === 'slot_taken') {
@@ -365,7 +450,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       )}
 
       {step === 'details' && slot && (
-        <form onSubmit={e => { e.preventDefault(); book() }} className="space-y-4">
+        <form onSubmit={e => { e.preventDefault(); submitDetails() }} className="space-y-4">
           <p className="text-sm text-gray-700">
             <span className="font-medium text-gray-900">{longDate(slot.date)} at {to12h(slot.start)}</span>
             {isNewClient ? ` \u00b7 includes ${consultMin} min with ${consultWith}` : ''}
@@ -403,8 +488,16 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           </label>
           <button type="submit" disabled={loading || !phoneOk}
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
-            {loading ? 'Booking\u2026' : 'Confirm booking'}
+            {loading
+              ? (needsVerify && !verifyToken ? 'Texting you a code\u2026' : 'Booking\u2026')
+              : (needsVerify && !verifyToken ? 'Text me a code' : 'Confirm booking')}
           </button>
+          {needsVerify && !verifyToken && (
+            <p className="text-xs text-gray-600">
+              We will text a six-digit code to that number to check we can reach you. Your
+              booking is not taken until you enter it.
+            </p>
+          )}
           <p className="text-xs text-gray-600">
             We will email your confirmation straight away, then remind you the day before and
             an hour before. By booking you agree to our{' '}
@@ -415,8 +508,63 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           </button>
         </form>
       )}
+
+      {step === 'verify' && slot && (
+        <form onSubmit={e => { e.preventDefault(); verifyAndBook() }} className="space-y-4">
+          <p className="text-sm text-gray-700">
+            We texted a six-digit code to{' '}
+            <span className="font-medium text-gray-900">{formatUsPhone(digits)}</span>.
+          </p>
+          <label className="block text-sm font-medium text-gray-900">
+            Your code
+            <input
+              required
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              type="text"
+              inputMode="numeric"
+              /* one-time-code lets iOS and Android offer the code from the SMS
+                 itself, which removes the app-switch this step otherwise costs */
+              autoComplete="one-time-code"
+              maxLength={8}
+              placeholder="123456"
+              autoFocus
+              className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base tracking-[0.3em]"
+            />
+          </label>
+          <button type="submit" disabled={loading || code.replace(/\D/g, '').length < 4}
+            className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
+            {loading ? 'Confirming…' : 'Confirm booking'}
+          </button>
+          <div className="flex flex-wrap gap-4 text-sm">
+            <button
+              type="button"
+              disabled={loading || codeResent}
+              onClick={async () => { if (await sendCode()) setCodeResent(true) }}
+              className="text-brand-600 hover:text-brand-700 disabled:opacity-50"
+            >
+              {codeResent ? 'Code sent again' : 'Send it again'}
+            </button>
+            <button
+              type="button"
+              onClick={() => { setCode(''); setCodeResent(false); setError(null); setStep('details') }}
+              className="text-brand-600 hover:text-brand-700"
+            >
+              Use a different number
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   )
+}
+
+/** (818) 555-0142 — so the patient can check at a glance that the code went to
+ *  the number they meant, which is half the reason this step exists. */
+function formatUsPhone(tenDigits: string): string {
+  return tenDigits.length === 10
+    ? `(${tenDigits.slice(0, 3)}) ${tenDigits.slice(3, 6)}-${tenDigits.slice(6)}`
+    : tenDigits
 }
 
 export default function BookTreatment({ deposit = false }: { deposit?: boolean }) {
