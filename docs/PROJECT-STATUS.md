@@ -35,6 +35,7 @@ after-care guides, and book a complimentary video consultation.
 | `/services/[slug]/pre-treatment` | Pre-Treatment & Planning guide (video + checklist) |
 | `/services/[slug]/after-care` | After-Care guide (video + checklist) |
 | `/bookings` | Booking landing page (used as the Google Business Profile "Book" link) |
+| `/photo-consult` | Photo-consult landing page — sells the free video walkthrough and hands off to the intake form on `portal.magnoliaskincenter.com`. **Unlisted (noindex + robots) until the Cloud BAA is accepted** |
 | `/privacy` | Privacy Policy + Accessibility Statement (one page; `#accessibility` anchor) |
 | `/admin` | Content editor (Firestore-backed) — **unlisted, token-gated** |
 | `/spin` | Internal content tool — **unlisted** (excluded from robots/sitemap) |
