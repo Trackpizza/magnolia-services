@@ -30,12 +30,13 @@ interface View {
   date: string
   start: string
   end: string
-  status: 'booked' | 'cancelled' | 'pending'
+  status: 'booked' | 'cancelled' | 'pending' | 'completed'
   treatment: string | null
   provider: string | null
   prepUrl: string | null
   canReschedule: boolean
   rescheduleBlocked: string | null
+  canCancel: boolean
   leadHours: number
   intakeNeeded: boolean
   clinicPhone: string
@@ -240,6 +241,9 @@ export default function ManageClient({ token }: { token: string }) {
   if (!view) return null
 
   const movedJustNow = screen === 'moved'
+  // Cancelled or already treated: the cards below offer nothing, and offering
+  // them anyway invites a patient to try and then be refused.
+  const closed = view.status === 'cancelled' || view.status === 'completed'
 
   // One cancel control, rendered in both branches below. Cancelling is offered
   // whether or not the appointment can still be MOVED online: a slot given back
@@ -294,10 +298,16 @@ export default function ManageClient({ token }: { token: string }) {
           </p>
         )}
 
+        {view.status === 'completed' && (
+          <p className="mt-4 text-sm text-gray-700 bg-cream-100 rounded-xl px-4 py-3">
+            You have already been seen for this appointment. {callUs(view.clinicPhone)}
+          </p>
+        )}
+
         {notice && <p className="mt-4 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{notice}</p>}
       </div>
 
-      {view.intakeNeeded && view.status !== 'cancelled' && (
+      {view.intakeNeeded && !closed && (
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-2" style={heading}>Before you come in</h2>
           <p className="text-sm text-gray-700 mb-4">
@@ -311,7 +321,7 @@ export default function ManageClient({ token }: { token: string }) {
         </div>
       )}
 
-      {view.prepUrl && view.status !== 'cancelled' && (
+      {view.prepUrl && !closed && (
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-2" style={heading}>How to prepare</h2>
           <a href={view.prepUrl} className="text-brand-600 hover:text-brand-700 text-sm font-medium">
@@ -320,7 +330,7 @@ export default function ManageClient({ token }: { token: string }) {
         </div>
       )}
 
-      {view.status !== 'cancelled' && (
+      {!closed && (
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-3" style={heading}>Need to change it?</h2>
 
@@ -331,7 +341,7 @@ export default function ManageClient({ token }: { token: string }) {
                 {working ? 'Loading…' : 'Move to another time'}
               </button>
 
-              {cancelControl}
+              {view.canCancel && cancelControl}
             </>
           ) : (
             <>
@@ -344,7 +354,7 @@ export default function ManageClient({ token }: { token: string }) {
                   ? <>This booking is still waiting on its deposit. {callUs(view.clinicPhone)}</>
                   : <>Appointments cannot be changed online at the moment. {callUs(view.clinicPhone)}</>}
               </p>
-              {view.rescheduleBlocked !== 'past' && cancelControl}
+              {view.canCancel && cancelControl}
             </>
           )}
         </div>
