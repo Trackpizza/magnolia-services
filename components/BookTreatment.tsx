@@ -80,6 +80,68 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   /** True once we know who they are — arrived with a portal token and it
    *  resolved. Drives both the prefill and skipping the first-visit question. */
   const [known, setKnown] = useState(false)
+  // "I have been here before" on the details step: prove the mobile, fill the
+  // form in. 'idle' -> 'phone' -> 'code' -> done (which sets `known`).
+  const [idStep, setIdStep] = useState<'idle' | 'phone' | 'sending' | 'code' | 'checking'>('idle')
+  const [idPhone, setIdPhone] = useState('')
+  const [idCode, setIdCode] = useState('')
+  const [idError, setIdError] = useState('')
+
+  const idSend = async () => {
+    setIdStep('sending')
+    setIdError('')
+    try {
+      const res = await fetch(`${API}/api/public/identify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start', phone: idPhone.replace(/\D/g, '') }),
+      })
+      if (!res.ok) {
+        setIdError('We could not send a code to that number. Check it, or just fill the form in.')
+        setIdStep('phone')
+        return
+      }
+      setIdStep('code')
+    } catch {
+      setIdError('We could not send a code just now. Please fill the form in.')
+      setIdStep('phone')
+    }
+  }
+
+  const idCheck = async () => {
+    setIdStep('checking')
+    setIdError('')
+    try {
+      const res = await fetch(`${API}/api/public/identify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check', phone: idPhone.replace(/\D/g, ''), code: idCode }),
+      })
+      const d = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setIdError('That code did not work. Check it and try again, or send a new one.')
+        setIdStep('code')
+        return
+      }
+      // The number is proved, so booking must not ask for a second code.
+      if (d.verifyToken) setVerifyToken(String(d.verifyToken))
+      setPhone(formatPhoneInput(idPhone.replace(/\D/g, '')))
+      if (d.client) {
+        setFirstName(String(d.client.firstName ?? ''))
+        setLastName(String(d.client.lastName ?? ''))
+        setEmail(String(d.client.email ?? ''))
+        setKnown(true)
+      }
+      // No chart, or more than one on this mobile: the number is filled in and
+      // the rest is typed, exactly as before. Saying which of those happened
+      // would answer "is this person a patient here", so it says neither.
+      setIdStep('idle')
+      setIdCode('')
+    } catch {
+      setIdError('Something went wrong. Please fill the form in.')
+      setIdStep('code')
+    }
+  }
 
   /**
    * Where to go after picking a provider.
@@ -553,6 +615,69 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
             <span className="font-medium text-gray-900">{longDate(slot.date)} at {to12h(slot.start)}</span>
             {isNewClient ? ` \u00b7 includes ${consultMin} min with ${consultWith}` : ''}
           </p>
+          {/* "I have been here before", right where they would otherwise start
+              typing. Hidden once we know them — offering to identify somebody
+              whose name is already in the box is noise. */}
+          {!known && (
+            <div className="rounded-xl border border-gray-200 p-4">
+              {idStep === 'idle' && (
+                <button type="button" onClick={() => { setIdStep('phone'); setIdPhone(phone) }}
+                  className="text-sm font-medium text-brand-600 hover:text-brand-700">
+                  Been here before? We&apos;ll fill this in for you &rarr;
+                </button>
+              )}
+
+              {(idStep === 'phone' || idStep === 'sending') && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">
+                    Your mobile
+                    <input value={idPhone} onChange={e => setIdPhone(formatPhoneInput(e.target.value))}
+                      inputMode="tel" autoComplete="tel" placeholder="(555)-111-7777"
+                      className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+                  </label>
+                  <p className="text-xs text-gray-600">
+                    We&apos;ll text you a code. Nothing is sent to anyone else.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button type="button" onClick={idSend}
+                      disabled={idStep === 'sending' || idPhone.replace(/\D/g, '').length !== 10}
+                      className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
+                      {idStep === 'sending' ? 'Sending…' : 'Text me a code'}
+                    </button>
+                    <button type="button" onClick={() => { setIdStep('idle'); setIdError('') }}
+                      className="text-sm text-gray-600 hover:text-gray-900">
+                      I&apos;ll type it in
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {(idStep === 'code' || idStep === 'checking') && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-900">
+                    Code we texted you
+                    <input value={idCode} onChange={e => setIdCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                      inputMode="numeric" autoComplete="one-time-code" placeholder="6-digit code"
+                      className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base tracking-widest text-center" />
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button type="button" onClick={idCheck}
+                      disabled={idStep === 'checking' || idCode.length < 4}
+                      className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
+                      {idStep === 'checking' ? 'Checking…' : 'Continue'}
+                    </button>
+                    <button type="button" onClick={idSend} disabled={idStep === 'checking'}
+                      className="text-sm text-brand-600 hover:text-brand-700">
+                      Send a new code
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {idError && <p className="mt-2 text-sm text-plum-900">{idError}</p>}
+            </div>
+          )}
+
           <div className="grid sm:grid-cols-2 gap-4">
             <label className="block text-sm font-medium text-gray-900">
               First name
