@@ -65,6 +65,7 @@ interface View {
   questionnaireNeeded: boolean
   bookingUrl: string
   clinicPhone: string
+  clinicAddress: string
   historyAvailable: boolean
   unlocked: boolean
   history: History | null
@@ -443,9 +444,11 @@ export default function PortalClient({ token }: { token: string }) {
         ) : (
           <p className="text-gray-700">Give us a call or a text any time.</p>
         )}
-        <p className="text-sm text-gray-600 mt-3">
-          3508 1/2 W Magnolia Blvd, Burbank, CA 91505
-        </p>
+        {/* From settings, not hardcoded. A clinic that moves should not need a
+            deploy to stop sending patients to the old address. */}
+        {view.clinicAddress && (
+          <p className="text-sm text-gray-600 mt-3">{view.clinicAddress}</p>
+        )}
       </div>
 
       <p className="text-center text-xs text-gray-500 px-4">
