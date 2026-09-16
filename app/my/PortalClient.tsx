@@ -17,6 +17,16 @@ function to12h(hhmm: string): string {
   return `${hour}:${String(m).padStart(2, '0')} ${period}`
 }
 
+/** "Aug 12, 2026" — for things that already happened, where the weekday is
+ *  noise and the year is not. Also just narrower, which matters in a two-column
+ *  row on a 375px screen. */
+function pastDate(ymd: string): string {
+  const [y, m, d] = ymd.split('-').map(Number)
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC',
+  })
+}
+
 function longDate(ymd: string): string {
   const [y, m, d] = ymd.split('-').map(Number)
   return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
@@ -43,6 +53,10 @@ interface PlanItem {
 
 interface ConsentItem { names: string[]; url: string }
 
+interface PastVisit { date: string; treatment: string; provider: string }
+interface SignedConsent { names: string[]; signedAt: string | null }
+interface History { visits: PastVisit[]; consents: SignedConsent[] }
+
 interface View {
   firstName: string
   upcoming: Appt[]
@@ -51,6 +65,25 @@ interface View {
   questionnaireNeeded: boolean
   bookingUrl: string
   clinicPhone: string
+  historyAvailable: boolean
+  unlocked: boolean
+  history: History | null
+}
+
+/**
+ * Where the 90-day device trust lives.
+ *
+ * localStorage, per browser, and it is only a KEY — the server decides what
+ * it unlocks and which patient it belongs to. A stolen one is worth nothing on
+ * anyone else's link. Wrapped because a private window or blocked site data
+ * makes these throw rather than return empty.
+ */
+const SESSION_KEY = 'msc_portal_session'
+function readSession(): string {
+  try { return localStorage.getItem(SESSION_KEY) ?? '' } catch { return '' }
+}
+function writeSession(v: string) {
+  try { localStorage.setItem(SESSION_KEY, v) } catch { /* history just asks again next time */ }
 }
 
 const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
@@ -60,23 +93,77 @@ export default function PortalClient({ token }: { token: string }) {
   const [view, setView] = useState<View | null>(null)
   const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'error'>('loading')
 
-  const load = useCallback(async () => {
-    if (!token) { setState('gone'); return }
-    try {
+  // 'idle' → 'sending' → 'entering' → unlocked (which lives on `view`)
+  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  const [code, setCode] = useState('')
+  const [last4, setLast4] = useState('')
+  const [gateError, setGateError] = useState('')
+
+  const call = useCallback(
+    async (extra: Record<string, unknown> = {}) => {
       const res = await fetch(`${API}/api/public/portal`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ token, ...extra }),
       })
-      if (!res.ok) { setState('gone'); return }
-      setView((await res.json()) as View)
+      return { ok: res.ok, status: res.status, data: await res.json().catch(() => ({})) }
+    },
+    [token],
+  )
+
+  const load = useCallback(async () => {
+    if (!token) { setState('gone'); return }
+    try {
+      // The stored session rides along on the first call, so a trusted device
+      // arrives with history already open rather than being asked again.
+      const { ok, data } = await call({ session: readSession() })
+      if (!ok) { setState('gone'); return }
+      setView(data as View)
       setState('ok')
     } catch {
       setState('error')
     }
-  }, [token])
+  }, [token, call])
 
   useEffect(() => { load() }, [load])
+
+  const sendCode = async () => {
+    setGate('sending')
+    setGateError('')
+    try {
+      const { ok, data } = await call({ action: 'code' })
+      if (!ok) {
+        setGateError('We could not send a code just now. Please call or text us.')
+        setGate('idle')
+        return
+      }
+      setLast4(String(data.last4 ?? ''))
+      setGate('entering')
+    } catch {
+      setGateError('We could not send a code just now. Please call or text us.')
+      setGate('idle')
+    }
+  }
+
+  const unlock = async () => {
+    setGate('checking')
+    setGateError('')
+    try {
+      const { ok, data } = await call({ action: 'unlock', code })
+      if (!ok) {
+        setGateError('That code did not work. Check it and try again, or send a new one.')
+        setGate('entering')
+        return
+      }
+      writeSession(String(data.session ?? ''))
+      setView((v) => (v ? { ...v, unlocked: true, history: data.history as History } : v))
+      setGate('idle')
+      setCode('')
+    } catch {
+      setGateError('Something went wrong. Please try again.')
+      setGate('entering')
+    }
+  }
 
   if (state === 'loading') {
     return <div className={card}><p className="text-gray-600">Loading your page&hellip;</p></div>
@@ -231,6 +318,114 @@ export default function PortalClient({ token }: { token: string }) {
           >
             Book your next visit
           </a>
+        </div>
+      )}
+
+      {/* Treatment history, behind a code.
+          The code goes to the number already on their chart, never one typed
+          here — so whoever holds this link can make a phone buzz but cannot
+          receive the code. Hidden entirely when there is no mobile on file:
+          offering a code we cannot send is worse than not offering one. */}
+      {view.historyAvailable && !view.unlocked && (
+        <div className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
+            Your treatment history
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Everything you have had done with us. We will text a code to the mobile on your
+            file first — just once on this phone.
+          </p>
+
+          {/* 'checking' keeps this branch open on purpose — branching on
+              'entering' alone made the code box disappear the instant they
+              pressed the button, which reads as the page losing what they
+              typed. */}
+          {gate === 'entering' || gate === 'checking' ? (
+            <div className="space-y-3">
+              <p className="text-sm text-gray-700">
+                We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.
+              </p>
+              <input
+                value={code}
+                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                placeholder="6-digit code"
+                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg tracking-widest text-center"
+              />
+              <button
+                onClick={unlock}
+                disabled={gate === 'checking' || code.length < 4}
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
+              >
+                {gate === 'checking' ? 'Checking…' : 'Show my history'}
+              </button>
+              <button
+                onClick={sendCode}
+                disabled={gate === 'checking'}
+                className="text-sm text-brand-600 hover:text-brand-700"
+              >
+                Send a new code
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={sendCode}
+              disabled={gate === 'sending'}
+              className="w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
+            >
+              {gate === 'sending' ? 'Sending…' : 'Text me a code'}
+            </button>
+          )}
+
+          {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
+        </div>
+      )}
+
+      {view.unlocked && view.history && (
+        <div className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-4" style={heading}>
+            Your treatment history
+          </h2>
+
+          {view.history.visits.length === 0 ? (
+            <p className="text-sm text-gray-700">Nothing recorded yet — your first visit is still to come.</p>
+          ) : (
+            <ul className="space-y-3">
+              {view.history.visits.map((v, i) => (
+                <li key={i} className="flex justify-between gap-4 border-b border-gray-100 pb-3 last:border-0">
+                  <span className="min-w-0">
+                    <span className="block text-gray-900">{v.treatment}</span>
+                    <span className="block text-sm text-gray-600">with {v.provider}</span>
+                  </span>
+                  <span className="shrink-0 text-sm text-gray-600">{pastDate(v.date)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {view.history.consents.length > 0 && (
+            <>
+              <h3 className="text-sm font-semibold text-gray-900 mt-6 mb-2">Forms you have signed</h3>
+              <ul className="space-y-1.5">
+                {view.history.consents.map((c, i) => (
+                  <li key={i} className="flex justify-between gap-4 text-sm">
+                    <span className="min-w-0 text-gray-700">{c.names.join(' · ')}</span>
+                    {c.signedAt && (
+                      <span className="shrink-0 text-gray-500">
+                        {new Date(c.signedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          <p className="text-xs text-gray-500 mt-5">
+            Need your photos or treatment notes? Ask us — they are part of your medical record
+            and we will go through them with you.
+          </p>
         </div>
       )}
 
