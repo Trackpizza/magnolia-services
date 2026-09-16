@@ -44,6 +44,10 @@ function longDate(ymd: string): string {
  */
 function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   const preselect = useSearchParams().get('treatment') ?? undefined
+  /** A client portal token, when they came from their own page. Means we know
+   *  exactly who this is, so the form fills itself in and the "have you been
+   *  here before?" question answers itself. */
+  const portalToken = useSearchParams().get('c') ?? ''
   const [treatments, setTreatments] = useState<Treatment[]>([])
   const [consultMin, setConsultMin] = useState(30)
   const [providers, setProviders] = useState<Provider[]>([])
@@ -73,6 +77,52 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   // text. The API burns it only once a booking actually lands.
   const [verifyToken, setVerifyToken] = useState('')
   const [codeResent, setCodeResent] = useState(false)
+  /** True once we know who they are — arrived with a portal token and it
+   *  resolved. Drives both the prefill and skipping the first-visit question. */
+  const [known, setKnown] = useState(false)
+
+  /**
+   * Where to go after picking a provider.
+   *
+   * Someone who arrived from their own portal has already told us they are a
+   * patient here — asking "have you been treated here before?" of a person
+   * standing inside their own account is the kind of question that makes
+   * software feel like it is not paying attention. Straight to the times.
+   */
+  const afterProvider = (pid: string) => {
+    if (known) { setIsNewClient(false); void loadSlots(false, pid) }
+    else setStep('visit')
+  }
+
+  // Fill the form in from their chart when they arrived from their own portal.
+  // Best-effort: a token that no longer resolves just means they type it in,
+  // which is exactly what happened before this existed.
+  useEffect(() => {
+    if (!/^[0-9a-f]{32}$/.test(portalToken)) return
+    let live = true
+    ;(async () => {
+      try {
+        const res = await fetch(`${API}/api/public/portal`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: portalToken, action: 'prefill' }),
+        })
+        if (!res.ok || !live) return
+        const d = await res.json()
+        if (!live) return
+        setFirstName(String(d.firstName ?? ''))
+        setLastName(String(d.lastName ?? ''))
+        setPhone(formatPhoneInput(String(d.phone ?? '').replace(/\D/g, '')))
+        setEmail(String(d.email ?? ''))
+        // They are on their own portal page, so they are not a first visit.
+        setIsNewClient(false)
+        setKnown(true)
+      } catch {
+        /* They type it in, as before. */
+      }
+    })()
+    return () => { live = false }
+  }, [portalToken])
 
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
   // Count as they type rather than rejecting on submit: someone who has typed
@@ -150,14 +200,25 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
     cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [step, open])
 
-  const loadSlots = async (newClient: boolean) => {
+  /**
+   * `providerOverride` exists because setState is not synchronous. The skip
+   * path picks a provider and loads times in the same click, so reading
+   * `providerId` back out of state here would use the PREVIOUS value and quietly
+   * offer times for the wrong person. The longer path is unaffected: it goes via
+   * another screen, by which point state has settled.
+   */
+  const loadSlots = async (newClient: boolean, providerOverride?: string) => {
     setLoading(true)
     setError(null)
     try {
       const res = await fetch(`${API}/api/public/slots`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ procedureId: treatmentId, isNewClient: newClient, providerId: providerId || undefined }),
+        body: JSON.stringify({
+          procedureId: treatmentId,
+          isNewClient: newClient,
+          providerId: (providerOverride ?? providerId) || undefined,
+        }),
       })
       const d = await res.json()
       if (!res.ok) throw new Error(d.error ?? 'failed')
@@ -416,12 +477,12 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
             <span className="font-medium text-gray-900">{treatment.name}</span> &mdash; who would you like to see?
           </p>
           {providers.map(p => (
-            <button key={p.id} onClick={() => { setProviderId(p.id); setStep('visit') }}
+            <button key={p.id} onClick={() => { setProviderId(p.id); afterProvider(p.id) }}
               className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
               <span className="font-medium text-gray-900">{p.name}</span>
             </button>
           ))}
-          <button onClick={() => { setProviderId(''); setStep('visit') }}
+          <button onClick={() => { setProviderId(''); afterProvider('') }}
             className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors">
             <span className="block font-medium text-gray-900">No preference</span>
             <span className="block text-sm text-gray-600 mt-1">Shows the most available times.</span>
