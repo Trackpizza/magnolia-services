@@ -205,28 +205,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
     : ''
   const emailSuggestion = emailOk ? suggestEmailDomain(emailTrimmed) : null
 
-  /**
-   * Reformat as they type.
-   *
-   * Two things that break naive live formatting, both handled:
-   *
-   *  - Backspacing over a separator removes a character that is not a digit, so
-   *    the stripped value is unchanged and the field reformats straight back.
-   *    The key looks dead. Detect a shortening edit that left the digits alone
-   *    and drop a digit instead.
-   *  - Pasting "+1 818 555 3333" gives eleven digits, and truncating to ten
-   *    silently keeps the country code and loses the last digit. Strip a leading
-   *    1 only when pasting into an empty field — typing it as an area code is
-   *    invalid anyway, but stripping mid-edit would corrupt a number in progress.
-   */
-
-  const onPhoneChange = (raw: string) => {
-    let d = raw.replace(/\D/g, '')
-    if (digits.length === 0 && d.length === 11 && d.startsWith('1')) d = d.slice(1)
-    d = d.slice(0, 10)
-    if (raw.length < phone.length && d === digits) d = d.slice(0, -1)
-    setPhone(formatPhoneInput(d))
-  }
+  const onPhoneChange = (raw: string) => setPhone(nextPhoneValue(raw, phone))
   // Never "our nurse": both providers are co-owners and either may take the
   // appointment, so the copy names whoever the patient actually chose.
   const consultWith = providers.find(p => p.id === providerId)?.name ?? 'your provider'
@@ -631,7 +610,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-900">
                     Your mobile
-                    <input value={idPhone} onChange={e => setIdPhone(formatPhoneInput(e.target.value))}
+                    <input value={idPhone} onChange={e => setIdPhone(nextPhoneValue(e.target.value, idPhone))}
                       inputMode="tel" autoComplete="tel" placeholder="(555)-111-7777"
                       className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
                   </label>
@@ -889,6 +868,35 @@ function suggestEmailDomain(email: string): string | null {
     if (editDistance(domain, candidate) <= limit) return `${email.slice(0, at + 1)}${candidate}`
   }
   return null
+}
+
+/**
+ * One edit of a phone field, reformatted as they type: the raw value the
+ * browser now holds, and what the field held before it.
+ *
+ * BOTH phone inputs go through this. "Been here before" once formatted its own
+ * field, and passed the already-formatted value to `formatPhoneInput`, which
+ * takes DIGITS — so the brackets were fed back in as characters and typing 310
+ * gave "(((3)-1)0".
+ *
+ * Two things break naive live formatting, both handled here:
+ *
+ *  - Backspacing over a separator removes a character that is not a digit, so
+ *    the stripped value is unchanged and the field reformats straight back.
+ *    The key looks dead. Detect a shortening edit that left the digits alone
+ *    and drop a digit instead.
+ *  - Pasting "+1 818 555 3333" gives eleven digits, and truncating to ten
+ *    silently keeps the country code and loses the last digit. Strip a leading
+ *    1 only when pasting into an empty field — typing it as an area code is
+ *    invalid anyway, but stripping mid-edit would corrupt a number in progress.
+ */
+function nextPhoneValue(raw: string, prev: string): string {
+  const prevDigits = prev.replace(/\D/g, '')
+  let d = raw.replace(/\D/g, '')
+  if (prevDigits.length === 0 && d.length === 11 && d.startsWith('1')) d = d.slice(1)
+  d = d.slice(0, 10)
+  if (raw.length < prev.length && d === prevDigits) d = d.slice(0, -1)
+  return formatPhoneInput(d)
 }
 
 /**
