@@ -53,6 +53,10 @@ interface PlanItem {
 
 interface ConsentItem { names: string[]; url: string }
 
+/** Clinic-editable buttons. `href` arrives already normalised and filtered by
+ *  the records app, so this renders it without interpreting anything. */
+interface PortalLink { label: string; href: string; emoji: string }
+
 interface PastVisit { date: string; treatment: string; provider: string }
 interface SignedConsent { names: string[]; signedAt: string | null }
 interface History { visits: PastVisit[]; consents: SignedConsent[] }
@@ -66,6 +70,7 @@ interface View {
   bookingUrl: string
   clinicPhone: string
   clinicAddress: string
+  links: PortalLink[]
   historyAvailable: boolean
   unlocked: boolean
   history: History | null
@@ -427,6 +432,30 @@ export default function PortalClient({ token }: { token: string }) {
             Need your photos or treatment notes? Ask us — they are part of your medical record
             and we will go through them with you.
           </p>
+        </div>
+      )}
+
+      {/* ── The clinic's own buttons ────────────────────────────────
+          Whatever the clinic would otherwise have typed into a text message:
+          book, leave a review, the services site, a number to tap. Editable in
+          Settings, so the list changes without a deploy. */}
+      {view.links.length > 0 && (
+        <div className={card}>
+          <div className="space-y-2">
+            {view.links.map((l) => (
+              <a
+                key={l.href + l.label}
+                href={l.href}
+                {...(l.href.startsWith('http')
+                  ? { target: '_blank', rel: 'noopener noreferrer' }
+                  : {})}
+                className="flex items-center gap-3 w-full border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors"
+              >
+                <span className="text-xl shrink-0" aria-hidden>{l.emoji}</span>
+                <span className="font-medium text-gray-900">{l.label}</span>
+              </a>
+            ))}
+          </div>
         </div>
       )}
 
