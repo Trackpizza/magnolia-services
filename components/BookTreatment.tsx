@@ -615,7 +615,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
                       className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
                   </label>
                   <p className="text-xs text-gray-600">
-                    We&apos;ll text you a code. Nothing is sent to anyone else.
+                    We&apos;ll text you a code.
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <button type="button" onClick={idSend}
