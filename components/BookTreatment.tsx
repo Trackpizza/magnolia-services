@@ -80,12 +80,21 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   /** True once we know who they are — arrived with a portal token and it
    *  resolved. Drives both the prefill and skipping the first-visit question. */
   const [known, setKnown] = useState(false)
-  // "I have been here before" on the details step: prove the mobile, fill the
-  // form in. 'idle' -> 'phone' -> 'code' -> done (which sets `known`).
+  // "I have been here before" on the details step: prove a contact detail, fill
+  // the form in. 'idle' -> 'phone' -> 'code' -> done (which sets `known`).
+  // 'phone' is the step that asks for the detail, whichever kind it is.
   const [idStep, setIdStep] = useState<'idle' | 'phone' | 'sending' | 'code' | 'checking'>('idle')
+  // Mobile or email. Somebody who has changed their number, or who is at a
+  // desk with the phone in another room, has no way through an SMS-only door
+  // — and they are exactly the returning patient this is for.
+  const [idChannel, setIdChannel] = useState<'sms' | 'email'>('sms')
   const [idPhone, setIdPhone] = useState('')
+  const [idEmail, setIdEmail] = useState('')
   const [idCode, setIdCode] = useState('')
   const [idError, setIdError] = useState('')
+
+  const idTarget = idChannel === 'email' ? idEmail.trim() : idPhone.replace(/\D/g, '')
+  const idReady = idChannel === 'email' ? EMAIL_RE.test(idEmail.trim()) : idTarget.length === 10
 
   const idSend = async () => {
     setIdStep('sending')
@@ -94,10 +103,18 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       const res = await fetch(`${API}/api/public/identify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'start', phone: idPhone.replace(/\D/g, '') }),
+        body: JSON.stringify(
+          idChannel === 'email'
+            ? { action: 'start', channel: 'email', email: idTarget }
+            : { action: 'start', phone: idTarget },
+        ),
       })
       if (!res.ok) {
-        setIdError('We could not send a code to that number. Check it, or just fill the form in.')
+        setIdError(
+          idChannel === 'email'
+            ? 'We could not send a code to that address. Check it, or just fill the form in.'
+            : 'We could not send a code to that number. Check it, or just fill the form in.',
+        )
         setIdStep('phone')
         return
       }
@@ -115,7 +132,11 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       const res = await fetch(`${API}/api/public/identify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', phone: idPhone.replace(/\D/g, ''), code: idCode }),
+        body: JSON.stringify(
+          idChannel === 'email'
+            ? { action: 'check', channel: 'email', email: idTarget, code: idCode }
+            : { action: 'check', phone: idTarget, code: idCode },
+        ),
       })
       const d = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -123,18 +144,26 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
         setIdStep('code')
         return
       }
-      // The number is proved, so booking must not ask for a second code.
+      // A proved MOBILE means booking must not ask for a second code. A proved
+      // address means nothing about a handset, so the API sends no token and
+      // the phone step below stands — which is correct, not an oversight.
       if (d.verifyToken) setVerifyToken(String(d.verifyToken))
-      setPhone(formatPhoneInput(idPhone.replace(/\D/g, '')))
+      // Fill in the detail they just proved, either way.
+      if (idChannel === 'email') setEmail(idTarget)
+      else setPhone(formatPhoneInput(idTarget))
       if (d.client) {
         setFirstName(String(d.client.firstName ?? ''))
         setLastName(String(d.client.lastName ?? ''))
-        setEmail(String(d.client.email ?? ''))
+        // Each channel returns the OTHER detail — that is the point of proving
+        // one of them.
+        if (d.client.email) setEmail(String(d.client.email))
+        if (d.client.phone) setPhone(formatPhoneInput(String(d.client.phone).replace(/\D/g, '')))
         setKnown(true)
       }
-      // No chart, or more than one on this mobile: the number is filled in and
-      // the rest is typed, exactly as before. Saying which of those happened
-      // would answer "is this person a patient here", so it says neither.
+      // No chart, or more than one on this mobile or address: what they proved
+      // is filled in and the rest is typed, exactly as before. Saying which of
+      // those happened would answer "is this person a patient here", so it
+      // says neither.
       setIdStep('idle')
       setIdCode('')
     } catch {
@@ -600,7 +629,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           {!known && (
             <div className="rounded-xl border border-gray-200 p-4">
               {idStep === 'idle' && (
-                <button type="button" onClick={() => { setIdStep('phone'); setIdPhone(phone) }}
+                <button type="button" onClick={() => { setIdStep('phone'); setIdPhone(phone); setIdEmail(email) }}
                   className="text-sm font-medium text-brand-600 hover:text-brand-700">
                   Been here before? We&apos;ll fill this in for you &rarr;
                 </button>
@@ -608,20 +637,39 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
 
               {(idStep === 'phone' || idStep === 'sending') && (
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-900">
-                    Your mobile
-                    <input value={idPhone} onChange={e => setIdPhone(nextPhoneValue(e.target.value, idPhone))}
-                      inputMode="tel" autoComplete="tel" placeholder="(555)-111-7777"
-                      className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
-                  </label>
+                  {idChannel === 'sms' ? (
+                    <label className="block text-sm font-medium text-gray-900">
+                      Your mobile
+                      <input value={idPhone} onChange={e => setIdPhone(nextPhoneValue(e.target.value, idPhone))}
+                        inputMode="tel" autoComplete="tel" placeholder="(555)-111-7777"
+                        className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+                    </label>
+                  ) : (
+                    <label className="block text-sm font-medium text-gray-900">
+                      Your email
+                      <input value={idEmail} onChange={e => setIdEmail(e.target.value)}
+                        inputMode="email" autoComplete="email" placeholder="you@example.com"
+                        className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base" />
+                    </label>
+                  )}
                   <p className="text-xs text-gray-600">
-                    We&apos;ll text you a code.
+                    {idChannel === 'sms' ? <>We&apos;ll text you a code.</> : <>We&apos;ll email you a code.</>}
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <button type="button" onClick={idSend}
-                      disabled={idStep === 'sending' || idPhone.replace(/\D/g, '').length !== 10}
+                      disabled={idStep === 'sending' || !idReady}
                       className="bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors disabled:opacity-50">
-                      {idStep === 'sending' ? 'Sending…' : 'Text me a code'}
+                      {idStep === 'sending'
+                        ? 'Sending…'
+                        : idChannel === 'sms' ? 'Text me a code' : 'Email me a code'}
+                    </button>
+                    {/* The way out for a changed number or a phone in another
+                        room. Without it, the only returning patients this
+                        helps are the ones who needed the least help. */}
+                    <button type="button"
+                      onClick={() => { setIdChannel(c => (c === 'sms' ? 'email' : 'sms')); setIdError('') }}
+                      className="text-sm text-brand-600 hover:text-brand-700">
+                      {idChannel === 'sms' ? 'Use my email instead' : 'Use my mobile instead'}
                     </button>
                     <button type="button" onClick={() => { setIdStep('idle'); setIdError('') }}
                       className="text-sm text-gray-600 hover:text-gray-900">
@@ -634,7 +682,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
               {(idStep === 'code' || idStep === 'checking') && (
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-900">
-                    Code we texted you
+                    {idChannel === 'sms' ? 'Code we texted you' : 'Code we emailed you'}
                     <input value={idCode} onChange={e => setIdCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       inputMode="numeric" autoComplete="one-time-code" placeholder="6-digit code"
                       className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-3 text-base tracking-widest text-center" />
