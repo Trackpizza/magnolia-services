@@ -7,6 +7,7 @@
  * link — what is coming and why — and everything else on here is admin.
  */
 import { useCallback, useEffect, useState } from 'react'
+import FindMyPage from './FindMyPage'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -75,6 +76,9 @@ interface View {
   clinicAddress: string
   links: PortalLink[]
   historyAvailable: boolean
+  /** Which routes a code can actually take. Offering a button the API answers
+   *  503 to is worse than offering nothing. */
+  historyChannels?: { sms: boolean; email: boolean }
   unlocked: boolean
   history: History | null
 }
@@ -106,6 +110,11 @@ export default function PortalClient({ token }: { token: string }) {
   const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
   const [code, setCode] = useState('')
   const [last4, setLast4] = useState('')
+  const [sentTo, setSentTo] = useState('')
+  // Which way the code went. A patient whose number changed is the reason the
+  // email route exists, and they are also the one most likely to be staring at
+  // a page saying "check your phone".
+  const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
   const [gateError, setGateError] = useState('')
 
   const call = useCallback(
@@ -136,17 +145,19 @@ export default function PortalClient({ token }: { token: string }) {
 
   useEffect(() => { load() }, [load])
 
-  const sendCode = async () => {
+  const sendCode = async (channel: 'sms' | 'email' = gateChannel) => {
     setGate('sending')
     setGateError('')
+    setGateChannel(channel)
     try {
-      const { ok, data } = await call({ action: 'code' })
+      const { ok, data } = await call({ action: 'code', channel })
       if (!ok) {
         setGateError('We could not send a code just now. Please call or text us.')
         setGate('idle')
         return
       }
       setLast4(String(data.last4 ?? ''))
+      setSentTo(String(data.sentTo ?? ''))
       setGate('entering')
     } catch {
       setGateError('We could not send a code just now. Please call or text us.')
@@ -158,7 +169,7 @@ export default function PortalClient({ token }: { token: string }) {
     setGate('checking')
     setGateError('')
     try {
-      const { ok, data } = await call({ action: 'unlock', code })
+      const { ok, data } = await call({ action: 'unlock', code, channel: gateChannel })
       if (!ok) {
         setGateError('That code did not work. Check it and try again, or send a new one.')
         setGate('entering')
@@ -178,15 +189,11 @@ export default function PortalClient({ token }: { token: string }) {
     return <div className={card}><p className="text-gray-600">Loading your page&hellip;</p></div>
   }
 
+  // No token at all, or one that no longer resolves. Both used to end at
+  // "call us"; both are now the same question — which mobile or email do you
+  // use with us — answered on the spot.
   if (state === 'gone') {
-    return (
-      <div className={card}>
-        <h1 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>Link not found</h1>
-        <p className="text-gray-700">
-          This link is not valid any more. Please call or text us and we will send you a new one.
-        </p>
-      </div>
-    )
+    return <FindMyPage />
   }
 
   if (state === 'error' || !view) {
@@ -359,9 +366,9 @@ export default function PortalClient({ token }: { token: string }) {
             Your treatment history
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Everything you have had done with us. To keep it private we text a code first —
-            to the number we already have for you, so there is nothing to type. After that
-            this phone stays unlocked for 90 days.
+            Everything you have had done with us. To keep it private we send a code first —
+            to the number or address we already have for you, so there is nothing to type.
+            After that this phone stays unlocked for 90 days.
           </p>
 
           {/* 'checking' keeps this branch open on purpose — branching on
@@ -371,16 +378,31 @@ export default function PortalClient({ token }: { token: string }) {
           {gate === 'entering' || gate === 'checking' ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
-                We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.
+                {gateChannel === 'email' ? (
+                  <>We sent a code to <strong className="text-plum-900">{sentTo}</strong>.</>
+                ) : (
+                  <>We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.</>
+                )}
               </p>
-              {/* The dead end this page used to have no answer for: the number
-                  on file is the only place the code can go, so a patient who
-                  has changed it cannot get in by trying harder. Say so, and
-                  point at the people who can fix it. */}
-              <p className="text-xs text-gray-600">
-                Not your number any more? Call or text the clinic and we will update it —
-                the code can only go to the number on your file.
-              </p>
+              {/* The dead end this page used to have no answer for: the code
+                  can only go to the details already on file, so a patient
+                  whose number changed cannot get in by trying harder. Now
+                  there is a second route, and when neither reaches them, the
+                  people who can fix it. */}
+              {gateChannel === 'sms' && view.historyChannels?.email ? (
+                <button
+                  onClick={() => sendCode('email')}
+                  disabled={gate === 'checking'}
+                  className="text-sm text-brand-600 hover:text-brand-700"
+                >
+                  Not your number any more? Email the code instead
+                </button>
+              ) : (
+                <p className="text-xs text-gray-600">
+                  Not yours any more? Call or text the clinic and we will update it — the code
+                  can only go to the details on your file.
+                </p>
+              )}
               <input
                 value={code}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
@@ -397,7 +419,7 @@ export default function PortalClient({ token }: { token: string }) {
                 {gate === 'checking' ? 'Checking…' : 'Show my history'}
               </button>
               <button
-                onClick={sendCode}
+                onClick={() => sendCode()}
                 disabled={gate === 'checking'}
                 className="text-sm text-brand-600 hover:text-brand-700"
               >
@@ -405,13 +427,30 @@ export default function PortalClient({ token }: { token: string }) {
               </button>
             </div>
           ) : (
-            <button
-              onClick={sendCode}
-              disabled={gate === 'sending'}
-              className="w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
-            >
-              {gate === 'sending' ? 'Sending…' : 'Text me a code'}
-            </button>
+            <div className="space-y-3">
+              {view.historyChannels?.sms !== false && (
+                <button
+                  onClick={() => sendCode('sms')}
+                  disabled={gate === 'sending'}
+                  className="w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
+                >
+                  {gate === 'sending' ? 'Sending…' : 'Text me a code'}
+                </button>
+              )}
+              {view.historyChannels?.email && (
+                <button
+                  onClick={() => sendCode('email')}
+                  disabled={gate === 'sending'}
+                  className={
+                    view.historyChannels?.sms === false
+                      ? 'w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
+                      : 'text-sm text-brand-600 hover:text-brand-700'
+                  }
+                >
+                  {view.historyChannels?.sms === false ? 'Email me a code' : 'Or email it to me instead'}
+                </button>
+              )}
+            </div>
           )}
 
           {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
