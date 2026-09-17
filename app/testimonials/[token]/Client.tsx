@@ -115,6 +115,20 @@ export default function TestimonialUploader() {
     if (previewUrl) URL.revokeObjectURL(previewUrl)
   }, [stopCamera, previewUrl])
 
+  // Put the live camera into the frame as soon as the frame is on screen.
+  // Keyed on `stage` because that is what mounts the element; the stream sits
+  // in a ref, which cannot trigger a render on its own.
+  useEffect(() => {
+    const el = videoRef.current
+    const stream = streamRef.current
+    if (!el || !stream) return
+    if (el.srcObject !== stream) el.srcObject = stream
+    // Autoplay covers the ordinary case; this covers a browser that declined
+    // to start it on its own. Muted + playsInline is what lets either happen
+    // inline on iOS instead of the video going fullscreen or refusing.
+    el.play().catch(() => {})
+  }, [stage])
+
   const beginCountdown = async () => {
     setMessage('')
     try {
@@ -123,10 +137,12 @@ export default function TestimonialUploader() {
         audio: true,
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play().catch(() => {})
-      }
+      // NOT attached here. The <video> lives inside a frame that only renders
+      // from the countdown stage onward, so at this point in the flow the ref
+      // is still null and this silently did nothing — which is why the preview
+      // was a black rectangle for the whole recording while the playback
+      // afterwards, a different element, was fine. The effect below attaches
+      // it once the element actually exists.
     } catch {
       setMessage('We could not reach your camera. Check the permission prompt, or use "choose a video" below.')
       return
@@ -297,10 +313,28 @@ export default function TestimonialUploader() {
           does not jump between stages. */}
       {(stage === 'countdown' || stage === 'recording' || stage === 'review') && (
         <div className="relative rounded-xl overflow-hidden bg-black aspect-[3/4] sm:aspect-video">
+          {/* Distinct keys so React builds a NEW element when the frame
+              switches between playback and the live camera, rather than
+              reusing one node and leaving `src` and `srcObject` set on the
+              same video — which is how a re-record ends up showing the last
+              take instead of the camera. */}
           {stage === 'review' && previewUrl ? (
-            <video src={previewUrl} controls playsInline className="w-full h-full object-contain" />
+            <video
+              key="playback"
+              src={previewUrl}
+              controls
+              playsInline
+              className="w-full h-full object-contain"
+            />
           ) : (
-            <video ref={videoRef} muted playsInline className="w-full h-full object-cover" />
+            <video
+              key="live"
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              className="w-full h-full object-cover"
+            />
           )}
 
           {stage === 'countdown' && (
