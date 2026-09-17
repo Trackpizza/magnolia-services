@@ -45,6 +45,9 @@ interface Appt {
 
 interface PlanItem {
   title: string
+  /** The rest of the same visit, when the clinic stacked treatments into one
+   *  appointment. Absent on every plan written before stacking existed. */
+  also?: string[]
   timing: string
   note: string
   walkthroughUrl: string | null
@@ -302,6 +305,24 @@ export default function PortalClient({ token }: { token: string }) {
                   <p className={`font-medium ${s.done ? 'text-gray-500' : 'text-gray-900'}`}>
                     {s.title}
                   </p>
+                  {/* Stacked treatments sit under the first one, inside the
+                      SAME numbered step — one visit, several things done at
+                      it. Numbering them separately would read as extra trips,
+                      and a plan that looks longer than it is gets declined. */}
+                  {(s.also ?? []).map((t, j) => (
+                    <p
+                      key={j}
+                      className={`font-medium ${s.done ? 'text-gray-500' : 'text-gray-900'}`}
+                    >
+                      <span className="text-gray-400 mr-1" aria-hidden>
+                        +
+                      </span>
+                      {t}
+                    </p>
+                  ))}
+                  {(s.also ?? []).length > 0 && (
+                    <p className="text-xs text-gray-500 mt-0.5">Together, in one visit</p>
+                  )}
                   {s.timing && <p className="text-sm text-gray-600">{s.timing}</p>}
                   {s.note && <p className="text-sm text-gray-700 mt-1">{s.note}</p>}
                   {s.walkthroughUrl && (
