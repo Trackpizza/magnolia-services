@@ -83,7 +83,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
   // "I have been here before" on the details step: prove a contact detail, fill
   // the form in. 'idle' -> 'phone' -> 'code' -> done (which sets `known`).
   // 'phone' is the step that asks for the detail, whichever kind it is.
-  const [idStep, setIdStep] = useState<'idle' | 'phone' | 'sending' | 'code' | 'checking'>('idle')
+  const [idStep, setIdStep] = useState<'idle' | 'phone' | 'sending' | 'code' | 'checking' | 'done'>('idle')
   // Mobile or email. Somebody who has changed their number, or who is at a
   // desk with the phone in another room, has no way through an SMS-only door
   // — and they are exactly the returning patient this is for.
@@ -164,7 +164,13 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       // is filled in and the rest is typed, exactly as before. Saying which of
       // those happened would answer "is this person a patient here", so it
       // says neither.
-      setIdStep('idle')
+      //
+      // 'done' rather than back to 'idle': a patient who has just read a code
+      // out of a text message and been handed the same "Been here before?"
+      // button reasonably concludes it failed, and does the whole thing again.
+      // A found chart hides this block entirely, so this state is only ever
+      // seen by someone whose details we could not fill in.
+      setIdStep('done')
       setIdCode('')
     } catch {
       setIdError('Something went wrong. Please fill the form in.')
@@ -629,10 +635,27 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           {!known && (
             <div className="rounded-xl border border-gray-200 p-4">
               {idStep === 'idle' && (
-                <button type="button" onClick={() => { setIdStep('phone'); setIdPhone(phone); setIdEmail(email) }}
-                  className="text-sm font-medium text-brand-600 hover:text-brand-700">
-                  Been here before? We&apos;ll fill this in for you &rarr;
-                </button>
+                <>
+                  <button type="button" onClick={() => { setIdStep('phone'); setIdPhone(phone); setIdEmail(email) }}
+                    className="text-sm font-medium text-brand-600 hover:text-brand-700">
+                    Been here before? We&apos;ll fill this in for you &rarr;
+                  </button>
+                  {/* A code arriving unannounced reads as a hurdle. Said up
+                      front, it reads as the price of not retyping anything. */}
+                  <p className="mt-1 text-xs text-gray-600">
+                    We send a code to your mobile or email to check it&apos;s you, then fill in
+                    the rest. Or skip it and type it in.
+                  </p>
+                </>
+              )}
+
+              {idStep === 'done' && (
+                <p className="text-sm text-gray-700">
+                  Thanks — that&apos;s confirmed. Fill in the rest below and you&apos;re done.
+                  {idChannel === 'email' && needsVerify && (
+                    <> We&apos;ll still text you a code when you book, to confirm your mobile.</>
+                  )}
+                </p>
               )}
 
               {(idStep === 'phone' || idStep === 'sending') && (
@@ -654,6 +677,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
                   )}
                   <p className="text-xs text-gray-600">
                     {idChannel === 'sms' ? <>We&apos;ll text you a code.</> : <>We&apos;ll email you a code.</>}
+                    {' '}It only confirms it&apos;s you — nothing is booked yet.
                   </p>
                   <div className="flex flex-wrap items-center gap-3">
                     <button type="button" onClick={idSend}

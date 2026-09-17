@@ -359,8 +359,9 @@ export default function PortalClient({ token }: { token: string }) {
             Your treatment history
           </h2>
           <p className="text-sm text-gray-600 mb-4">
-            Everything you have had done with us. We will text a code to the mobile on your
-            file first — just once on this phone.
+            Everything you have had done with us. To keep it private we text a code first —
+            to the number we already have for you, so there is nothing to type. After that
+            this phone stays unlocked for 90 days.
           </p>
 
           {/* 'checking' keeps this branch open on purpose — branching on
@@ -371,6 +372,14 @@ export default function PortalClient({ token }: { token: string }) {
             <div className="space-y-3">
               <p className="text-sm text-gray-700">
                 We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.
+              </p>
+              {/* The dead end this page used to have no answer for: the number
+                  on file is the only place the code can go, so a patient who
+                  has changed it cannot get in by trying harder. Say so, and
+                  point at the people who can fix it. */}
+              <p className="text-xs text-gray-600">
+                Not your number any more? Call or text the clinic and we will update it —
+                the code can only go to the number on your file.
               </p>
               <input
                 value={code}
