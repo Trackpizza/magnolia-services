@@ -6,8 +6,10 @@
  * The plan is the top of the page on purpose. It is the reason to open the
  * link — what is coming and why — and everything else on here is admin.
  */
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import FindMyPage from './FindMyPage'
+import { readSession, writeSession } from './session'
+import BookTreatment from '@/components/BookTreatment'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -65,7 +67,21 @@ interface PastVisit { date: string; treatment: string; provider: string }
 interface SignedConsent { names: string[]; signedAt: string | null }
 interface History { visits: PastVisit[]; consents: SignedConsent[] }
 
-interface View {
+/**
+ * What the API sends before anyone has proved anything: which ways a code can
+ * be sent, and the clinic's own number. Nothing about the patient — not even a
+ * first name, because "Hello, Jane" to whoever opened a forwarded link is
+ * already a disclosure.
+ */
+interface LockedView {
+  locked: true
+  /** Offering a button the API answers 503 to is worse than offering nothing. */
+  channels: { sms: boolean; email: boolean }
+  clinicPhone: string
+}
+
+interface OpenView {
+  locked?: false
   firstName: string
   upcoming: Appt[]
   plan: PlanItem[]
@@ -75,32 +91,17 @@ interface View {
   clinicPhone: string
   clinicAddress: string
   links: PortalLink[]
-  historyAvailable: boolean
-  /** Which routes a code can actually take. Offering a button the API answers
-   *  503 to is worse than offering nothing. */
-  historyChannels?: { sms: boolean; email: boolean }
-  unlocked: boolean
   history: History | null
 }
 
-/**
- * Where the 90-day device trust lives.
- *
- * localStorage, per browser, and it is only a KEY — the server decides what
- * it unlocks and which patient it belongs to. A stolen one is worth nothing on
- * anyone else's link. Wrapped because a private window or blocked site data
- * makes these throw rather than return empty.
- */
-const SESSION_KEY = 'msc_portal_session'
-function readSession(): string {
-  try { return localStorage.getItem(SESSION_KEY) ?? '' } catch { return '' }
-}
-function writeSession(v: string) {
-  try { localStorage.setItem(SESSION_KEY, v) } catch { /* history just asks again next time */ }
-}
+type View = LockedView | OpenView
+
 
 const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
 const card = 'bg-white rounded-2xl border border-gray-100 p-6 sm:p-8'
+const primaryBtn =
+  'w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
+const quietBtn = 'text-sm text-brand-600 hover:text-brand-700'
 
 export default function PortalClient({ token }: { token: string }) {
   const [view, setView] = useState<View | null>(null)
@@ -116,6 +117,18 @@ export default function PortalClient({ token }: { token: string }) {
   // a page saying "check your phone".
   const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
   const [gateError, setGateError] = useState('')
+  // The booking widget, shown on request. Both Book buttons open it and scroll
+  // to it — a picker that is always open would make the page about booking,
+  // and the page is about the plan.
+  const [booking, setBooking] = useState(false)
+  const bookingRef = useRef<HTMLDivElement | null>(null)
+  const openBooking = () => {
+    setBooking(true)
+    // After paint, or it scrolls to where the card is about to be.
+    requestAnimationFrame(() =>
+      bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }),
+    )
+  }
 
   const call = useCallback(
     async (extra: Record<string, unknown> = {}) => {
@@ -175,10 +188,14 @@ export default function PortalClient({ token }: { token: string }) {
         setGate('entering')
         return
       }
+      // Saved first, then the page asks for itself again WITH the session —
+      // which is also exactly what every later visit on this device does, so
+      // the logged-in path is the same code as the returning path rather than
+      // a second one that can drift.
       writeSession(String(data.session ?? ''))
-      setView((v) => (v ? { ...v, unlocked: true, history: data.history as History } : v))
       setGate('idle')
       setCode('')
+      await load()
     } catch {
       setGateError('Something went wrong. Please try again.')
       setGate('entering')
@@ -203,6 +220,96 @@ export default function PortalClient({ token }: { token: string }) {
         <p className="text-gray-700">
           We could not load your page just now. Please try again, or call or text us.
         </p>
+      </div>
+    )
+  }
+
+  // ── Locked: the link named the chart, the code says it is them ───────────
+  //
+  // This is the whole portal now, not a second gate on one section. The page
+  // below never renders for somebody who has only got hold of a link.
+  if (view.locked) {
+    const canSms = view.channels.sms
+    const canEmail = view.channels.email
+    return (
+      <div className={card}>
+        <h1 className="text-2xl font-semibold text-plum-900 mb-2" style={heading}>
+          Your page
+        </h1>
+        {/* The pitch, not an apology. A code is worth typing for something,
+            and this says what — without saying anything about the chart. */}
+        <p className="text-sm text-gray-600 mb-5">
+          Your treatment plan, your appointments and anything still to sign are inside. To
+          keep them private we send a code first, to the number or address we already have
+          for you — there is nothing to type.
+        </p>
+
+        {gate === 'entering' || gate === 'checking' ? (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-700">
+              {gateChannel === 'email' ? (
+                <>We sent a code to <strong className="text-plum-900">{sentTo}</strong>.</>
+              ) : (
+                <>We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.</>
+              )}
+            </p>
+            <input
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              placeholder="6-digit code"
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg tracking-widest text-center"
+            />
+            <button onClick={unlock} disabled={gate === 'checking' || code.length < 4} className={primaryBtn}>
+              {gate === 'checking' ? 'Checking…' : 'Open my page'}
+            </button>
+            <div className="flex flex-wrap gap-4">
+              <button onClick={() => sendCode()} disabled={gate === 'checking'} className={quietBtn}>
+                Send a new code
+              </button>
+              {gateChannel === 'sms' && canEmail && (
+                <button onClick={() => sendCode('email')} disabled={gate === 'checking'} className={quietBtn}>
+                  Not your number any more? Email it instead
+                </button>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {/* SMS first whenever we have a mobile, and that is security
+                rather than taste: the LINK usually arrives by email, so a
+                code to the same inbox would put the door and its key in one
+                place. */}
+            {canSms && (
+              <button onClick={() => sendCode('sms')} disabled={gate === 'sending'} className={primaryBtn}>
+                {gate === 'sending' ? 'Sending…' : 'Text me a code'}
+              </button>
+            )}
+            {canEmail && (
+              <button
+                onClick={() => sendCode('email')}
+                disabled={gate === 'sending'}
+                className={canSms ? quietBtn : primaryBtn}
+              >
+                {canSms ? 'Or email it to me instead' : gate === 'sending' ? 'Sending…' : 'Email me a code'}
+              </button>
+            )}
+            {!canSms && !canEmail && (
+              /* Nothing on the chart to send to. The records app now refuses
+                 to mint a link for one of these, so this is an older link
+                 rather than a new mistake — and there is no self-serve way
+                 out of it by design. */
+              <p className="text-sm text-gray-700">
+                We do not have a mobile or an email on file for this page, so we cannot send
+                a code. Please call or text us{view.clinicPhone ? ` on ${view.clinicPhone}` : ''} and
+                we will sort it out.
+              </p>
+            )}
+          </div>
+        )}
+
+        {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
       </div>
     )
   }
@@ -256,12 +363,12 @@ export default function PortalClient({ token }: { token: string }) {
         {view.upcoming.length === 0 ? (
           <>
             <p className="text-sm text-gray-700 mb-4">Nothing booked at the moment.</p>
-            <a
-              href={view.bookingUrl}
+            <button
+              onClick={openBooking}
               className="inline-block bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors"
             >
               Book an appointment
-            </a>
+            </button>
           </>
         ) : (
           <div className="space-y-4">
@@ -346,118 +453,28 @@ export default function PortalClient({ token }: { token: string }) {
               </li>
             ))}
           </ol>
-          <a
-            href={view.bookingUrl}
+          <button
+            onClick={openBooking}
             className="block w-full text-center mt-6 border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors"
           >
             Book your next visit
-          </a>
+          </button>
         </div>
       )}
 
-      {/* Treatment history, behind a code.
-          The code goes to the number already on their chart, never one typed
-          here — so whoever holds this link can make a phone buzz but cannot
-          receive the code. Hidden entirely when there is no mobile on file:
-          offering a code we cannot send is worse than not offering one. */}
-      {view.historyAvailable && !view.unlocked && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Your treatment history
-          </h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Everything you have had done with us. To keep it private we send a code first —
-            to the number or address we already have for you, so there is nothing to type.
-            After that this phone stays unlocked for 90 days.
-          </p>
-
-          {/* 'checking' keeps this branch open on purpose — branching on
-              'entering' alone made the code box disappear the instant they
-              pressed the button, which reads as the page losing what they
-              typed. */}
-          {gate === 'entering' || gate === 'checking' ? (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-700">
-                {gateChannel === 'email' ? (
-                  <>We sent a code to <strong className="text-plum-900">{sentTo}</strong>.</>
-                ) : (
-                  <>We sent a code to the number ending <strong className="text-plum-900">{last4}</strong>.</>
-                )}
-              </p>
-              {/* The dead end this page used to have no answer for: the code
-                  can only go to the details already on file, so a patient
-                  whose number changed cannot get in by trying harder. Now
-                  there is a second route, and when neither reaches them, the
-                  people who can fix it. */}
-              {gateChannel === 'sms' && view.historyChannels?.email ? (
-                <button
-                  onClick={() => sendCode('email')}
-                  disabled={gate === 'checking'}
-                  className="text-sm text-brand-600 hover:text-brand-700"
-                >
-                  Not your number any more? Email the code instead
-                </button>
-              ) : (
-                <p className="text-xs text-gray-600">
-                  Not yours any more? Call or text the clinic and we will update it — the code
-                  can only go to the details on your file.
-                </p>
-              )}
-              <input
-                value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 10))}
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                placeholder="6-digit code"
-                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg tracking-widest text-center"
-              />
-              <button
-                onClick={unlock}
-                disabled={gate === 'checking' || code.length < 4}
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
-              >
-                {gate === 'checking' ? 'Checking…' : 'Show my history'}
-              </button>
-              <button
-                onClick={() => sendCode()}
-                disabled={gate === 'checking'}
-                className="text-sm text-brand-600 hover:text-brand-700"
-              >
-                Send a new code
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {view.historyChannels?.sms !== false && (
-                <button
-                  onClick={() => sendCode('sms')}
-                  disabled={gate === 'sending'}
-                  className="w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
-                >
-                  {gate === 'sending' ? 'Sending…' : 'Text me a code'}
-                </button>
-              )}
-              {view.historyChannels?.email && (
-                <button
-                  onClick={() => sendCode('email')}
-                  disabled={gate === 'sending'}
-                  className={
-                    view.historyChannels?.sms === false
-                      ? 'w-full border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
-                      : 'text-sm text-brand-600 hover:text-brand-700'
-                  }
-                >
-                  {view.historyChannels?.sms === false ? 'Email me a code' : 'Or email it to me instead'}
-                </button>
-              )}
-            </div>
-          )}
-
-          {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
+      {/* Booking, in the portal rather than off it.
+          The widget already knows who this is, so there is no form to fill in
+          and no code to wait for: the session it carries IS the proof, and it
+          is a stronger one than the text the booking form would otherwise
+          send. Rendered only once asked for, so the page still opens on the
+          plan rather than on a treatment picker. */}
+      {booking && (
+        <div ref={bookingRef}>
+          <BookTreatment portal={{ token, session: readSession() }} />
         </div>
       )}
 
-      {view.unlocked && view.history && (
+      {view.history && (
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-4" style={heading}>
             Your treatment history

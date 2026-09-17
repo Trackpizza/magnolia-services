@@ -15,6 +15,7 @@
  * match that to a single page", which is true of both and gives away neither.
  */
 import { useState } from 'react'
+import { writeSession } from './session'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -92,6 +93,10 @@ export default function FindMyPage() {
         return
       }
       if (d.token) {
+        // Logged in already: the code they just read back is the same proof
+        // the portal's own login asks for, and sending them to a locked page
+        // to do it twice would be two codes to open one page.
+        if (d.session) writeSession(String(d.session))
         // A whole navigation rather than a router push: the token belongs in
         // the address bar, so the page they land on is one they can bookmark.
         window.location.href = `/my?t=${encodeURIComponent(String(d.token))}`

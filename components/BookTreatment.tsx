@@ -21,7 +21,7 @@ const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 interface Treatment { id: string; name: string; durationMin: number; category?: string }
 interface Slot { date: string; start: string; end: string }
 interface Provider { id: string; name: string }
-type Step = 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'verify' | 'done'
+type Step = 'who' | 'treatment' | 'provider' | 'visit' | 'time' | 'details' | 'verify' | 'done'
 
 function to12h(hhmm: string): string {
   const [h, m] = hhmm.split(':').map(Number)
@@ -42,21 +42,37 @@ function longDate(ymd: string): string {
  * server-side would force /bookings to render per request and lose the ISR
  * caching it has had all along -- for a value only this widget uses.
  */
-function BookTreatmentInner({ deposit }: { deposit: boolean }) {
+function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: PortalIdentity }) {
   const preselect = useSearchParams().get('treatment') ?? undefined
   /** A client portal token, when they came from their own page. Means we know
    *  exactly who this is, so the form fills itself in and the "have you been
-   *  here before?" question answers itself. */
-  const portalToken = useSearchParams().get('c') ?? ''
+   *  here before?" question answers itself.
+   *
+   *  As a PROP when this is rendered inside the portal, and from the query
+   *  string when the patient followed a Book link out of it. Same token either
+   *  way; the prop just means nobody had to put it in a URL. */
+  const qsToken = useSearchParams().get('c') ?? ''
+  const portalToken = portal?.token || qsToken
+  /** A logged-in portal session. The booking route takes this INSTEAD of a
+   *  texted code: the portal already sent a code to the contact on the chart
+   *  and had it read back, which is a stronger proof than the booking OTP. */
+  const portalSession = portal?.session ?? ''
   const [treatments, setTreatments] = useState<Treatment[]>([])
   const [consultMin, setConsultMin] = useState(30)
   const [providers, setProviders] = useState<Provider[]>([])
   // '' means no preference, which offers the most times.
   const [providerId, setProviderId] = useState('')
   const [enabled, setEnabled] = useState<boolean | null>(null)
-  const [open, setOpen] = useState(false)
+  // Collapsed on a marketing page, where it is one call to action among
+  // several. Open inside the portal, where the patient has already pressed
+  // Book and a second button saying Book under a heading saying Book is a
+  // click that asks them to confirm they meant it.
+  const [open, setOpen] = useState(!!portal)
   const cardRef = useRef<HTMLDivElement>(null)
-  const [step, setStep] = useState<Step>('treatment')
+  // 'who' first, except inside the portal — asking somebody standing in their
+  // own logged-in page whether they have been here before is the kind of
+  // question that makes software feel like it is not paying attention.
+  const [step, setStep] = useState<Step>(portal ? 'treatment' : 'who')
   const [treatmentId, setTreatmentId] = useState('')
   const [isNewClient, setIsNewClient] = useState<boolean | null>(null)
   const [slots, setSlots] = useState<Slot[]>([])
@@ -188,6 +204,10 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
    */
   const afterProvider = (pid: string) => {
     if (known) { setIsNewClient(false); void loadSlots(false, pid) }
+    // Answered on the 'who' step, which every patient outside the portal now
+    // passes through. The 'visit' step stays for the portal's own flow and for
+    // anyone who somehow arrives mid-form without it.
+    else if (isNewClient !== null) void loadSlots(isNewClient, pid)
     else setStep('visit')
   }
 
@@ -202,7 +222,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
         const res = await fetch(`${API}/api/public/portal`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: portalToken, action: 'prefill' }),
+          body: JSON.stringify({ token: portalToken, action: 'prefill', session: portalSession }),
         })
         if (!res.ok || !live) return
         const d = await res.json()
@@ -219,7 +239,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
       }
     })()
     return () => { live = false }
-  }, [portalToken])
+  }, [portalToken, portalSession])
 
   const treatment = treatments.find(t => t.id === treatmentId) ?? null
   // Count as they type rather than rejecting on submit: someone who has typed
@@ -368,8 +388,18 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
 
   /** Details form submitted. Book straight away unless a code is wanted and we
    *  do not already hold a good one. */
+  // What the button is about to do. It used to read `needsVerify &&
+  // !verifyToken`, which stopped being the whole truth the moment a portal
+  // session could stand in for the code — leaving a button that promised a
+  // text and then booked without sending one.
+  const willTextCode = needsVerify && !verifyToken && !portalSession
+
   const submitDetails = async () => {
-    if (!needsVerify) return book()
+    // A portal booking has already been verified, harder than this step
+    // verifies: the code went to the contact on the chart, not to whatever
+    // number was typed into a form. The server enforces the same rule, so a
+    // stale value here cannot skip anything.
+    if (!needsVerify || portalSession) return book()
     if (verifyToken) return book(verifyToken)
     setCodeResent(false)
     await sendCode()
@@ -398,6 +428,7 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           phone: digits,
           email: email.trim(),
           ...(token ? { verifyToken: token } : {}),
+          ...(portalSession ? { portalSession } : {}),
         }),
       })
       const d = await res.json()
@@ -521,6 +552,48 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
 
       {error && (
         <p className="mb-5 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>
+      )}
+
+      {/* ── Who is this? ────────────────────────────────────────────────
+          The first question, before treatments, because the two answers go to
+          different places. A new patient carries on down this form. A
+          returning one belongs in their portal — which is where the plan, the
+          walkthrough and a booking with nothing to type all live, and which
+          they would otherwise never find. */}
+      {step === 'who' && (
+        <div className="space-y-3">
+          <button
+            onClick={() => { setIsNewClient(true); setStep('treatment') }}
+            className="w-full text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors"
+          >
+            <span className="block font-medium text-gray-900">This is my first visit</span>
+            <span className="block text-sm text-gray-600">
+              Includes time with your provider before any treatment. Nothing to fill in now.
+            </span>
+          </button>
+          <a
+            href="/my"
+            className="block text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors"
+          >
+            <span className="block font-medium text-gray-900">
+              I&apos;m an existing patient — log in to my page
+            </span>
+            <span className="block text-sm text-gray-600">
+              Your plan and your appointments, and booking with nothing to type. We text you
+              a code, or email one.
+            </span>
+          </a>
+          {/* The way through for the returning patient who cannot get a code:
+              a shared mobile, a changed number, a chart with an old address.
+              Quiet, because it is the worse path — it books them without ever
+              showing them the page we want them to keep. */}
+          <button
+            onClick={() => { setIsNewClient(false); setStep('treatment') }}
+            className="text-sm text-gray-600 hover:text-gray-900 underline"
+          >
+            I&apos;ve been here before but can&apos;t log in — just book me
+          </button>
+        </div>
       )}
 
       {step === 'treatment' && (
@@ -775,10 +848,10 @@ function BookTreatmentInner({ deposit }: { deposit: boolean }) {
           <button type="submit" disabled={loading || !phoneOk || !emailOk}
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
             {loading
-              ? (needsVerify && !verifyToken ? 'Texting you a code\u2026' : 'Booking\u2026')
-              : (needsVerify && !verifyToken ? 'Text me a code' : 'Confirm booking')}
+              ? (willTextCode ? 'Texting you a code\u2026' : 'Booking\u2026')
+              : (willTextCode ? 'Text me a code' : 'Confirm booking')}
           </button>
-          {needsVerify && !verifyToken && (
+          {willTextCode && (
             <p className="text-xs text-gray-600">
               We will text a six-digit code to that number to check we can reach you. Your
               booking is not taken until you enter it.
@@ -997,10 +1070,22 @@ function formatUsPhone(tenDigits: string): string {
   return tenDigits.length === 10 ? formatPhoneInput(tenDigits) : tenDigits
 }
 
-export default function BookTreatment({ deposit = false }: { deposit?: boolean }) {
+/** Who the patient is, when this is rendered inside their own portal. */
+export interface PortalIdentity {
+  token: string
+  session: string
+}
+
+export default function BookTreatment({
+  deposit = false,
+  portal,
+}: {
+  deposit?: boolean
+  portal?: PortalIdentity
+}) {
   return (
     <Suspense fallback={null}>
-      <BookTreatmentInner deposit={deposit} />
+      <BookTreatmentInner deposit={deposit} portal={portal} />
     </Suspense>
   )
 }

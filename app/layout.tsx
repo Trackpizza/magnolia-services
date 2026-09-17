@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Cormorant_Garamond } from 'next/font/google'
 import './globals.css'
+import ExistingPatientBar from '@/components/ExistingPatientBar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://i.ytimg.com" />
       </head>
       <body className={`${inter.className} ${cormorant.variable} antialiased bg-cream-100`}>
+        <ExistingPatientBar />
         {children}
       </body>
     </html>
