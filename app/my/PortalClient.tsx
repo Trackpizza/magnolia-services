@@ -78,6 +78,9 @@ interface LockedView {
   /** Offering a button the API answers 503 to is worse than offering nothing. */
   channels: { sms: boolean; email: boolean }
   clinicPhone: string
+  /** Public documents. They belong on the login screen too — the privacy
+   *  policy should not sit behind the login it describes. */
+  legalLinks?: PortalLink[]
 }
 
 interface OpenView {
@@ -91,6 +94,7 @@ interface OpenView {
   clinicPhone: string
   clinicAddress: string
   links: PortalLink[]
+  legalLinks?: PortalLink[]
   history: History | null
 }
 
@@ -310,6 +314,10 @@ export default function PortalClient({ token }: { token: string }) {
         )}
 
         {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
+
+        <div className="mt-6">
+          <LegalFooter links={view.legalLinks} />
+        </div>
       </div>
     )
   }
@@ -569,6 +577,27 @@ export default function PortalClient({ token }: { token: string }) {
       <p className="text-center text-xs text-gray-500 px-4">
         This page is yours — keep the link. It stays up to date on its own.
       </p>
+
+      <LegalFooter links={view.legalLinks} />
     </div>
+  )
+}
+
+/** Privacy, Terms and whatever else the clinic lists in Settings. Quiet, at
+ *  the bottom, present for the person who goes looking. Renders nothing at all
+ *  when the list is empty rather than leaving an orphaned separator. */
+function LegalFooter({ links }: { links?: PortalLink[] }) {
+  if (!links?.length) return null
+  return (
+    <p className="text-center text-xs text-gray-400 px-4 pb-2">
+      {links.map((l, i) => (
+        <span key={l.href}>
+          {i > 0 && <span className="mx-1.5">·</span>}
+          <a href={l.href} target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 underline">
+            {l.label}
+          </a>
+        </span>
+      ))}
+    </p>
   )
 }

@@ -13,6 +13,10 @@ export async function POST(req: NextRequest) {
   revalidatePath('/', 'layout')
   revalidatePath('/')
   revalidatePath('/bookings')
+  // Terms is editable in /admin, so a save has to evict it too — otherwise the
+  // clinic changes its cancellation policy and the page keeps serving the old
+  // one for up to a minute, which is exactly the page where that matters.
+  revalidatePath('/terms')
   for (const slug of getAllSlugs()) {
     revalidatePath(`/services/${slug}`)
     revalidatePath(`/services/${slug}/pre-treatment`)

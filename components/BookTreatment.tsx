@@ -88,6 +88,10 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
   // Whether the clinic is asking for a texted code. Advisory: the records API
   // enforces it either way, so a stale value here cannot let a booking skip it.
   const [needsVerify, setNeedsVerify] = useState(false)
+  /** Privacy, Terms and anything else the clinic lists. Shown beside the Book
+   *  button, which is the only place they do any work — "by booking you agree"
+   *  is empty if the thing agreed to is somewhere else. */
+  const [legalLinks, setLegalLinks] = useState<{ label: string; href: string }[]>([])
   const [code, setCode] = useState('')
   // Kept so a retry after 'that time was just taken' does not cost a second
   // text. The API burns it only once a booking actually lands.
@@ -269,10 +273,11 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
     let live = true
     fetch(`${API}/api/public/treatments`)
       .then(r => r.json())
-      .then((d: { enabled: boolean; treatments: Treatment[]; providers?: Provider[]; newClientConsultMin?: number; phoneVerification?: boolean }) => {
+      .then((d: { enabled: boolean; treatments: Treatment[]; providers?: Provider[]; newClientConsultMin?: number; phoneVerification?: boolean; legalLinks?: { label: string; href: string }[] }) => {
         if (!live) return
         setEnabled(d.enabled)
         setNeedsVerify(d.phoneVerification === true)
+        setLegalLinks(Array.isArray(d.legalLinks) ? d.legalLinks : [])
         setTreatments(d.treatments ?? [])
         setProviders(d.providers ?? [])
         if (d.newClientConsultMin) setConsultMin(d.newClientConsultMin)
@@ -855,6 +860,25 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
             <p className="text-xs text-gray-600">
               We will text a six-digit code to that number to check we can reach you. Your
               booking is not taken until you enter it.
+            </p>
+          )}
+          {legalLinks.length > 0 && (
+            <p className="text-xs text-gray-600">
+              By booking you agree to our{' '}
+              {legalLinks.map((l, i) => (
+                <span key={l.href}>
+                  {i > 0 && (i === legalLinks.length - 1 ? ' and ' : ', ')}
+                  <a
+                    href={l.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-brand-600 hover:text-brand-700"
+                  >
+                    {l.label}
+                  </a>
+                </span>
+              ))}
+              .
             </p>
           )}
           <p className="text-xs text-gray-600">

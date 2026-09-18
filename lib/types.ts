@@ -33,6 +33,7 @@ export interface ServiceLinks {
   videos: Record<string, string>  // id → main treatment YouTube URL (empty = show placeholder)
   videoDates: Record<string, string>  // id → upload date (YYYY-MM-DD) for VideoObject structured data
   content: Record<string, string>  // id → markdown shown under "How it works" (empty = hide)
+  terms?: string  // markdown for /terms — the clinic's own wording, edited without a deploy
   prepVideos: Record<string, string>     // id → Pre-Treatment & Planning Guide video
   prepVideoDates: Record<string, string> // id → prep video upload date (YYYY-MM-DD) for VideoObject
   prepContent: Record<string, string>    // id → Pre-Treatment & Planning Guide markdown
