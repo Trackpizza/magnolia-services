@@ -65,6 +65,16 @@ interface PortalLink { label: string; href: string; emoji: string }
 
 interface PastVisit { date: string; treatment: string; provider: string }
 interface SignedConsent { names: string[]; signedAt: string | null }
+
+/** An ISO timestamp as a patient would say it. Used for "we have your video
+ *  from ..." — a date, never a time, because the time it was uploaded is not
+ *  something anyone needs to be reminded of. */
+function shortDate(iso: string): string {
+  const d = new Date(iso)
+  return Number.isNaN(d.getTime())
+    ? ''
+    : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+}
 interface History { visits: PastVisit[]; consents: SignedConsent[] }
 
 /**
@@ -95,6 +105,9 @@ interface OpenView {
   clinicAddress: string
   links: PortalLink[]
   legalLinks?: PortalLink[]
+  /** Share your story. `signed` is the authorization; `sent` is what they have
+   *  already given, newest first. */
+  testimonial?: { signed: boolean; sent: string[] }
   history: History | null
 }
 
@@ -124,6 +137,27 @@ export default function PortalClient({ token }: { token: string }) {
   // The booking widget, shown on request. Both Book buttons open it and scroll
   // to it — a picker that is always open would make the page about booking,
   // and the page is about the plan.
+  // Minted on demand rather than handed out with the page: a testimonial link
+  // sitting unused in a payload is a live upload link for whoever sees it.
+  const [busy, setBusy] = useState('')
+  const [linkError, setLinkError] = useState('')
+  const openLink = async (action: 'video-consent' | 'testimonial-link') => {
+    setBusy(action)
+    setLinkError('')
+    try {
+      const { ok, data } = await call({ action, session: readSession() })
+      if (!ok || !data.url) {
+        setLinkError('We could not open that just now. Please try again, or call or text us.')
+        return
+      }
+      window.location.href = String(data.url)
+    } catch {
+      setLinkError('We could not open that just now. Please try again, or call or text us.')
+    } finally {
+      setBusy('')
+    }
+  }
+
   const [booking, setBooking] = useState(false)
   const bookingRef = useRef<HTMLDivElement | null>(null)
   const openBooking = () => {
@@ -467,6 +501,59 @@ export default function PortalClient({ token }: { token: string }) {
           >
             Book your next visit
           </button>
+        </div>
+      )}
+
+      {/* Share your story.
+          Eileen had to remember to ask, chart by chart, at the moment she is
+          busiest. The person best placed to decide is the patient reading
+          their own plan and looking at what has changed — so it is offered
+          here, on their own time, and she stops being the bottleneck.
+
+          Authorization first, recording second, the same order staff follow.
+          Filming a testimonial before somebody has agreed to it being used is
+          collecting footage you have no right to. */}
+      {view.testimonial && (
+        <div className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
+            Share your story
+          </h2>
+
+          {view.testimonial.sent.length > 0 && (
+            <p className="text-sm text-gray-600 mb-3">
+              {view.testimonial.sent.length === 1
+                ? `Thank you — we have your video${view.testimonial.sent[0] ? ` from ${shortDate(view.testimonial.sent[0])}` : ''}.`
+                : `Thank you — we have ${view.testimonial.sent.length} videos from you${
+                    view.testimonial.sent[0] ? `, the most recent from ${shortDate(view.testimonial.sent[0])}` : ''
+                  }.`}
+            </p>
+          )}
+
+          {!view.testimonial.signed ? (
+            <>
+              <p className="text-sm text-gray-600 mb-4">
+                If you are happy with how things are going, a short video helps someone else
+                decide. First there is a one-page authorization to read and sign — nothing is
+                ever used without it, and you can withdraw it at any time.
+              </p>
+              <button onClick={() => openLink('video-consent')} disabled={busy !== ''} className={primaryBtn}>
+                {busy === 'video-consent' ? 'Opening…' : 'Read the authorization'}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-gray-600 mb-4">
+                {view.testimonial.sent.length > 0
+                  ? 'Happy to record another? A minute is plenty, filmed on your own phone.'
+                  : 'A minute is plenty, filmed on your own phone, whenever suits you. You can watch it back and record it again before anything is sent.'}
+              </p>
+              <button onClick={() => openLink('testimonial-link')} disabled={busy !== ''} className={primaryBtn}>
+                {busy === 'testimonial-link' ? 'Opening…' : 'Record a video'}
+              </button>
+            </>
+          )}
+
+          {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
         </div>
       )}
 
