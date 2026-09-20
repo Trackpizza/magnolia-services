@@ -1,6 +1,6 @@
 # Magnolia Skin Center — Services Site: Project Status
 
-_Last updated: 2026-09-02_
+_Last updated: 2026-09-20_
 
 Public marketing / services site for Magnolia Skin Center (Burbank, CA). Browse all
 treatments, search by concern, watch per-treatment videos, read pre-treatment &
@@ -8,6 +8,77 @@ after-care guides, and book a complimentary video consultation.
 
 **Related docs:** [`README.md`](../README.md) (dev/deploy quickstart) ·
 [`docs/ACCESSIBILITY-CHECKLIST.md`](ACCESSIBILITY-CHECKLIST.md) (WCAG 2.2 AA audit).
+
+---
+
+## 0. Newest first — 2026-09-16 → 09-20
+
+This site is no longer only marketing. It now hosts three patient surfaces that
+talk to the records app's public API from the browser (never through this
+site's server — see §5, that boundary is what keeps this project out of HIPAA
+scope).
+
+### `/my` — the patient portal, now behind a login
+
+The link is no longer the credential. `?t=<32 hex>` says WHICH chart; a texted
+or emailed code says it is them; a 90-day device session means that happens
+once per device. A forwarded email or a screenshot opens nothing.
+
+- Everything is behind it — the old "treatment history behind a separate code"
+  tier is gone, and `prefill` moved behind it too (it was handing the name,
+  mobile and address on a chart to any link holder).
+- **SMS is the default whenever the chart has a mobile.** That is security, not
+  taste: staff send the LINK by email, so emailing the code as well puts the
+  door and its key in one inbox.
+- **Booking happens inside the portal.** The widget is embedded with the
+  session, which the records app accepts INSTEAD of a texted code — the portal
+  code already went to the contact on the chart, which is a stronger proof.
+- Cards: a photo request when one is outstanding, the plan, appointments,
+  "Share your story" (video testimonial, self-serve), treatment history, clinic
+  links, legal links.
+- `/my` with no token, or a dead one, shows **Find your page** — prove a mobile
+  or an email and the browser walks in. Zero charts and TWO charts on one
+  number say the identical thing.
+
+### `/photos/[token]` — follow-up photos from the patient
+
+One angle at a time, front camera, mirrored preview and an **unmirrored file**
+(a flipped clinical photo compares the wrong side). Cropped to **9:16** at
+capture, verified against a 1920×1080 landscape camera → 608×1080. Each angle
+uploads as it is taken, so giving up halfway still leaves the clinic something.
+
+### `/terms` — editable
+
+Hand-written privacy page beside it stays as-is; terms are the clinic's own
+policy and Eileen edits them in `/admin` without a deploy. Ships with a
+developer's draft, **clearly marked for a lawyer to review**. Saving revalidates
+the page.
+
+### Booking widget
+
+- First question is now **"This is my first visit"** vs **"I'm an existing
+  patient — log in to my page"**, with a quiet third option for a returning
+  patient who cannot get a code (a failed login must not become a lost
+  booking).
+- "Been here before?" identifies by **mobile or email**; an emailed code
+  issues no verified-phone token, so booking still asks for its text.
+- Legal links render beside the Book button — "by booking you agree" means
+  nothing when the thing agreed to is elsewhere.
+
+### Testimonial recorder — a bug worth remembering
+
+The live preview was a black rectangle for the whole take while playback
+afterwards worked. `srcObject` was set BEFORE the stage that mounts the
+`<video>`, so the ref was null and the guard skipped in silence. Attaching now
+happens in an effect keyed on the stage. Not mobile-only, despite how it
+showed up.
+
+### A site-wide bar
+
+`ExistingPatientBar` in the layout carries "Already a patient? … Log in" on
+every page except `/my` and `/admin`. The sixteen page-level headers were left
+alone deliberately — threading a button through all of them is sixteen chances
+to break a layout for one link.
 
 ---
 
