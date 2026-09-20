@@ -108,6 +108,8 @@ interface OpenView {
   /** Share your story. `signed` is the authorization; `sent` is what they have
    *  already given, newest first. */
   testimonial?: { signed: boolean; sent: string[] }
+  /** Photos the clinic has asked for and is still waiting on. */
+  photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
 }
 
@@ -503,6 +505,35 @@ export default function PortalClient({ token }: { token: string }) {
           </button>
         </div>
       )}
+
+      {/* Photos the clinic is waiting on.
+          Near the top, above the plan, because it is the one thing on this
+          page somebody else is waiting for — everything else is theirs to
+          read whenever. It also makes "check your page" a real instruction:
+          an email from three weeks ago is not somewhere a patient can be
+          sent, and this is why Eileen can text four words instead of
+          re-sending a link. */}
+      {(view.photoRequests ?? []).map((r) => (
+        <div key={r.url} className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
+            Could you send us a photo?
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            It has been {r.label}
+            {r.procedureName ? ` since your ${r.procedureName}` : ""}. A couple of photos lets
+            your provider see how it is settling — it takes a minute on your phone, and they
+            go straight onto your record.
+          </p>
+          {r.slots.length > 0 && (
+            <p className="text-sm text-gray-600 mb-4">
+              We will ask for {r.slots.length}: {r.slots.join(', ')}.
+            </p>
+          )}
+          <a href={r.url} className={primaryBtn + ' text-center block'}>
+            Take the photos
+          </a>
+        </div>
+      ))}
 
       {/* Share your story.
           Eileen had to remember to ask, chart by chart, at the moment she is
