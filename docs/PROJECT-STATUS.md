@@ -13,6 +13,43 @@ after-care guides, and book a complimentary video consultation.
 
 ## 0. Newest first — 2026-09-16 → 09-20
 
+### The angle diagram on /photos, and the convention behind it (2026-09-20)
+
+A patient holding a phone at arm's length has never heard "Right 45°", and a
+guessed angle is worse than no photograph — it lands in the comparison row
+beside the one staff took, where the whole point is that the two are the same
+view. So each angle now carries a diagram of a head seen from above, with the
+camera below it, plus the instruction in words.
+
+⚠️ **THE CONVENTION, confirmed with Eric on 2026-09-20:** "Right 45°" means
+the patient's **RIGHT side faces the camera** — the aesthetics standard, and
+what the clinic's own Before photos are shot to. To show their right cheek the
+patient turns towards their **LEFT** shoulder. **Changing this silently
+mismatches every before/after pair.** Phrased as "towards your left shoulder"
+rather than "to your left": a shoulder is a thing you can find, a direction is
+one you work out while looking at a mirrored preview of yourself.
+
+Seen from above with the face pointing at the camera, **the patient's right is
+on the LEFT of the picture** — true, and the single most confusing thing about
+the drawing. It is now labelled **R** and **L**, counter-rotated so they stay
+upright, and they are what makes the diagram self-checking: for Right 45° you
+can watch R swing down towards the camera, and at Right 90° it faces it
+squarely.
+
+🪤 **The arrow was wrong when first shipped, and it was reported before the
+geometry was.** The head rotates counter-clockwise on screen for a right-side
+shot (`rotate(-45)`, nose measured to bottom-right) but the arrow swept
+clockwise. It was also drawn over the top of the head — the crown, which
+travels *opposite* to the face, so even drawn correctly it contradicts the
+thing it describes. It now traces where the **nose** goes: from the camera
+line round to where the face lands.
+
+Verified by measuring in the browser rather than reading the picture —
+`getScreenCTM()` on the nose tip, and a cross-product on the arc to get its
+sweep direction. Both are worth redoing if this drawing is ever touched.
+
+---
+
 This site is no longer only marketing. It now hosts three patient surfaces that
 talk to the records app's public API from the browser (never through this
 site's server — see §5, that boundary is what keeps this project out of HIPAA

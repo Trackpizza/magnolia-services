@@ -95,9 +95,38 @@ export function angleGuide(slot: string): Guide {
   };
 }
 
+/** Where the guide arc sits — outside the head (r=24) and outside the nose
+ *  (tip at r=31), so it traces the turn without colliding with either. */
+const ARC_R = 38;
+
+/** A point on that arc, `deg` from "pointing straight at the camera".
+ *  POSITIVE deg is counter-clockwise on screen, which is the direction the
+ *  face travels when it turns towards the patient's LEFT shoulder. */
+function arcPoint(deg: number): [number, number] {
+  const r = (deg * Math.PI) / 180;
+  return [60 + ARC_R * Math.sin(r), 45 + ARC_R * Math.cos(r)];
+}
+
 /** The head, seen from above, with the camera below it. */
 export default function AngleGuide({ slot }: { slot: string }) {
   const { turn, how } = angleGuide(slot);
+
+  /**
+   * The arrow traces where the NOSE goes, not some abstract spin.
+   *
+   * It used to be an arc over the top of the head, and it pointed the wrong
+   * way: the head rotates counter-clockwise on screen for a right-side shot,
+   * and the arrow swept clockwise. Even drawn correctly, an arc over the top
+   * is the crown of the head moving, which travels opposite to the face — so
+   * it reads as a contradiction of the very thing it is describing.
+   *
+   * Starting just off the camera line and ending where the nose lands, it
+   * says one thing: your face goes here.
+   */
+  const travel = turn === null ? 0 : -turn;
+  const [ax, ay] = arcPoint(Math.sign(travel) * 6);
+  const [bx, by] = arcPoint(travel);
+  const sweep = travel > 0 ? 0 : 1;
 
   return (
     <div className="mb-4 flex items-start gap-4 rounded-xl bg-cream-100 px-4 py-3">
@@ -106,7 +135,7 @@ export default function AngleGuide({ slot }: { slot: string }) {
           viewBox="0 0 120 110"
           className="h-24 w-24 shrink-0"
           role="img"
-          aria-label={`Diagram: head turned for ${slot}`}
+          aria-label={`Diagram: head seen from above, turned for ${slot}`}
         >
           {/* The camera, and the line of sight up to the face. Without the
               camera in the picture the rotation has nothing to be relative
@@ -132,13 +161,40 @@ export default function AngleGuide({ slot }: { slot: string }) {
             <ellipse cx="36.5" cy="45" rx="3" ry="6" className="fill-white stroke-plum-900" strokeWidth="2" />
             <ellipse cx="83.5" cy="45" rx="3" ry="6" className="fill-white stroke-plum-900" strokeWidth="2" />
             <path d="M54 66 L60 76 L66 66 Z" className="fill-plum-900" />
+
+            {/* Which side is whose. Seen from above with the face pointing at
+                the camera, the patient's RIGHT is on the LEFT of the picture —
+                true, and the single most confusing thing about this drawing
+                until it is labelled. Counter-rotated so it stays upright as
+                the head turns, and it is the marker you watch: for a right
+                45°, R swings down towards the camera. */}
+            <text
+              x="26"
+              y="48"
+              transform={`rotate(${-turn} 26 45)`}
+              className="fill-gray-500"
+              fontSize="11"
+              fontWeight="600"
+              textAnchor="middle"
+            >
+              R
+            </text>
+            <text
+              x="94"
+              y="48"
+              transform={`rotate(${-turn} 94 45)`}
+              className="fill-gray-500"
+              fontSize="11"
+              fontWeight="600"
+              textAnchor="middle"
+            >
+              L
+            </text>
           </g>
 
-          {/* Which way to turn, when there is a turn. Drawn as an arc over the
-              head in the direction of travel. */}
           {turn !== 0 && (
             <path
-              d={turn < 0 ? "M34 22 A 30 30 0 0 1 86 22" : "M86 22 A 30 30 0 0 0 34 22"}
+              d={`M${ax.toFixed(1)} ${ay.toFixed(1)} A ${ARC_R} ${ARC_R} 0 0 ${sweep} ${bx.toFixed(1)} ${by.toFixed(1)}`}
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
