@@ -54,6 +54,9 @@ interface PlanItem {
   timing: string
   note: string
   walkthroughUrl: string | null
+  /** The clinic has this one in the diary. Absent on every plan written
+   *  before the status existed, so it is read as false. */
+  scheduled?: boolean
   done: boolean
 }
 
@@ -445,16 +448,25 @@ export default function PortalClient({ token }: { token: string }) {
           {/* "Discussed", never "agreed". This is a clinical conversation
               written down, not a contract, and the wording is the whole
               difference between the two. */}
+          {/* "Discussed, not booked" is the whole premise of this list, and it
+              stops being true the moment one of them IS booked. Saying it
+              anyway next to a step the patient has already made an
+              appointment for reads as the page not knowing. */}
           <p className="text-sm text-gray-600 mb-5">
-            What we discussed for the months ahead. Nothing here is booked or fixed — we
-            adjust as we go.
+            {view.plan.some((s) => s.scheduled)
+              ? 'What we discussed for the months ahead. Anything marked scheduled is already in the diary — the rest we adjust as we go.'
+              : 'What we discussed for the months ahead. Nothing here is booked or fixed — we adjust as we go.'}
           </p>
           <ol className="space-y-5">
             {view.plan.map((s, i) => (
               <li key={i} className="flex gap-4">
                 <span
                   className={`shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold ${
-                    s.done ? 'bg-brand-600 text-white' : 'border border-gray-300 text-gray-500'
+                    s.done
+                      ? 'bg-brand-600 text-white'
+                      : s.scheduled
+                        ? 'border-2 border-brand-600 text-brand-700'
+                        : 'border border-gray-300 text-gray-500'
                   }`}
                 >
                   {s.done ? '✓' : i + 1}
@@ -481,7 +493,23 @@ export default function PortalClient({ token }: { token: string }) {
                   {(s.also ?? []).length > 0 && (
                     <p className="text-xs text-gray-500 mt-0.5">Together, in one visit</p>
                   )}
-                  {s.timing && <p className="text-sm text-gray-600">{s.timing}</p>}
+                  {/* Beside the timing rather than under the title, because
+                      "January 2027" and "scheduled" are the same fact told
+                      two ways, and reading them apart is what made the
+                      patient work it out. No date here on purpose — the plan
+                      has never carried one, and the real one is in Your
+                      appointments above. */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {s.timing && <p className="text-sm text-gray-600">{s.timing}</p>}
+                    {s.scheduled && !s.done && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-brand-600 bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Scheduled
+                      </span>
+                    )}
+                  </div>
                   {s.note && <p className="text-sm text-gray-700 mt-1">{s.note}</p>}
                   {s.walkthroughUrl && (
                     <a
