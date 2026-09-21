@@ -747,7 +747,7 @@ export default function PortalClient({ token }: { token: string }) {
             <a href={`tel:${view.clinicPhone.replace(/\D/g, '')}`} className="font-semibold text-plum-900 hover:text-brand-700">
               {view.clinicPhone}
             </a>
-            . You will get one of us, not a robot.
+            .
           </p>
         ) : (
           <p className="text-gray-700">Give us a call or a text any time.</p>
