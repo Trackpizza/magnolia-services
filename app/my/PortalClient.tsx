@@ -440,7 +440,11 @@ export default function PortalClient({ token }: { token: string }) {
       </div>
 
       {/* ── The plan ──────────────────────────────────────────────────── */}
-      {view.plan.length > 0 && (
+      {view.plan.length > 0 && (() => {
+        /** The first step that has not happened yet — the only live one. */
+        const nextIdx = view.plan.findIndex((s) => !s.done);
+        const next = nextIdx >= 0 ? view.plan[nextIdx] : null;
+        return (
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
             Where we are going
@@ -453,10 +457,17 @@ export default function PortalClient({ token }: { token: string }) {
               anyway next to a step the patient has already made an
               appointment for reads as the page not knowing. */}
           <p className="text-sm text-gray-600 mb-5">
-            {view.plan.some((s) => s.scheduled)
-              ? 'What we discussed for the months ahead. Anything marked scheduled is already in the diary — the rest we adjust as we go.'
+            {next?.scheduled
+              ? 'What we discussed for the months ahead. The next one is already in the diary — the rest we adjust as we go.'
               : 'What we discussed for the months ahead. Nothing here is booked or fixed — we adjust as we go.'}
           </p>
+          {/* Everything on this list except ONE step is a conversation about
+              next year. The live one is the first that has not happened yet:
+              it is the only one that can be scheduled, the only one worth
+              telling somebody how to book, and — once it is booked — the only
+              one carrying a green pill. Every step after it says nothing at
+              all, which is what stops a five-step plan reading as five things
+              to chase. */}
           <ol className="space-y-5">
             {view.plan.map((s, i) => (
               <li key={i} className="flex gap-4">
@@ -501,7 +512,7 @@ export default function PortalClient({ token }: { token: string }) {
                       appointments above. */}
                   <div className="flex flex-wrap items-center gap-2">
                     {s.timing && <p className="text-sm text-gray-600">{s.timing}</p>}
-                    {s.scheduled && !s.done && (
+                    {i === nextIdx && s.scheduled && (
                       <span className="inline-flex items-center gap-1 rounded-full border border-brand-600 bg-brand-50 px-2.5 py-0.5 text-xs font-semibold text-brand-700">
                         <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -510,6 +521,28 @@ export default function PortalClient({ token }: { token: string }) {
                       </span>
                     )}
                   </div>
+                  {/* How to book, on the one step that can be booked.
+                      Not a button: self-booking cannot reach a date this far
+                      out, and a button that fails is worse than a sentence
+                      that works. Not repeated down the list either — five
+                      "get in touch" lines reads as five things owed. */}
+                  {i === nextIdx && !s.scheduled && (
+                    <p className="mt-1 text-sm text-gray-700">
+                      Ready when you are — call or text us
+                      {view.clinicPhone ? (
+                        <>
+                          {' on '}
+                          <a
+                            href={`tel:${view.clinicPhone.replace(/\D/g, '')}`}
+                            className="font-semibold text-brand-700 hover:text-brand-800"
+                          >
+                            {view.clinicPhone}
+                          </a>
+                        </>
+                      ) : null}{' '}
+                      and we will find a time.
+                    </p>
+                  )}
                   {s.note && <p className="text-sm text-gray-700 mt-1">{s.note}</p>}
                   {s.walkthroughUrl && (
                     <a
@@ -525,14 +558,17 @@ export default function PortalClient({ token }: { token: string }) {
               </li>
             ))}
           </ol>
-          <button
-            onClick={openBooking}
-            className="block w-full text-center mt-6 border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors"
-          >
-            Book your next visit
-          </button>
+          {/* No booking button here any more.
+              A plan runs years out — five steps, the last of them a long way
+              past any diary the clinic keeps open — so "book your next visit"
+              under a list of five was an invitation to try to book something
+              nobody can book yet, five times over. What is bookable is the
+              NEXT one, and that is handled on the step itself. "Your
+              appointments" above still has a Book button when there is
+              nothing in the diary at all. */}
         </div>
-      )}
+        );
+      })()}
 
       {/* Photos the clinic is waiting on.
           Near the top, above the plan, because it is the one thing on this
