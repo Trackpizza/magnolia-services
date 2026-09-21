@@ -22,6 +22,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
+import AngleGuide from './AngleGuide'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -58,6 +59,10 @@ export default function PhotoRequestClient() {
   const [index, setIndex] = useState(0)
   const [message, setMessage] = useState('')
   const [shot, setShot] = useState<{ blob: Blob; url: string } | null>(null)
+  /** Whether a live preview is running. Not derived from the ref: a ref does
+   *  not re-render, and this decides what the shooting stage draws. Somebody
+   *  who only ever picks photos from their library never starts a camera. */
+  const [cameraOn, setCameraOn] = useState(false)
   const [uploading, setUploading] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -98,6 +103,7 @@ export default function PhotoRequestClient() {
   const stopCamera = () => {
     streamRef.current?.getTracks().forEach((t) => t.stop())
     streamRef.current = null
+    setCameraOn(false)
   }
   useEffect(() => () => stopCamera(), [])
 
@@ -127,11 +133,16 @@ export default function PhotoRequestClient() {
         },
         audio: false,
       })
+      setCameraOn(true)
       setStage('shooting')
     } catch {
+      // Not a dead end any more: there is a file picker underneath this, and
+      // a phone that will not give up its camera will still give up its
+      // camera roll.
       setMessage(
-        'We could not reach your camera. Check the permission prompt, or reply to our email with the photos instead.',
+        'We could not reach your camera. Check the permission prompt, or use "Choose a photo" below instead.',
       )
+      setStage('shooting')
     }
   }
 
@@ -157,6 +168,55 @@ export default function PhotoRequestClient() {
       'image/jpeg',
       0.92,
     )
+  }
+
+  /**
+   * A photo from the phone's library instead of the camera.
+   *
+   * Asked for because not every one of these is taken on the spot: somebody
+   * photographs themselves in better light in the morning, somebody has a
+   * partner take it, somebody's browser will not hand over the camera at all.
+   * Before this, any of those meant replying to the email with an attachment
+   * that then had to be filed by hand.
+   *
+   * Cropped through exactly the same 9:16 rectangle as a capture, and
+   * re-encoded as JPEG. These sit in a comparison row beside the clinic's own
+   * photographs, and a set that does not match is a set nobody can compare —
+   * so the crop is not optional, and neither is the format the upload step
+   * has already told the server to expect.
+   */
+  const chooseFile = async (file: File) => {
+    setMessage('')
+    try {
+      const bmp = await createImageBitmap(file)
+      const { x, y, w, h } = cropRect(bmp.width, bmp.height)
+      // Cap the long edge where the camera path caps it, so a 12-megapixel
+      // library photo does not become a 9 MB upload on clinic wifi.
+      const scale = Math.min(1, 1920 / h)
+      const c = document.createElement('canvas')
+      c.width = Math.round(w * scale)
+      c.height = Math.round(h * scale)
+      const ctx = c.getContext('2d')
+      if (!ctx) throw new Error('no canvas')
+      ctx.drawImage(bmp, x, y, w, h, 0, 0, c.width, c.height)
+      bmp.close?.()
+      c.toBlob(
+        (blob) => {
+          if (!blob) {
+            setMessage('We could not read that picture. Try another one.')
+            return
+          }
+          setShot({ blob, url: URL.createObjectURL(blob) })
+          setStage('review')
+        },
+        'image/jpeg',
+        0.92,
+      )
+    } catch {
+      // HEIC on a browser that cannot decode it is the likely one. iPhones
+      // convert on the way out of the picker most of the time, but not all.
+      setMessage('We could not read that picture. Try another one, or use the camera.')
+    }
   }
 
   const keep = async () => {
@@ -208,6 +268,29 @@ export default function PhotoRequestClient() {
   const primary =
     'w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
   const quiet = 'text-sm text-brand-600 hover:text-brand-700'
+  const outline =
+    'block w-full cursor-pointer text-center border border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors'
+
+  /** The library picker. A <label> wrapping a hidden input, so it is the same
+   *  size and shape as the buttons beside it — a bare file input is a control
+   *  nobody recognises as the way out of a camera that will not start. */
+  const filePicker = (label: string, className: string) => (
+    <label className={className}>
+      <input
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          // Cleared so choosing the SAME file twice still fires a change —
+          // which is exactly what happens after "take it again".
+          e.target.value = ''
+          if (f) void chooseFile(f)
+        }}
+      />
+      {label}
+    </label>
+  )
 
   if (stage === 'loading') {
     return (
@@ -266,6 +349,9 @@ export default function PhotoRequestClient() {
           <button onClick={startCamera} className={primary}>
             Start
           </button>
+          <div className="mt-3">
+            {filePicker('Choose photos from your phone', outline)}
+          </div>
           <p className="text-xs text-gray-500 mt-3">
             Somewhere bright, with a window in front of you rather than behind, and hold the
             phone upright.
@@ -279,10 +365,27 @@ export default function PhotoRequestClient() {
             {slot} <span className="text-gray-500">· {index + 1} of {total}</span>
           </p>
 
+          {/* What this angle actually means, in a picture. Shown while
+              shooting AND while reviewing: the moment somebody looks at a
+              shot and thinks "is that right?" is the moment the diagram is
+              worth most. */}
+          {stage !== 'sending' && <AngleGuide slot={slot} />}
+
           <div className="relative mx-auto mb-4 h-[60vh] max-w-full aspect-[9/16] overflow-hidden rounded-xl bg-black">
             {stage === 'review' && shot ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img key="shot" src={shot.url} alt={slot} className="h-full w-full object-cover" />
+            ) : !cameraOn ? (
+              /* No preview to show — the camera was refused, or this patient
+                 is picking from their library and never started one. A black
+                 rectangle here looks like a broken camera, which is the one
+                 thing it must not look like when the way forward is the
+                 button underneath it. */
+              <div className="flex h-full w-full items-center justify-center px-6 text-center">
+                <p className="text-sm text-white/70">
+                  Choose a photo below, or switch the camera on.
+                </p>
+              </div>
             ) : (
               <video
                 key="live"
@@ -298,9 +401,21 @@ export default function PhotoRequestClient() {
           </div>
 
           {stage === 'shooting' && (
-            <button onClick={capture} className={primary}>
-              Take the photo
-            </button>
+            <div className="space-y-3">
+              {cameraOn ? (
+                <button onClick={capture} className={primary}>
+                  Take the photo
+                </button>
+              ) : (
+                <button onClick={startCamera} className={primary}>
+                  Use the camera
+                </button>
+              )}
+              {filePicker(
+                cameraOn ? 'Choose a photo instead' : 'Choose a photo from your phone',
+                outline,
+              )}
+            </div>
           )}
 
           {stage === 'review' && (
@@ -309,7 +424,7 @@ export default function PhotoRequestClient() {
                 {uploading ? 'Sending…' : index + 1 >= total ? 'Send them' : 'Use this one'}
               </button>
               <button onClick={retake} disabled={uploading} className={quiet}>
-                Take it again
+                {cameraOn ? 'Take it again' : 'Choose a different one'}
               </button>
             </div>
           )}
