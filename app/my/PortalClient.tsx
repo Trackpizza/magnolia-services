@@ -425,9 +425,12 @@ export default function PortalClient({ token }: { token: string }) {
                 <p className="text-base text-gray-900">{to12h(a.start)} &ndash; {to12h(a.end)}</p>
                 <p className="text-sm text-gray-700 mt-1">{a.treatment}</p>
                 <p className="text-sm text-gray-600">with {a.provider}</p>
-                {/* Only self-booked appointments carry a token, so one booked
-                    for them over the phone simply shows no link, exactly as
-                    their confirmation email does. */}
+                {/* Every appointment carries one now. It used to be only the
+                    self-booked ones, because `cancelToken` was minted at
+                    booking — so an appointment the clinic put in the diary
+                    over the phone offered no way to move it, which is the one
+                    thing this page is opened to do. The records API mints a
+                    token for any that lack one when it serves this page. */}
                 {a.manageUrl && (
                   <a href={a.manageUrl} className="inline-block mt-2 text-sm text-brand-600 hover:text-brand-700">
                     Reschedule or cancel &rarr;
