@@ -311,8 +311,8 @@ export default function ManageClient({ token }: { token: string }) {
         <div className={card}>
           <h2 className="text-lg font-semibold text-plum-900 mb-2" style={heading}>Before you come in</h2>
           <p className="text-sm text-gray-700 mb-4">
-            There are a few health questions to answer. It takes a couple of minutes on your
-            phone and saves filling in a form when you arrive.
+            Your consent and health history, to read, fill in and sign. It takes a few minutes
+            on your phone and saves doing it at the front desk.
           </p>
           <button onClick={openIntake} disabled={working}
             className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50">
