@@ -60,7 +60,7 @@ export default function BookingConfirmed({
       {consultMin > 0 && (
         <p className="text-gray-700">
           Your first visit includes {consultMin} minutes with {providerName || 'your provider'} before
-          your treatment. There is nothing to fill in beforehand.
+          your treatment. We may send you a form or two to fill in online beforehand — look out for it.
         </p>
       )}
 
@@ -90,38 +90,26 @@ export default function BookingConfirmed({
 }
 
 /**
- * The welcome video, or the promise of one.
+ * The welcome video — nothing at all until it is recorded.
  *
  * Its own export so the confirmation page can show it even when it has no
- * booking to confirm — someone who lands there without a Stripe session gets
- * a page that is still about their visit rather than a dead end. Deliberately
- * shown rather than hidden while unrecorded: this is the moment a new patient
- * is most curious about who they are about to see, and an empty space says
- * nothing while a promised video says the clinic was expecting them.
+ * booking to confirm. It used to show a "coming soon" card while unrecorded;
+ * the clinic asked for that to go (2026-09-25) — a promise on the page is
+ * only worth making once the video exists. Pass `videoUrl` and it appears.
  */
 export function WelcomeVideo({ videoUrl }: { videoUrl?: string }) {
+  if (!videoUrl) return null
   return (
     <div className="rounded-xl border border-gray-200 overflow-hidden">
-      {videoUrl ? (
-        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-          <iframe
-            src={videoUrl}
-            title="What to expect at your appointment"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-            className="absolute inset-0 w-full h-full"
-          />
-        </div>
-      ) : (
-        <div className="bg-gray-50 px-5 py-8 text-center">
-          <div className="text-3xl mb-2" aria-hidden="true">🎥</div>
-          <p className="text-sm font-medium text-gray-800">What to expect — coming soon</p>
-          <p className="text-xs text-gray-600 mt-1 max-w-sm mx-auto">
-            Dr. David and Nurse Eileen are recording a short welcome video: what happens when you
-            arrive, and how to get the most from your treatment.
-          </p>
-        </div>
-      )}
+      <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+        <iframe
+          src={videoUrl}
+          title="What to expect at your appointment"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 w-full h-full"
+        />
+      </div>
     </div>
   )
 }
