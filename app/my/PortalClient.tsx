@@ -121,6 +121,13 @@ interface OpenView {
 type View = LockedView | OpenView
 
 
+/** A form link that knows its way back here: the form page shows "Back to your
+ *  page" instead of "You can close this page", which closed the portal too. */
+function withReturn(url: string): string {
+  if (typeof window === 'undefined') return url
+  return `${url}${url.includes('?') ? '&' : '?'}return=${encodeURIComponent(window.location.href)}`
+}
+
 const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
 const card = 'bg-white rounded-2xl border border-gray-100 p-6 sm:p-8'
 const primaryBtn =
@@ -157,7 +164,7 @@ export default function PortalClient({ token }: { token: string }) {
         setLinkError('We could not open that just now. Please try again, or call or text us.')
         return
       }
-      window.location.href = String(data.url)
+      window.location.href = withReturn(String(data.url))
     } catch {
       setLinkError('We could not open that just now. Please try again, or call or text us.')
     } finally {
@@ -202,6 +209,21 @@ export default function PortalClient({ token }: { token: string }) {
   }, [token, call])
 
   useEffect(() => { load() }, [load])
+
+  // Coming BACK to the portal — the back arrow (served from the browser's
+  // page cache), or switching back to this tab — re-asks the server, so a
+  // form they have just signed shows as signed instead of still waiting
+  // (2026-09-25).
+  useEffect(() => {
+    const onShow = (e: PageTransitionEvent) => { if (e.persisted) load() }
+    const onVisible = () => { if (document.visibilityState === 'visible') load() }
+    window.addEventListener('pageshow', onShow)
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      window.removeEventListener('pageshow', onShow)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [load])
 
   const sendCode = async (channel: 'sms' | 'email' = gateChannel) => {
     setGate('sending')
@@ -394,7 +416,7 @@ export default function PortalClient({ token }: { token: string }) {
             {view.consents.map((c) => (
               <a
                 key={c.url}
-                href={c.url}
+                href={withReturn(c.url)}
                 className="block w-full text-center bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors"
               >
                 Read and sign: {c.names.join(' · ')}
