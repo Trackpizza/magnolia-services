@@ -111,6 +111,8 @@ interface OpenView {
   /** Share your story. `signed` is the authorization; `sent` is what they have
    *  already given, newest first. */
   testimonial?: { signed: boolean; sent: string[] }
+  /** Photo & marketing authorization — offered until it is signed. */
+  photoAuth?: { signed: boolean }
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
@@ -146,7 +148,7 @@ export default function PortalClient({ token }: { token: string }) {
   // sitting unused in a payload is a live upload link for whoever sees it.
   const [busy, setBusy] = useState('')
   const [linkError, setLinkError] = useState('')
-  const openLink = async (action: 'video-consent' | 'testimonial-link') => {
+  const openLink = async (action: 'video-consent' | 'testimonial-link' | 'marketing-consent') => {
     setBusy(action)
     setLinkError('')
     try {
@@ -601,6 +603,29 @@ export default function PortalClient({ token }: { token: string }) {
           </a>
         </div>
       ))}
+
+      {/* Your before-and-after photos — the photo & marketing authorization.
+          Eileen used to have to ask in the chair; here the patient decides on
+          their own time, or she texts "it's on your page". Optional, so it is
+          its own card and never under "Before your next visit". Gone once
+          signed. */}
+      {view.photoAuth && !view.photoAuth.signed && (
+        <div className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
+            Your before-and-after photos
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            With your permission, we may share your before-and-after photos — on our website,
+            social media or in the clinic — to help others see what is possible. Your full name is
+            never shown without separate permission, and you can withdraw at any time. Entirely
+            optional, and it makes no difference to your care.
+          </p>
+          <button onClick={() => openLink('marketing-consent')} disabled={busy !== ''} className={primaryBtn}>
+            {busy === 'marketing-consent' ? 'Opening…' : 'Read the authorization'}
+          </button>
+          {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
+        </div>
+      )}
 
       {/* Share your story.
           Eileen had to remember to ask, chart by chart, at the moment she is
