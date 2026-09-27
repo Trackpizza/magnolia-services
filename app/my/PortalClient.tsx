@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import FindMyPage from './FindMyPage'
 import { readSession, writeSession } from './session'
 import BookTreatment from '@/components/BookTreatment'
+import PortalJourney, { type Journey } from './PortalJourney'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -113,6 +114,8 @@ interface OpenView {
   testimonial?: { signed: boolean; sent: string[] }
   /** Photo & marketing authorization — offered until it is signed. */
   photoAuth?: { signed: boolean }
+  /** "Your progress" — their photos by opaque id, minus any the clinic hid. */
+  journey?: Journey
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
@@ -625,6 +628,20 @@ export default function PortalClient({ token }: { token: string }) {
           </a>
         </div>
       ))}
+
+      {/* Your progress — their own photos, first & latest or every one. */}
+      {view.journey && view.journey.points.length > 0 && (
+        <div className={card}>
+          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
+            Your progress
+          </h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Your photos from each visit, oldest to newest. Pick an angle to compare the same view over
+            time. Only you can see these — they are part of your record with us.
+          </p>
+          <PortalJourney journey={view.journey} token={token} session={readSession()} />
+        </div>
+      )}
 
       {/* Your before-and-after photos — the photo & marketing authorization.
           Eileen used to have to ask in the chair; here the patient decides on
