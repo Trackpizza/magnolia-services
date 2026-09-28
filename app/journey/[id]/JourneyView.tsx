@@ -7,10 +7,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import PortalJourney, { type Journey, type PhotoLoader } from '../../my/PortalJourney'
+import Section from '../../my/Section'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
-const card = 'bg-white rounded-2xl border border-gray-100 p-6 sm:p-8'
 
 export default function JourneyView({ id, videoConsultUrl, phone }: {
   id: string
@@ -59,11 +59,16 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
     'block w-full rounded-xl px-5 py-4 text-center text-base font-semibold transition-colors'
 
   return (
-    <div className="space-y-6">
-      <div className={card}>
-        <h1 className="text-3xl font-semibold text-plum-900 mb-2" style={heading}>
-          A patient&rsquo;s journey
-        </h1>
+    <div className="space-y-4">
+      {/* A title that stays visible, then the two sections closed — the same
+          collapsible layout as the portal. */}
+      <h1 className="px-1 text-3xl font-semibold text-plum-900" style={heading}>
+        A patient&rsquo;s journey
+      </h1>
+      <Section
+        title="Their before & after photos"
+        badge={state === 'ok' && journey ? `${journey.points.length} photo sets` : undefined}
+      >
         {state === 'loading' && <p className="text-sm text-gray-500">Loading…</p>}
         {state === 'gone' && (
           <p className="text-sm text-gray-600">
@@ -82,12 +87,9 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
             <PortalJourney journey={journey} load={load} />
           </>
         )}
-      </div>
+      </Section>
 
-      <div className={card}>
-        <h2 className="text-2xl font-semibold text-plum-900 mb-1" style={heading}>
-          Curious what we&rsquo;d suggest for you?
-        </h2>
+      <Section title="Curious what we&rsquo;d suggest for you?">
         <p className="text-sm text-gray-600 mb-5">
           Every plan starts with a conversation. Pick whichever suits you — the first two are complimentary.
         </p>
@@ -110,7 +112,7 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
             </a>
           </p>
         )}
-      </div>
+      </Section>
     </div>
   )
 }
