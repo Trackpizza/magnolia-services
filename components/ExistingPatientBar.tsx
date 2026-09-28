@@ -13,7 +13,9 @@
  * a marketing page with its own header, and threading one more button through
  * sixteen of them would be sixteen chances to break a layout for one link.
  *
- * Hidden on the portal itself and on /admin — offering somebody a way in to
+ * Hidden on the portal itself, on /admin, and on a shared journey (/journey —
+ * the people reading it are friends, not patients, and a plum strip on the
+ * dark share page is noise) — offering somebody a way in to
  * the page they are standing on is noise.
  */
 import Link from 'next/link'
@@ -21,7 +23,7 @@ import { usePathname } from 'next/navigation'
 
 export default function ExistingPatientBar() {
   const path = usePathname() ?? ''
-  if (path.startsWith('/my') || path.startsWith('/admin')) return null
+  if (path.startsWith('/my') || path.startsWith('/admin') || path.startsWith('/journey')) return null
 
   return (
     <div className="bg-plum-900 text-white">

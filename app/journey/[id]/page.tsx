@@ -30,7 +30,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ id: st
   const { id } = await params
   const links = await getLinks()
   return (
-    <div className="min-h-screen bg-cream-100">
+    <div className="portal-dark min-h-screen">
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link href="/">
