@@ -1,24 +1,42 @@
 'use client'
 /**
- * "Your progress" — the patient's own photos, oldest to newest, one angle at
- * a time; or just their first and latest side by side (2026-09-27, asked for
- * by Eileen). The chart's Client journey, minus anything the clinic hid.
+ * "Your progress" — the patient's own photos, one treatment at a time, one
+ * angle at a time, as a SLIDESHOW (2026-09-28): oldest to newest in one
+ * frame, with arrows, swipe, a counter and Play. Or the first and latest side
+ * by side. The chart's Client journey, minus anything the clinic hid.
+ *
+ * It used to open a full-screen viewer on tap — one enormous photo, no way to
+ * step through — and a grid that was too big on a phone. Everything now stays
+ * inline, at a size that fits the screen with the controls.
  *
  * The page never holds a storage path or a public URL. Each photo is an
- * opaque id; the image is fetched from the records API with the portal
- * session, which re-checks it every time and answers no-store. Images live
- * only as blob: URLs in this tab and are released when it moves on.
+ * opaque id; the image is fetched from the records API, which re-checks it
+ * every time and answers no-store. Images live only as blob: URLs in this tab
+ * and are released when it moves on. Every frame of the run is mounted once
+ * and cross-faded, so stepping or playing never re-downloads a photo.
  *
  * The same viewer draws a shared journey (/journey/[id]) — only how a photo
  * is fetched differs, so that is passed in as `load`.
  */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
 export type Journey = {
   slotOrder: string[]
-  points: { label: string; date: string; photos: Record<string, string> }[]
+  /** `treatment` — one journey per treatment name (2026-09-28). Optional so an
+   *  older records API that does not send it still draws, as one journey. */
+  points: { label: string; date: string; treatment?: string; photos: Record<string, string> }[]
+}
+
+/** The treatments in a journey, oldest first — the order they began. */
+export function treatmentsOf(journey: Journey): string[] {
+  const out: string[] = []
+  for (const p of journey.points) {
+    const t = p.treatment ?? ''
+    if (!out.includes(t)) out.push(t)
+  }
+  return out
 }
 
 function shortDate(v?: string): string {
@@ -71,35 +89,87 @@ export function PortalPhoto({ load, id, alt, className }: {
   return <img src={src} alt={alt} className={className} />
 }
 
+const PLAY_MS = 2500
+
 export default function PortalJourney({ journey, load }: {
   journey: Journey; load: PhotoLoader
 }) {
+  // One journey per treatment: Agnes RF on the face and Plasmage on the neck
+  // share the face angles, and in one row they read as one story. Opens on the
+  // most recent treatment.
+  const treatments = useMemo(() => treatmentsOf(journey), [journey])
+  const latest = journey.points[journey.points.length - 1]?.treatment ?? ''
+  const [treatment, setTreatment] = useState<string | null>(null)
+  const currentTreatment = treatment !== null && treatments.includes(treatment) ? treatment : latest
+  const points = useMemo(
+    () => journey.points.filter((p) => (p.treatment ?? '') === currentTreatment),
+    [journey, currentTreatment],
+  )
+
   const slots = useMemo(() => {
     const seen: string[] = []
-    for (const p of journey.points) for (const s of Object.keys(p.photos)) if (!seen.includes(s)) seen.push(s)
+    for (const p of points) for (const s of Object.keys(p.photos)) if (!seen.includes(s)) seen.push(s)
     return [...journey.slotOrder.filter((s) => seen.includes(s)), ...seen.filter((s) => !journey.slotOrder.includes(s))]
-  }, [journey])
+  }, [journey, points])
   const [slot, setSlot] = useState('')
-  const [mode, setMode] = useState<'firstLatest' | 'timeline'>('firstLatest')
-  const [open, setOpen] = useState<number | null>(null)
+  const [mode, setMode] = useState<'slideshow' | 'firstLatest'>('slideshow')
+  const [index, setIndex] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const touchX = useRef<number | null>(null)
+
+  const current = slots.includes(slot) ? slot : slots[0] ?? ''
+  const run = points.filter((p) => !!p.photos[current])
+  const at = Math.min(index, Math.max(0, run.length - 1))
+  const pair = run.length >= 2
+
+  // Autoplay steps forward and loops; any manual step stops it.
+  useEffect(() => {
+    if (!playing || run.length < 2) return
+    const t = setInterval(() => setIndex((i) => (i + 1) % run.length), PLAY_MS)
+    return () => clearInterval(t)
+  }, [playing, run.length])
 
   if (!slots.length) return null
-  const current = slots.includes(slot) ? slot : slots[0]
-  const all = journey.points.filter((p) => !!p.photos[current])
-  const pair = all.length >= 2
-  const columns = mode === 'firstLatest' && pair ? [all[0], all[all.length - 1]] : all
+
+  const go = (i: number) => {
+    setPlaying(false)
+    setIndex((i + run.length) % run.length)
+  }
+  const pick = (fn: () => void) => {
+    fn()
+    setIndex(0)
+    setPlaying(false)
+  }
+
+  const chip = (on: boolean) =>
+    `rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+      on ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+    }`
+  const arrow =
+    'absolute top-1/2 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-2xl leading-none text-white hover:bg-black/70'
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+      {treatments.length > 1 && (
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Treatment">
+          {treatments.map((t) => (
+            <button
+              key={t}
+              onClick={() => pick(() => setTreatment(t))}
+              aria-pressed={t === currentTreatment}
+              className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
+                t === currentTreatment ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              {t || 'Other'}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Angle">
         {slots.map((s) => (
-          <button
-            key={s}
-            onClick={() => setSlot(s)}
-            className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-              s === current ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-            }`}
-          >
+          <button key={s} onClick={() => pick(() => setSlot(s))} className={chip(s === current)}>
             {s}
           </button>
         ))}
@@ -107,10 +177,10 @@ export default function PortalJourney({ journey, load }: {
 
       {pair && (
         <div className="inline-flex rounded-xl bg-gray-100 p-1 text-sm font-medium">
-          {([['firstLatest', 'First & latest'], ['timeline', 'Every photo']] as const).map(([m, label]) => (
+          {([['slideshow', 'Slideshow'], ['firstLatest', 'First & latest']] as const).map(([m, label]) => (
             <button
               key={m}
-              onClick={() => setMode(m)}
+              onClick={() => pick(() => setMode(m))}
               className={`rounded-lg px-3 py-1.5 transition-colors ${
                 mode === m ? 'bg-white text-plum-900 shadow-sm' : 'text-gray-500'
               }`}
@@ -121,53 +191,90 @@ export default function PortalJourney({ journey, load }: {
         </div>
       )}
 
-      <div className={mode === 'firstLatest' && pair ? 'grid grid-cols-2 gap-3' : 'flex gap-3 overflow-x-auto pb-2'}>
-        {columns.map((p, i) => (
-          <figure key={`${p.label}-${i}`} className={mode === 'firstLatest' && pair ? '' : 'w-40 shrink-0 sm:w-48'}>
-            <button
-              onClick={() => setOpen(i)}
-              className="block aspect-[9/16] w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
-              aria-label={`Open ${p.label} ${current}`}
-            >
-              <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-cover" />
-            </button>
-            <figcaption className="mt-1.5">
-              {mode === 'firstLatest' && pair && (
+      {mode === 'firstLatest' && pair ? (
+        <div className="grid grid-cols-2 gap-3">
+          {[run[0], run[run.length - 1]].map((p, i) => (
+            <figure key={`${p.label}-${i}`}>
+              <div className="mx-auto aspect-[9/16] max-h-[45vh] max-w-full overflow-hidden rounded-xl bg-black">
+                <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-contain" />
+              </div>
+              <figcaption className="mt-1.5">
                 <span className="block text-[11px] font-semibold uppercase tracking-wide text-brand-700">
                   {i === 0 ? 'First' : 'Latest'}
                 </span>
-              )}
-              <span className="block text-sm font-medium text-gray-800">{p.label}</span>
-              {shortDate(p.date) && <span className="block text-xs text-gray-500">{shortDate(p.date)}</span>}
-            </figcaption>
-          </figure>
-        ))}
-      </div>
+                <span className="block text-sm font-medium text-gray-800">{p.label}</span>
+                {shortDate(p.date) && <span className="block text-xs text-gray-500">{shortDate(p.date)}</span>}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      ) : (
+        <div>
+          {/* One frame. Every photo of the run is mounted once and faded in
+              turn, so Play and the arrows never re-fetch. */}
+          <div
+            className="relative mx-auto aspect-[9/16] h-[55vh] max-h-[560px] max-w-full overflow-hidden rounded-xl bg-black outline-none"
+            onTouchStart={(e) => { touchX.current = e.touches[0]?.clientX ?? null }}
+            onTouchEnd={(e) => {
+              const start = touchX.current
+              touchX.current = null
+              const end = e.changedTouches[0]?.clientX
+              if (start === null || end === undefined || Math.abs(end - start) < 40) return
+              go(end < start ? at + 1 : at - 1)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'ArrowRight') go(at + 1)
+              if (e.key === 'ArrowLeft') go(at - 1)
+            }}
+            tabIndex={0}
+            role="region"
+            aria-label={`${current} photos, ${at + 1} of ${run.length}`}
+          >
+            {run.map((p, i) => (
+              <div
+                key={`${p.photos[current]}-${i}`}
+                className={`absolute inset-0 transition-opacity duration-500 ${i === at ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+                aria-hidden={i !== at}
+              >
+                <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-contain" />
+              </div>
+            ))}
+            {run.length > 1 && (
+              <>
+                <button onClick={() => go(at - 1)} className={`${arrow} left-2`} aria-label="Earlier">‹</button>
+                <button onClick={() => go(at + 1)} className={`${arrow} right-2`} aria-label="Later">›</button>
+              </>
+            )}
+          </div>
 
-      {/* Full size, one at a time, with the neighbours a tap away. A dark
-          surround, so skin tone reads true. */}
-      {open !== null && columns[open] && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black/90" role="dialog" aria-modal="true">
-          <div className="flex items-center justify-between px-4 py-3 text-white">
-            <span className="text-sm">
-              {columns[open].label}
-              {shortDate(columns[open].date) ? ` · ${shortDate(columns[open].date)}` : ''}
-            </span>
-            <button onClick={() => setOpen(null)} className="text-2xl leading-none" aria-label="Close">×</button>
+          <div className="mt-3 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-gray-800">{run[at]?.label}</p>
+              <p className="text-xs text-gray-500">
+                {shortDate(run[at]?.date)}
+                {run.length > 1 ? ` · ${at + 1} of ${run.length}` : ''}
+              </p>
+            </div>
+            {run.length > 1 && (
+              <button
+                onClick={() => setPlaying((v) => !v)}
+                className="shrink-0 rounded-full border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                {playing ? '❚❚ Pause' : '▶ Play'}
+              </button>
+            )}
           </div>
-          <div className="flex flex-1 items-center justify-center px-2 pb-4">
-            <PortalPhoto
-              key={columns[open].photos[current]}
-              load={load}
-              id={columns[open].photos[current]}
-              alt={`${columns[open].label} — ${current}`}
-              className="max-h-full max-w-full object-contain"
-            />
-          </div>
-          {columns.length > 1 && (
-            <div className="flex justify-between px-4 pb-6 text-white">
-              <button disabled={open === 0} onClick={() => setOpen(open - 1)} className="rounded-lg px-4 py-2 disabled:opacity-30">‹ Earlier</button>
-              <button disabled={open === columns.length - 1} onClick={() => setOpen(open + 1)} className="rounded-lg px-4 py-2 disabled:opacity-30">Later ›</button>
+
+          {run.length > 1 && (
+            <div className="mt-2 flex justify-center gap-1.5" aria-hidden>
+              {run.map((_, i) => (
+                <button
+                  key={i}
+                  tabIndex={-1}
+                  onClick={() => go(i)}
+                  className={`h-2 rounded-full transition-all ${i === at ? 'w-5 bg-brand-600' : 'w-2 bg-gray-300'}`}
+                />
+              ))}
             </div>
           )}
         </div>

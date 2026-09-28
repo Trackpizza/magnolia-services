@@ -6,7 +6,7 @@
  * The plan is the top of the page on purpose. It is the reason to open the
  * link — what is coming and why — and everything else on here is admin.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import FindMyPage from './FindMyPage'
 import { readSession, writeSession } from './session'
 import BookTreatment from '@/components/BookTreatment'
@@ -411,10 +411,7 @@ export default function PortalClient({ token }: { token: string }) {
           page with a deadline attached to it. Absent entirely when there is
           nothing — an empty "nothing to do" card is noise on every visit. */}
       {toDo > 0 && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Before your next visit
-          </h2>
+        <Section title="Before your next visit" badge={`${toDo} to do`} urgent>
           <p className="text-sm text-gray-600 mb-4">
             A couple of minutes on your phone, and there is nothing to fill in when you arrive.
           </p>
@@ -434,14 +431,11 @@ export default function PortalClient({ token }: { token: string }) {
               </a>
             ))}
           </div>
-        </div>
+        </Section>
       )}
 
       {/* ── What is booked ────────────────────────────────────────────── */}
-      <div className={card}>
-        <h2 className="text-lg font-semibold text-plum-900 mb-3" style={heading}>
-          Your appointments
-        </h2>
+      <Section title="Your appointments" badge={view.upcoming.length ? `${view.upcoming.length} booked` : undefined}>
         {view.upcoming.length === 0 ? (
           <>
             <p className="text-sm text-gray-700 mb-4">Nothing booked at the moment.</p>
@@ -475,7 +469,7 @@ export default function PortalClient({ token }: { token: string }) {
             ))}
           </div>
         )}
-      </div>
+      </Section>
 
       {/* ── The plan ──────────────────────────────────────────────────── */}
       {view.plan.length > 0 && (() => {
@@ -483,10 +477,7 @@ export default function PortalClient({ token }: { token: string }) {
         const nextIdx = view.plan.findIndex((s) => !s.done);
         const next = nextIdx >= 0 ? view.plan[nextIdx] : null;
         return (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Where we are going
-          </h2>
+        <Section title="Where we are going">
           {/* "Discussed", never "agreed". This is a clinical conversation
               written down, not a contract, and the wording is the whole
               difference between the two. */}
@@ -604,7 +595,7 @@ export default function PortalClient({ token }: { token: string }) {
               NEXT one, and that is handled on the step itself. "Your
               appointments" above still has a Book button when there is
               nothing in the diary at all. */}
-        </div>
+        </Section>
         );
       })()}
 
@@ -616,10 +607,7 @@ export default function PortalClient({ token }: { token: string }) {
           sent, and this is why Eileen can text four words instead of
           re-sending a link. */}
       {(view.photoRequests ?? []).map((r) => (
-        <div key={r.url} className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Could you send us a photo?
-          </h2>
+        <Section key={r.url} title="Could you send us a photo?" badge="Waiting on you" urgent>
           <p className="text-sm text-gray-600 mb-4">
             It has been {r.label}
             {r.procedureName ? ` since your ${r.procedureName}` : ""}. A couple of photos lets
@@ -634,15 +622,12 @@ export default function PortalClient({ token }: { token: string }) {
           <a href={r.url} className={primaryBtn + ' text-center block'}>
             Take the photos
           </a>
-        </div>
+        </Section>
       ))}
 
       {/* Your progress — their own photos, first & latest or every one. */}
       {view.journey && view.journey.points.length > 0 && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Your progress
-          </h2>
+        <Section title="Your progress">
           <p className="text-sm text-gray-600 mb-4">
             Your photos from each visit, oldest to newest. Pick an angle to compare the same view over
             time. Only you can see these — they are part of your record with us.
@@ -656,7 +641,7 @@ export default function PortalClient({ token }: { token: string }) {
             session={readSession()}
             onChanged={load}
           />
-        </div>
+        </Section>
       )}
 
       {/* Your before-and-after photos — the photo & marketing authorization.
@@ -665,10 +650,7 @@ export default function PortalClient({ token }: { token: string }) {
           its own card and never under "Before your next visit". Gone once
           signed. */}
       {view.photoAuth && !view.photoAuth.signed && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Your before-and-after photos
-          </h2>
+        <Section title="Your before-and-after photos">
           <p className="text-sm text-gray-600 mb-4">
             With your permission, we may share your before-and-after photos — on our website,
             social media or in the clinic — to help others see what is possible. Your full name is
@@ -679,7 +661,7 @@ export default function PortalClient({ token }: { token: string }) {
             {busy === 'marketing-consent' ? 'Opening…' : 'Read the authorization'}
           </button>
           {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
-        </div>
+        </Section>
       )}
 
       {/* Share your story.
@@ -692,10 +674,7 @@ export default function PortalClient({ token }: { token: string }) {
           Filming a testimonial before somebody has agreed to it being used is
           collecting footage you have no right to. */}
       {view.testimonial && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-1" style={heading}>
-            Share your story
-          </h2>
+        <Section title="Share your story">
 
           {view.testimonial.sent.length > 0 && (
             <p className="text-sm text-gray-600 mb-3">
@@ -732,7 +711,7 @@ export default function PortalClient({ token }: { token: string }) {
           )}
 
           {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
-        </div>
+        </Section>
       )}
 
       {/* Booking, in the portal rather than off it.
@@ -748,10 +727,7 @@ export default function PortalClient({ token }: { token: string }) {
       )}
 
       {view.history && (
-        <div className={card}>
-          <h2 className="text-lg font-semibold text-plum-900 mb-4" style={heading}>
-            Your treatment history
-          </h2>
+        <Section title="Your treatment history">
 
           {view.history.visits.length === 0 ? (
             <p className="text-sm text-gray-700">Nothing recorded yet — your first visit is still to come.</p>
@@ -791,7 +767,7 @@ export default function PortalClient({ token }: { token: string }) {
             Need your photos or treatment notes? Ask us — they are part of your medical record
             and we will go through them with you.
           </p>
-        </div>
+        </Section>
       )}
 
       {/* ── The clinic's own buttons ────────────────────────────────
@@ -799,7 +775,7 @@ export default function PortalClient({ token }: { token: string }) {
           book, leave a review, the services site, a number to tap. Editable in
           Settings, so the list changes without a deploy. */}
       {view.links.length > 0 && (
-        <div className={card}>
+        <Section title="Useful links">
           <div className="space-y-2">
             {view.links.map((l) => (
               <a
@@ -815,12 +791,11 @@ export default function PortalClient({ token }: { token: string }) {
               </a>
             ))}
           </div>
-        </div>
+        </Section>
       )}
 
       {/* ── Reaching a person ─────────────────────────────────────────── */}
-      <div className={`${card} text-center`}>
-        <h2 className="text-lg font-semibold text-plum-900 mb-2" style={heading}>Questions?</h2>
+      <Section title="Questions?">
         {view.clinicPhone ? (
           <p className="text-gray-700">
             Text or call us on{' '}
@@ -837,7 +812,7 @@ export default function PortalClient({ token }: { token: string }) {
         {view.clinicAddress && (
           <p className="text-sm text-gray-600 mt-3">{view.clinicAddress}</p>
         )}
-      </div>
+      </Section>
 
       <p className="text-center text-xs text-gray-500 px-4">
         This page is yours — keep the link. It stays up to date on its own.
@@ -845,6 +820,42 @@ export default function PortalClient({ token }: { token: string }) {
 
       <LegalFooter links={view.legalLinks} />
     </div>
+  )
+}
+
+/**
+ * One portal section, closed until tapped (2026-09-28, Eric: "all
+ * collapsible, hidden on startup"). The page opens as a short list of
+ * headings; a badge on the heading says when something is waiting.
+ * A native <details>, so it works without JavaScript and with a keyboard.
+ */
+function Section({ title, badge, urgent, children }: {
+  title: string
+  badge?: string
+  urgent?: boolean
+  children: ReactNode
+}) {
+  return (
+    <details className="group bg-white rounded-2xl border border-gray-100">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-5 sm:px-8 [&::-webkit-details-marker]:hidden">
+        <h2 className="text-lg font-semibold text-plum-900" style={heading}>{title}</h2>
+        <span className="flex shrink-0 items-center gap-2">
+          {badge && (
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                urgent ? 'bg-brand-600 text-white' : 'border border-gray-200 text-gray-600'
+              }`}
+            >
+              {badge}
+            </span>
+          )}
+          <svg className="h-5 w-5 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </summary>
+      <div className="px-6 pb-6 sm:px-8 sm:pb-8">{children}</div>
+    </details>
   )
 }
 

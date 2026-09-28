@@ -16,21 +16,24 @@
  */
 import { useMemo, useState } from 'react'
 import ShareSheet from '@/components/ShareSheet'
-import { PortalPhoto, type Journey, type PhotoLoader } from './PortalJourney'
+import { PortalPhoto, treatmentsOf, type Journey, type PhotoLoader } from './PortalJourney'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
 export type JourneyShare = { id: string; photoIds: string[] } | null
 
-/** First and latest of every angle — the default selection. */
+/** First and latest of every angle OF EACH TREATMENT — the default selection. */
 function firstAndLatest(journey: Journey): string[] {
   const out = new Set<string>()
-  const slots = new Set(journey.points.flatMap((p) => Object.keys(p.photos)))
-  for (const s of Array.from(slots)) {
-    const run = journey.points.filter((p) => p.photos[s])
-    if (run.length) {
-      out.add(run[0].photos[s])
-      out.add(run[run.length - 1].photos[s])
+  for (const t of treatmentsOf(journey)) {
+    const pts = journey.points.filter((p) => (p.treatment ?? '') === t)
+    const slots = new Set(pts.flatMap((p) => Object.keys(p.photos)))
+    for (const s of Array.from(slots)) {
+      const run = pts.filter((p) => p.photos[s])
+      if (run.length) {
+        out.add(run[0].photos[s])
+        out.add(run[run.length - 1].photos[s])
+      }
     }
   }
   return Array.from(out)
@@ -53,12 +56,23 @@ export default function PortalShare({ journey, share, load, token, session, onCh
   const origin = typeof window !== 'undefined' ? window.location.origin : ''
   const shareUrl = share ? `${origin}/journey/${share.id}` : ''
 
-  // Angle by angle, oldest first — the same order as Your progress.
+  // Treatment by treatment, then angle by angle, oldest first — the same
+  // order as Your progress, so "Front" of Agnes RF and "Front" of Plasmage
+  // are separate rows to pick from.
   const rows = useMemo(() => {
-    const slots: string[] = []
-    for (const s of journey.slotOrder) if (journey.points.some((p) => p.photos[s])) slots.push(s)
-    for (const p of journey.points) for (const s of Object.keys(p.photos)) if (!slots.includes(s)) slots.push(s)
-    return slots.map((s) => ({ slot: s, points: journey.points.filter((p) => p.photos[s]) }))
+    const multi = treatmentsOf(journey).length > 1
+    return treatmentsOf(journey).flatMap((t) => {
+      const pts = journey.points.filter((p) => (p.treatment ?? '') === t)
+      const slots: string[] = []
+      for (const s of journey.slotOrder) if (pts.some((p) => p.photos[s])) slots.push(s)
+      for (const p of pts) for (const s of Object.keys(p.photos)) if (!slots.includes(s)) slots.push(s)
+      return slots.map((s) => ({
+        key: `${t}|${s}`,
+        slot: s,
+        title: multi && t ? `${t} · ${s}` : s,
+        points: pts.filter((p) => p.photos[s]),
+      }))
+    })
   }, [journey])
 
   const startPicking = () => {
@@ -130,8 +144,8 @@ export default function PortalShare({ journey, share, load, token, session, onCh
             </p>
           </div>
           {rows.map((r) => (
-            <div key={r.slot}>
-              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{r.slot}</p>
+            <div key={r.key}>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-500">{r.title}</p>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {r.points.map((p, i) => {
                   const id = p.photos[r.slot]

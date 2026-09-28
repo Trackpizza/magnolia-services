@@ -36,7 +36,7 @@ export default async function PortalPage({
 }) {
   const { t } = await searchParams
   return (
-    <div className="min-h-screen bg-cream-100">
+    <div className="portal-dark min-h-screen">
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link href="/">

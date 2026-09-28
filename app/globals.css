@@ -18,3 +18,38 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ────────────────────────────────────────────────────────────────────────────
+   The client portal in dark (2026-09-28 — "easier to look at").
+   ────────────────────────────────────────────────────────────────────────────
+   Scoped to `.portal-dark` (app/my/page.tsx) rather than rewriting the portal
+   with `dark:` variants: the portal is built from a small, fixed set of light
+   utilities, and remapping those here keeps every portal component (the
+   booking widget and share sheet included) dark without touching the rest of
+   the site, which stays light. Add a line here when the portal starts using a
+   new colour utility. */
+.portal-dark { background-color: #15111b; color: #e5e7eb; color-scheme: dark; }
+.portal-dark .bg-white { background-color: #211a2a; }
+.portal-dark .bg-white\/90 { background-color: rgba(33, 26, 42, 0.9); }
+.portal-dark .bg-cream-100 { background-color: #15111b; }
+.portal-dark .bg-cream-100\/60 { background-color: #1a1522; }
+.portal-dark .bg-gray-50, .portal-dark .hover\:bg-gray-50:hover { background-color: #2a2234; }
+.portal-dark .bg-gray-100 { background-color: #2f2739; }
+.portal-dark .bg-gray-300 { background-color: #4a4156; }
+.portal-dark .bg-brand-50, .portal-dark .hover\:bg-brand-50:hover { background-color: #1d2e28; }
+.portal-dark .border-gray-100 { border-color: #2c2436; }
+.portal-dark .border-gray-200 { border-color: #3a3146; }
+.portal-dark .border-gray-300 { border-color: #4a4156; }
+.portal-dark .text-plum-900 { color: #efe6f4; }
+.portal-dark .text-gray-900 { color: #f3f4f6; }
+.portal-dark .text-gray-800 { color: #e5e7eb; }
+.portal-dark .text-gray-700 { color: #d1d5db; }
+.portal-dark .text-gray-600 { color: #b6bac3; }
+.portal-dark .text-gray-500 { color: #9ca3af; }
+.portal-dark .text-gray-400 { color: #858b96; }
+.portal-dark .text-brand-600,
+.portal-dark .text-brand-700,
+.portal-dark .hover\:text-brand-700:hover { color: #97c3b5; }
+.portal-dark .text-brand-800,
+.portal-dark .hover\:text-brand-800:hover { color: #c1dbd1; }
+.portal-dark input, .portal-dark select, .portal-dark textarea { background-color: #2a2234; color: #f3f4f6; }
