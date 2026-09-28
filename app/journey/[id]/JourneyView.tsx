@@ -67,7 +67,7 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
         {state === 'loading' && <p className="text-sm text-gray-500">Loading…</p>}
         {state === 'gone' && (
           <p className="text-sm text-gray-600">
-            This link is no longer shared. You can still see what we do and book a free consult below.
+            This link is no longer shared. You can still see what we do and book a complimentary consult below.
           </p>
         )}
         {state === 'error' && (
@@ -89,14 +89,14 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
           Curious what we&rsquo;d suggest for you?
         </h2>
         <p className="text-sm text-gray-600 mb-5">
-          Every plan starts with a conversation. Pick whichever suits you — the first two are free.
+          Every plan starts with a conversation. Pick whichever suits you — the first two are complimentary.
         </p>
         <div className="space-y-3">
           <a href={videoConsultUrl} target="_blank" rel="noopener noreferrer" className={`${book} bg-brand-600 text-white hover:bg-brand-700`}>
-            Book a free 15-minute video consult
+            Book a complimentary 15-minute video consult
           </a>
           <Link href="/photo-consult" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
-            Get a free photo consult
+            Get a complimentary photo consult
           </Link>
           <Link href="/bookings" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
             Book an in-person visit

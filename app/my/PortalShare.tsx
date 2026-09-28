@@ -233,7 +233,7 @@ export default function PortalShare({ journey, share, load, token, session, onCh
           </button>
           {showRefer && (
             <ShareSheet
-              text="I've been going to Magnolia Skin Center in Burbank and love it. You can book a free consult here:"
+              text="I've been going to Magnolia Skin Center in Burbank and love it. You can book a complimentary consult here:"
               url={`${origin}/`}
               subject="Magnolia Skin Center"
               note="This sends the clinic's website only — none of your photos or details."
