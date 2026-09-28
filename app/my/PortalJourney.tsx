@@ -5,9 +5,9 @@
  * frame, with arrows, swipe, a counter and Play. Or the first and latest side
  * by side. The chart's Client journey, minus anything the clinic hid.
  *
- * It used to open a full-screen viewer on tap — one enormous photo, no way to
- * step through — and a grid that was too big on a phone. Everything now stays
- * inline, at a size that fits the screen with the controls.
+ * Tap a photo and it pops up in the same viewer the clinic uses
+ * (PhotoLightbox): zoom that holds as you step through, pinch, drag, Reset
+ * view, and every timepoint along the bottom.
  *
  * The page never holds a storage path or a public URL. Each photo is an
  * opaque id; the image is fetched from the records API, which re-checks it
@@ -19,6 +19,7 @@
  * is fetched differs, so that is passed in as `load`.
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
+import PhotoLightbox from './PhotoLightbox'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -115,6 +116,8 @@ export default function PortalJourney({ journey, load }: {
   const [mode, setMode] = useState<'slideshow' | 'firstLatest'>('slideshow')
   const [index, setIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
+  /** The popup: which photo of the run it is open on, or null. */
+  const [popup, setPopup] = useState<number | null>(null)
   const touchX = useRef<number | null>(null)
 
   const current = slots.includes(slot) ? slot : slots[0] ?? ''
@@ -195,9 +198,13 @@ export default function PortalJourney({ journey, load }: {
         <div className="grid grid-cols-2 gap-3">
           {[run[0], run[run.length - 1]].map((p, i) => (
             <figure key={`${p.label}-${i}`}>
-              <div className="mx-auto aspect-[9/16] max-h-[45vh] max-w-full overflow-hidden rounded-xl bg-black">
+              <button
+                onClick={() => { setPlaying(false); setPopup(i === 0 ? 0 : run.length - 1) }}
+                className="mx-auto block aspect-[9/16] max-h-[45vh] max-w-full overflow-hidden rounded-xl bg-black"
+                aria-label={`Open ${p.label} — ${current}`}
+              >
                 <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-contain" />
-              </div>
+              </button>
               <figcaption className="mt-1.5">
                 <span className="block text-[11px] font-semibold uppercase tracking-wide text-brand-700">
                   {i === 0 ? 'First' : 'Latest'}
@@ -233,8 +240,9 @@ export default function PortalJourney({ journey, load }: {
             {run.map((p, i) => (
               <div
                 key={`${p.photos[current]}-${i}`}
-                className={`absolute inset-0 transition-opacity duration-500 ${i === at ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+                className={`absolute inset-0 cursor-zoom-in transition-opacity duration-500 ${i === at ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
                 aria-hidden={i !== at}
+                onClick={() => { setPlaying(false); setPopup(i) }}
               >
                 <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-contain" />
               </div>
@@ -265,6 +273,8 @@ export default function PortalJourney({ journey, load }: {
             )}
           </div>
 
+          <p className="mt-1 text-xs text-gray-500">Tap the photo to open it full size and zoom in.</p>
+
           {run.length > 1 && (
             <div className="mt-2 flex justify-center gap-1.5" aria-hidden>
               {run.map((_, i) => (
@@ -278,6 +288,17 @@ export default function PortalJourney({ journey, load }: {
             </div>
           )}
         </div>
+      )}
+
+      {popup !== null && run[popup] && (
+        <PhotoLightbox
+          slides={run.map((p) => ({ label: p.label, sub: shortDate(p.date), id: p.photos[current] }))}
+          index={popup}
+          title={`${currentTreatment ? `${currentTreatment} · ` : ''}${current}`}
+          load={load}
+          onIndex={(i) => { setPopup(i); setIndex(i) }}
+          onClose={() => setPopup(null)}
+        />
       )}
     </div>
   )
