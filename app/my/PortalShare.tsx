@@ -16,7 +16,7 @@
  */
 import { useMemo, useState } from 'react'
 import ShareSheet from '@/components/ShareSheet'
-import { PortalPhoto, treatmentsOf, type Journey, type PhotoLoader } from './PortalJourney'
+import { PortalPhoto, treatmentsOf, treatmentsOfPoint, type Journey, type PhotoLoader } from './PortalJourney'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -26,7 +26,7 @@ export type JourneyShare = { id: string; photoIds: string[] } | null
 function firstAndLatest(journey: Journey): string[] {
   const out = new Set<string>()
   for (const t of treatmentsOf(journey)) {
-    const pts = journey.points.filter((p) => (p.treatment ?? '') === t)
+    const pts = journey.points.filter((p) => treatmentsOfPoint(p).includes(t))
     const slots = new Set(pts.flatMap((p) => Object.keys(p.photos)))
     for (const s of Array.from(slots)) {
       const run = pts.filter((p) => p.photos[s])
@@ -62,7 +62,7 @@ export default function PortalShare({ journey, share, load, token, session, onCh
   const rows = useMemo(() => {
     const multi = treatmentsOf(journey).length > 1
     return treatmentsOf(journey).flatMap((t) => {
-      const pts = journey.points.filter((p) => (p.treatment ?? '') === t)
+      const pts = journey.points.filter((p) => treatmentsOfPoint(p).includes(t))
       const slots: string[] = []
       for (const s of journey.slotOrder) if (pts.some((p) => p.photos[s])) slots.push(s)
       for (const p of pts) for (const s of Object.keys(p.photos)) if (!slots.includes(s)) slots.push(s)

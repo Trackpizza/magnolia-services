@@ -27,15 +27,26 @@ export type Journey = {
   slotOrder: string[]
   /** `treatment` — one journey per treatment name (2026-09-28). Optional so an
    *  older records API that does not send it still draws, as one journey. */
-  points: { label: string; date: string; treatment?: string; photos: Record<string, string> }[]
+  points: {
+    label: string
+    date: string
+    treatment?: string
+    /** Every treatment in the visit — a stacked visit is in each one's journey. */
+    treatments?: string[]
+    photos: Record<string, string>
+  }[]
+}
+
+/** The treatments a point belongs to (older API: just `treatment`). */
+export function treatmentsOfPoint(p: Journey['points'][number]): string[] {
+  return p.treatments?.length ? p.treatments : [p.treatment ?? '']
 }
 
 /** The treatments in a journey, oldest first — the order they began. */
 export function treatmentsOf(journey: Journey): string[] {
   const out: string[] = []
   for (const p of journey.points) {
-    const t = p.treatment ?? ''
-    if (!out.includes(t)) out.push(t)
+    for (const t of treatmentsOfPoint(p)) if (!out.includes(t)) out.push(t)
   }
   return out
 }
@@ -99,11 +110,11 @@ export default function PortalJourney({ journey, load }: {
   // share the face angles, and in one row they read as one story. Opens on the
   // most recent treatment.
   const treatments = useMemo(() => treatmentsOf(journey), [journey])
-  const latest = journey.points[journey.points.length - 1]?.treatment ?? ''
+  const latest = journey.points.length ? treatmentsOfPoint(journey.points[journey.points.length - 1])[0] : ''
   const [treatment, setTreatment] = useState<string | null>(null)
   const currentTreatment = treatment !== null && treatments.includes(treatment) ? treatment : latest
   const points = useMemo(
-    () => journey.points.filter((p) => (p.treatment ?? '') === currentTreatment),
+    () => journey.points.filter((p) => treatmentsOfPoint(p).includes(currentTreatment)),
     [journey, currentTreatment],
   )
 
