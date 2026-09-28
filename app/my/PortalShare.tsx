@@ -11,7 +11,7 @@
  * and re-checks every photo against what the patient can see on each load, so
  * a photo the clinic hides drops out and "Stop sharing" kills the link at once.
  *
- * Also "Know someone who'd love this?" — the clinic's own site, with nothing
+ * Also "Recommend Magnolia Skin Center" — the clinic's own site, with nothing
  * of the patient's in it, for anyone who would rather not share photos.
  */
 import { useMemo, useState } from 'react'
@@ -229,14 +229,14 @@ export default function PortalShare({ journey, share, load, token, session, onCh
       {!picking && (
         <>
           <button type="button" onClick={() => setShowRefer((v) => !v)} aria-expanded={showRefer} className={outline}>
-            💬 Know someone who&rsquo;d love this?
+            💬 Recommend Magnolia Skin Center
           </button>
           {showRefer && (
             <ShareSheet
               text="I've been going to Magnolia Skin Center in Burbank and love it. You can book a complimentary consult here:"
               url={`${origin}/`}
               subject="Magnolia Skin Center"
-              note="This sends the clinic's website only — none of your photos or details."
+              note="Just the clinic's website — no photos of yours, and nothing about you."
             />
           )}
         </>
