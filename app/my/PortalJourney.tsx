@@ -135,6 +135,8 @@ export default function PortalJourney({ journey, load }: {
   const run = points.filter((p) => !!p.photos[current])
   const at = Math.min(index, Math.max(0, run.length - 1))
   const pair = run.length >= 2
+  const comparing = mode === 'firstLatest' && pair
+  const popupRun = comparing ? [run[0], run[run.length - 1]] : run
 
   // Autoplay steps forward and loops; any manual step stops it.
   useEffect(() => {
@@ -210,7 +212,7 @@ export default function PortalJourney({ journey, load }: {
           {[run[0], run[run.length - 1]].map((p, i) => (
             <figure key={`${p.label}-${i}`}>
               <button
-                onClick={() => { setPlaying(false); setPopup(i === 0 ? 0 : run.length - 1) }}
+                onClick={() => { setPlaying(false); setPopup(i) }}
                 className="mx-auto block aspect-[9/16] max-h-[45vh] max-w-full overflow-hidden rounded-xl bg-black"
                 aria-label={`Open ${p.label} — ${current}`}
               >
@@ -301,13 +303,16 @@ export default function PortalJourney({ journey, load }: {
         </div>
       )}
 
-      {popup !== null && run[popup] && (
+      {popup !== null && popupRun[popup] && (
         <PhotoLightbox
-          slides={run.map((p) => ({ label: p.label, sub: shortDate(p.date), id: p.photos[current] }))}
+          // From First & latest the popup steps between just those two —
+          // the whole run would open "First" onto After, and "Latest" at the
+          // end with nowhere to go (Eric, 2026-09-28).
+          slides={popupRun.map((p) => ({ label: p.label, sub: shortDate(p.date), id: p.photos[current] }))}
           index={popup}
           title={`${currentTreatment ? `${currentTreatment} · ` : ''}${current}`}
           load={load}
-          onIndex={(i) => { setPopup(i); setIndex(i) }}
+          onIndex={(i) => { setPopup(i); if (!comparing) setIndex(i) }}
           onClose={() => setPopup(null)}
         />
       )}

@@ -90,7 +90,9 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
   }
 
   const onPointerDown = (e: React.PointerEvent) => {
-    ;(e.target as Element).setPointerCapture?.(e.pointerId)
+    // The ‹ › arrows sit inside the photo area: a press on one is a tap, never
+    // the start of a drag or a pinch, and must not capture the pointer.
+    if ((e.target as Element).closest('button')) return
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY })
     if (pointers.current.size === 2) {
       // Second finger down: a pinch, not a drag.
@@ -99,6 +101,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
       return
     }
     if (zoom === 1) return
+    ;(e.currentTarget as Element).setPointerCapture?.(e.pointerId)
     dragRef.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y }
     setDragging(true)
   }
