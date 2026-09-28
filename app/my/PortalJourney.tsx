@@ -8,6 +8,9 @@
  * opaque id; the image is fetched from the records API with the portal
  * session, which re-checks it every time and answers no-store. Images live
  * only as blob: URLs in this tab and are released when it moves on.
+ *
+ * The same viewer draws a shared journey (/journey/[id]) — only how a photo
+ * is fetched differs, so that is passed in as `load`.
  */
 import { useEffect, useMemo, useState } from 'react'
 
@@ -27,21 +30,30 @@ function shortDate(v?: string): string {
     : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-/** One photo, fetched through the portal with the session. */
-function PortalPhoto({ token, session, id, alt, className }: {
-  token: string; session: string; id: string; alt: string; className?: string
-}) {
-  const [src, setSrc] = useState('')
-  const [failed, setFailed] = useState(false)
-  useEffect(() => {
-    let url = ''
-    let live = true
+/** Fetches one photo's bytes by opaque id. */
+export type PhotoLoader = (id: string) => Promise<Response>
+
+/** The portal's loader: the patient's own session. */
+export function portalLoader(token: string, session: string): PhotoLoader {
+  return (id) =>
     fetch(`${API}/api/public/portal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, session, action: 'photo', photo: id }),
       cache: 'no-store',
     })
+}
+
+/** One photo, as a blob: URL released when it leaves the screen. */
+export function PortalPhoto({ load, id, alt, className }: {
+  load: PhotoLoader; id: string; alt: string; className?: string
+}) {
+  const [src, setSrc] = useState('')
+  const [failed, setFailed] = useState(false)
+  useEffect(() => {
+    let url = ''
+    let live = true
+    load(id)
       .then(async (res) => {
         if (!res.ok) throw new Error(String(res.status))
         url = URL.createObjectURL(await res.blob())
@@ -52,15 +64,15 @@ function PortalPhoto({ token, session, id, alt, className }: {
       live = false
       if (url) URL.revokeObjectURL(url)
     }
-  }, [token, session, id])
+  }, [load, id])
   if (failed) return <div className={`${className} flex items-center justify-center text-xs text-gray-400`}>Could not load</div>
   if (!src) return <div className={`${className} animate-pulse bg-gray-100`} />
   // eslint-disable-next-line @next/next/no-img-element -- a blob: URL, not an optimisable asset
   return <img src={src} alt={alt} className={className} />
 }
 
-export default function PortalJourney({ journey, token, session }: {
-  journey: Journey; token: string; session: string
+export default function PortalJourney({ journey, load }: {
+  journey: Journey; load: PhotoLoader
 }) {
   const slots = useMemo(() => {
     const seen: string[] = []
@@ -117,7 +129,7 @@ export default function PortalJourney({ journey, token, session }: {
               className="block aspect-[9/16] w-full overflow-hidden rounded-xl border border-gray-100 bg-gray-50"
               aria-label={`Open ${p.label} ${current}`}
             >
-              <PortalPhoto token={token} session={session} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-cover" />
+              <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-cover" />
             </button>
             <figcaption className="mt-1.5">
               {mode === 'firstLatest' && pair && (
@@ -146,8 +158,7 @@ export default function PortalJourney({ journey, token, session }: {
           <div className="flex flex-1 items-center justify-center px-2 pb-4">
             <PortalPhoto
               key={columns[open].photos[current]}
-              token={token}
-              session={session}
+              load={load}
               id={columns[open].photos[current]}
               alt={`${columns[open].label} — ${current}`}
               className="max-h-full max-w-full object-contain"

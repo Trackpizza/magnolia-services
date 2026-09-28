@@ -18,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin', '/spin', '/photo-consult', '/bookingtesting', '/bookingpreview', '/bookingpreview-deposit', '/bookings/cancel', '/dr-davids-rejuvenation', '/nurse-eileens-rejuvenation', '/rejuvenation-journeys', '/stylists'],
+      disallow: ['/admin', '/spin', '/photo-consult', '/bookingtesting', '/bookingpreview', '/bookingpreview-deposit', '/bookings/cancel', '/journey', '/dr-davids-rejuvenation', '/nurse-eileens-rejuvenation', '/rejuvenation-journeys', '/stylists'],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,
   }

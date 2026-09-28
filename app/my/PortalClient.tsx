@@ -6,11 +6,12 @@
  * The plan is the top of the page on purpose. It is the reason to open the
  * link — what is coming and why — and everything else on here is admin.
  */
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FindMyPage from './FindMyPage'
 import { readSession, writeSession } from './session'
 import BookTreatment from '@/components/BookTreatment'
-import PortalJourney, { type Journey } from './PortalJourney'
+import PortalJourney, { portalLoader, type Journey } from './PortalJourney'
+import PortalShare, { type JourneyShare } from './PortalShare'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -116,6 +117,8 @@ interface OpenView {
   photoAuth?: { signed: boolean }
   /** "Your progress" — their photos by opaque id, minus any the clinic hid. */
   journey?: Journey
+  /** Their live public share of some of those photos, if any. */
+  journeyShare?: JourneyShare
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
@@ -174,6 +177,11 @@ export default function PortalClient({ token }: { token: string }) {
       setBusy('')
     }
   }
+
+  // One loader per session, so the photos' effects do not re-fetch on every
+  // render of this page.
+  const session = view && !view.locked ? readSession() : ''
+  const photoLoader = useMemo(() => portalLoader(token, session), [token, session])
 
   const [booking, setBooking] = useState(false)
   const bookingRef = useRef<HTMLDivElement | null>(null)
@@ -639,7 +647,15 @@ export default function PortalClient({ token }: { token: string }) {
             Your photos from each visit, oldest to newest. Pick an angle to compare the same view over
             time. Only you can see these — they are part of your record with us.
           </p>
-          <PortalJourney journey={view.journey} token={token} session={readSession()} />
+          <PortalJourney journey={view.journey} load={photoLoader} />
+          <PortalShare
+            journey={view.journey}
+            share={view.journeyShare ?? null}
+            load={photoLoader}
+            token={token}
+            session={readSession()}
+            onChanged={load}
+          />
         </div>
       )}
 
