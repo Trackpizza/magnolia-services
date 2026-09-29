@@ -120,6 +120,9 @@ interface OpenView {
   journey?: Journey
   /** Their live public share of some of those photos, if any. */
   journeyShare?: JourneyShare
+  /** Dr. David's photo consults (Visage Clinical), newest first — the video
+   *  links he has sent. Filed on the chart by Visage's onShareForRecords. */
+  photoConsults?: { title: string; url: string; readyAt: string }[]
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
@@ -625,6 +628,31 @@ export default function PortalClient({ token }: { token: string }) {
           </a>
         </Section>
       ))}
+
+      {/* Dr. David's photo consult — the walkthrough he recorded in Visage
+          Clinical from a photo the clinic sent. First among the photo
+          sections: it is what the text they just got points at. */}
+      {(view.photoConsults ?? []).length > 0 && (
+        <Section title="Your photo consult" badge={`${view.photoConsults!.length}`}>
+          <p className="text-sm text-gray-600 mb-4">
+            Dr. David&rsquo;s video walkthrough of what he sees and what he would suggest. The images
+            in it are AI simulations to help the conversation — not a guarantee of results.
+          </p>
+          <div className="space-y-2">
+            {view.photoConsults!.map((c) => (
+              <a
+                key={c.url}
+                href={c.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={primaryBtn + ' text-center block'}
+              >
+                ▶ Watch{c.readyAt ? ` — ${shortDate(c.readyAt)}` : ''}
+              </a>
+            ))}
+          </div>
+        </Section>
+      )}
 
       {/* Your progress — their own photos, first & latest or every one. */}
       {view.journey && view.journey.points.length > 0 && (
