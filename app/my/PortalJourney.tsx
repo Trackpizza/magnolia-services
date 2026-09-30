@@ -20,6 +20,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import PhotoLightbox from './PhotoLightbox'
+import NoteDialog from './NoteDialog'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -34,6 +35,9 @@ export type Journey = {
     /** Every treatment in the visit — a stacked visit is in each one's journey. */
     treatments?: string[]
     photos: Record<string, string>
+    /** The clinic's note for the patient on a follow-up set (portal only —
+     *  a share never carries it). */
+    note?: string
   }[]
 }
 
@@ -103,6 +107,13 @@ export function PortalPhoto({ load, id, alt, className }: {
 
 const PLAY_MS = 2500
 
+/** "Before · Sep 26", "Follow-up · Sep 29" — the viewer's timepoint chips. */
+function chipLabel(p: { label: string; date: string }): string {
+  const kind = p.label.split(' · ')[0]
+  const d = shortDate(p.date).replace(/, \d{4}$/, '')
+  return d ? `${kind} · ${d}` : kind
+}
+
 export default function PortalJourney({ journey, load }: {
   journey: Journey; load: PhotoLoader
 }) {
@@ -129,6 +140,8 @@ export default function PortalJourney({ journey, load }: {
   const [playing, setPlaying] = useState(false)
   /** The popup: which photo of the run it is open on, or null. */
   const [popup, setPopup] = useState<number | null>(null)
+  /** The point whose note popup is open. */
+  const [noteFor, setNoteFor] = useState<Journey['points'][number] | null>(null)
   const touchX = useRef<number | null>(null)
 
   const current = slots.includes(slot) ? slot : slots[0] ?? ''
@@ -224,6 +237,11 @@ export default function PortalJourney({ journey, load }: {
                 </span>
                 <span className="block text-sm font-medium text-gray-800">{p.label}</span>
                 {shortDate(p.date) && <span className="block text-xs text-gray-500">{shortDate(p.date)}</span>}
+                {p.note && (
+                  <button onClick={() => setNoteFor(p)} className="mt-0.5 text-xs font-medium text-brand-700 underline">
+                    📝 Note from the clinic
+                  </button>
+                )}
               </figcaption>
             </figure>
           ))}
@@ -275,6 +293,11 @@ export default function PortalJourney({ journey, load }: {
                 {shortDate(run[at]?.date)}
                 {run.length > 1 ? ` · ${at + 1} of ${run.length}` : ''}
               </p>
+              {run[at]?.note && (
+                <button onClick={() => setNoteFor(run[at])} className="mt-0.5 text-xs font-medium text-brand-700 underline">
+                  📝 Note from the clinic
+                </button>
+              )}
             </div>
             {run.length > 1 && (
               <button
@@ -308,12 +331,20 @@ export default function PortalJourney({ journey, load }: {
           // From First & latest the popup steps between just those two —
           // the whole run would open "First" onto After, and "Latest" at the
           // end with nowhere to go (Eric, 2026-09-28).
-          slides={popupRun.map((p) => ({ label: p.label, sub: shortDate(p.date), id: p.photos[current] }))}
+          slides={popupRun.map((p) => ({ label: p.label, sub: shortDate(p.date), chip: chipLabel(p), id: p.photos[current], note: p.note }))}
           index={popup}
           title={`${currentTreatment ? `${currentTreatment} · ` : ''}${current}`}
           load={load}
           onIndex={(i) => { setPopup(i); if (!comparing) setIndex(i) }}
           onClose={() => setPopup(null)}
+        />
+      )}
+
+      {noteFor?.note && (
+        <NoteDialog
+          title={`${noteFor.label}${shortDate(noteFor.date) ? ` · ${shortDate(noteFor.date)}` : ''}`}
+          note={noteFor.note}
+          onClose={() => setNoteFor(null)}
         />
       )}
     </div>

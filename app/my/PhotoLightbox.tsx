@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { PortalPhoto, type PhotoLoader } from './PortalJourney'
+import NoteDialog from './NoteDialog'
 
 export interface LightboxSlide {
   /** "Before · Agnes RF", "1 month" — the timepoint. */
@@ -29,6 +30,10 @@ export interface LightboxSlide {
   sub?: string
   /** Opaque photo id. */
   id: string
+  /** The timepoint chip along the bottom; `label` when absent. */
+  chip?: string
+  /** The clinic's note for the patient on a follow-up set. */
+  note?: string
 }
 
 const MIN_ZOOM = 1
@@ -50,6 +55,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
   /** Active pointers, for pinch: id → position. */
   const pointers = useRef(new Map<number, { x: number; y: number }>())
   const pinchRef = useRef<{ dist: number; zoom: number } | null>(null)
+  const [showNote, setShowNote] = useState(false)
 
   const clampZoom = (z: number) => Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z))
 
@@ -144,14 +150,31 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
             {slide.sub ? ` · ${slide.sub}` : ''} · {index + 1} of {slides.length}
           </p>
         </div>
-        <button
-          onClick={onClose}
-          className="shrink-0 rounded-lg px-3 py-1.5 text-sm text-white/80 hover:bg-white/10 hover:text-white"
-          aria-label="Close"
-        >
-          Close ✕
-        </button>
+        <div className="flex shrink-0 items-center gap-1">
+          {slide.note && (
+            <button
+              onClick={() => setShowNote(true)}
+              className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-white/90 hover:bg-white/20 hover:text-white"
+            >
+              📝 Note
+            </button>
+          )}
+          <button
+            onClick={onClose}
+            className="rounded-lg px-3 py-1.5 text-sm text-white/80 hover:bg-white/10 hover:text-white"
+            aria-label="Close"
+          >
+            Close ✕
+          </button>
+        </div>
       </div>
+      {showNote && slide.note && (
+        <NoteDialog
+          title={`${slide.label}${slide.sub ? ` · ${slide.sub}` : ''}`}
+          note={slide.note}
+          onClose={() => setShowNote(false)}
+        />
+      )}
 
       <div
         className="relative flex-1 touch-none overflow-hidden"
@@ -216,7 +239,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
                 i === index ? 'bg-[#ffffff] text-[#111827]' : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              {s.label}
+              {s.chip ?? s.label}
             </button>
           ))}
         </div>
