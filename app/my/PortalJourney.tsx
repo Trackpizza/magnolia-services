@@ -106,6 +106,16 @@ export function PortalPhoto({ load, id, alt, className }: {
 }
 
 const PLAY_MS = 2500
+/** The dropdown's first choice: every photo, oldest first. */
+const ALL = '__all__'
+
+/** "6 photos · Sep 26 – Nov 3" for a run of points. */
+function runSummary(run: Journey['points']): string {
+  const n = run.reduce((k, p) => k + Object.keys(p.photos).length, 0)
+  const a = shortDate(run[0]?.date).replace(/, \d{4}$/, '')
+  const b = shortDate(run[run.length - 1]?.date).replace(/, \d{4}$/, '')
+  return `${n} photo${n === 1 ? '' : 's'}${a ? ` · ${a}${b && b !== a ? ` – ${b}` : ''}` : ''}`
+}
 
 /** "Before · Sep 26", "Follow-up · Sep 29" — the viewer's timepoint chips. */
 function chipLabel(p: { label: string; date: string }): string {
@@ -117,15 +127,17 @@ function chipLabel(p: { label: string; date: string }): string {
 export default function PortalJourney({ journey, load }: {
   journey: Journey; load: PhotoLoader
 }) {
-  // One journey per treatment: Agnes RF on the face and Plasmage on the neck
-  // share the face angles, and in one row they read as one story. Opens on the
-  // most recent treatment.
+  // Opens on every photo in date order (Eric, 2026-09-29); each treatment is
+  // its own run in the dropdown — Agnes RF on the face and Plasmage on the
+  // neck share the face angles, and together they read as one story.
   const treatments = useMemo(() => treatmentsOf(journey), [journey])
-  const latest = journey.points.length ? treatmentsOfPoint(journey.points[journey.points.length - 1])[0] : ''
   const [treatment, setTreatment] = useState<string | null>(null)
-  const currentTreatment = treatment !== null && treatments.includes(treatment) ? treatment : latest
+  const currentTreatment = treatment !== null && treatments.includes(treatment) ? treatment : ALL
   const points = useMemo(
-    () => journey.points.filter((p) => treatmentsOfPoint(p).includes(currentTreatment)),
+    () =>
+      currentTreatment === ALL
+        ? journey.points
+        : journey.points.filter((p) => treatmentsOfPoint(p).includes(currentTreatment)),
     [journey, currentTreatment],
   )
 
@@ -179,21 +191,22 @@ export default function PortalJourney({ journey, load }: {
 
   return (
     <div className="space-y-4">
+      {/* All photos first, then each treatment. Only offered when there is
+          more than one treatment to choose between. */}
       {treatments.length > 1 && (
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Treatment">
+        <select
+          value={currentTreatment}
+          onChange={(e) => pick(() => setTreatment(e.target.value))}
+          aria-label="Which photos"
+          className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold text-gray-800"
+        >
+          <option value={ALL}>All photos — every visit ({runSummary(journey.points)})</option>
           {treatments.map((t) => (
-            <button
-              key={t}
-              onClick={() => pick(() => setTreatment(t))}
-              aria-pressed={t === currentTreatment}
-              className={`rounded-xl border px-3 py-2 text-sm font-semibold transition-colors ${
-                t === currentTreatment ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              }`}
-            >
-              {t || 'Other'}
-            </button>
+            <option key={t} value={t}>
+              {t || 'Other'} ({runSummary(journey.points.filter((p) => treatmentsOfPoint(p).includes(t)))})
+            </option>
           ))}
-        </div>
+        </select>
       )}
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Angle">
@@ -333,7 +346,7 @@ export default function PortalJourney({ journey, load }: {
           // end with nowhere to go (Eric, 2026-09-28).
           slides={popupRun.map((p) => ({ label: p.label, sub: shortDate(p.date), chip: chipLabel(p), id: p.photos[current], note: p.note }))}
           index={popup}
-          title={`${currentTreatment ? `${currentTreatment} · ` : ''}${current}`}
+          title={`${currentTreatment && currentTreatment !== ALL ? `${currentTreatment} · ` : ''}${current}`}
           load={load}
           onIndex={(i) => { setPopup(i); if (!comparing) setIndex(i) }}
           onClose={() => setPopup(null)}
