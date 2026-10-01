@@ -152,6 +152,8 @@ export default function PortalJourney({ journey, load }: {
   const [playing, setPlaying] = useState(false)
   /** The popup: which photo of the run it is open on, or null. */
   const [popup, setPopup] = useState<number | null>(null)
+  /** The popup was opened by ▶ Play: it starts playing, full screen. */
+  const [popupPlay, setPopupPlay] = useState(false)
   /** The point whose note popup is open. */
   const [noteFor, setNoteFor] = useState<Journey['points'][number] | null>(null)
   const touchX = useRef<number | null>(null)
@@ -238,7 +240,7 @@ export default function PortalJourney({ journey, load }: {
           {[run[0], run[run.length - 1]].map((p, i) => (
             <figure key={`${p.label}-${i}`}>
               <button
-                onClick={() => { setPlaying(false); setPopup(i) }}
+                onClick={() => { setPlaying(false); setPopupPlay(false); setPopup(i) }}
                 className="mx-auto block aspect-[9/16] max-h-[45vh] max-w-full overflow-hidden rounded-xl bg-black"
                 aria-label={`Open ${p.label} — ${current}`}
               >
@@ -286,7 +288,7 @@ export default function PortalJourney({ journey, load }: {
                 key={`${p.photos[current]}-${i}`}
                 className={`absolute inset-0 cursor-zoom-in transition-opacity duration-500 ${i === at ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
                 aria-hidden={i !== at}
-                onClick={() => { setPlaying(false); setPopup(i) }}
+                onClick={() => { setPlaying(false); setPopupPlay(false); setPopup(i) }}
               >
                 <PortalPhoto load={load} id={p.photos[current]} alt={`${p.label} — ${current}`} className="h-full w-full object-contain" />
               </div>
@@ -314,10 +316,10 @@ export default function PortalJourney({ journey, load }: {
             </div>
             {run.length > 1 && (
               <button
-                onClick={() => setPlaying((v) => !v)}
+                onClick={() => { setPlaying(false); setPopupPlay(true); setPopup(at) }}
                 className="shrink-0 rounded-full border border-gray-200 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                {playing ? '❚❚ Pause' : '▶ Play'}
+                ▶ Play
               </button>
             )}
           </div>
@@ -349,7 +351,8 @@ export default function PortalJourney({ journey, load }: {
           title={`${currentTreatment && currentTreatment !== ALL ? `${currentTreatment} · ` : ''}${current}`}
           load={load}
           onIndex={(i) => { setPopup(i); if (!comparing) setIndex(i) }}
-          onClose={() => setPopup(null)}
+          onClose={() => { setPopup(null); setPopupPlay(false) }}
+          autoplay={popupPlay}
         />
       )}
 

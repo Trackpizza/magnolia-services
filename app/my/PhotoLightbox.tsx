@@ -39,16 +39,35 @@ export interface LightboxSlide {
 const MIN_ZOOM = 1
 const MAX_ZOOM = 6
 
-export default function PhotoLightbox({ slides, index, title, load, onIndex, onClose }: {
+/** How long each photo stays up while playing. */
+const PLAY_MS = 2500
+
+export default function PhotoLightbox({ slides, index, title, load, onIndex, onClose, autoplay = false }: {
   slides: LightboxSlide[]
   index: number
   /** The angle being compared, shown in the corner. */
   title: string
   load: PhotoLoader
   onIndex: (i: number) => void
+  /** Open already playing — the portal's ▶ Play (2026-10-01, Eric): the
+   *  slideshow runs full screen, not in the small frame on the page. */
+  autoplay?: boolean
   onClose: () => void
 }) {
   const [zoom, setZoom] = useState(1)
+  /** Playing: steps forward every PLAY_MS and loops; the zoom holds, so a
+   *  framed spot stays framed through the whole run. */
+  const [playing, setPlaying] = useState(autoplay && slides.length > 1)
+  /** A step the patient took — it stops the slideshow. */
+  const step = (i: number) => {
+    setPlaying(false)
+    onIndex(i)
+  }
+  useEffect(() => {
+    if (!playing || slides.length < 2) return
+    const t = setTimeout(() => onIndex((index + 1) % slides.length), PLAY_MS)
+    return () => clearTimeout(t)
+  }, [playing, index, slides.length, onIndex])
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
   const dragRef = useRef<{ x: number; y: number; panX: number; panY: number } | null>(null)
@@ -67,14 +86,16 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
-      else if (e.key === 'ArrowRight') onIndex(Math.min(slides.length - 1, index + 1))
-      else if (e.key === 'ArrowLeft') onIndex(Math.max(0, index - 1))
+      else if (e.key === 'ArrowRight') step(Math.min(slides.length - 1, index + 1))
+      else if (e.key === 'ArrowLeft') step(Math.max(0, index - 1))
+      else if (e.key === ' ') setPlaying((p) => !p)
       else if (e.key === '+' || e.key === '=') setZoom((z) => clampZoom(z + 0.5))
       else if (e.key === '-') setZoom((z) => clampZoom(z - 0.5))
       else if (e.key === '0') reset()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `step` is rebuilt each render; index covers it
   }, [index, slides.length, onIndex, onClose, reset])
 
   // The page must not scroll behind the overlay — on a phone you end up
@@ -200,7 +221,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
 
         {index > 0 && (
           <button
-            onClick={() => onIndex(index - 1)}
+            onClick={() => step(index - 1)}
             className="absolute left-2 top-1/2 h-11 w-11 -translate-y-1/2 rounded-full bg-black/50 text-xl text-white hover:bg-black/70"
             aria-label="Previous"
           >
@@ -209,7 +230,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
         )}
         {index < slides.length - 1 && (
           <button
-            onClick={() => onIndex(index + 1)}
+            onClick={() => step(index + 1)}
             className="absolute right-2 top-1/2 h-11 w-11 -translate-y-1/2 rounded-full bg-black/50 text-xl text-white hover:bg-black/70"
             aria-label="Next"
           >
@@ -226,6 +247,15 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
         <button onClick={() => setZoom((z) => clampZoom(z + 0.5))} disabled={zoom >= MAX_ZOOM} className={`${ctl} h-10 w-10 text-lg`} aria-label="Zoom in">
           +
         </button>
+        {slides.length > 1 && (
+          <button
+            onClick={() => setPlaying((p) => !p)}
+            className={`${ctl} h-10 px-4 text-sm font-semibold`}
+            aria-label={playing ? 'Pause the slideshow' : 'Play the slideshow'}
+          >
+            {playing ? '❚❚ Pause' : '▶ Play'}
+          </button>
+        )}
         <button onClick={reset} disabled={zoom === 1 && pan.x === 0 && pan.y === 0} className={`${ctl} ml-2 h-10 px-3 text-xs`}>
           Reset view
         </button>
@@ -234,7 +264,7 @@ export default function PhotoLightbox({ slides, index, title, load, onIndex, onC
           {slides.map((s, i) => (
             <button
               key={`${s.label}-${i}`}
-              onClick={() => onIndex(i)}
+              onClick={() => step(i)}
               className={`rounded-full px-3 py-1.5 text-xs font-medium ${
                 i === index ? 'bg-[#ffffff] text-[#111827]' : 'bg-white/10 text-white hover:bg-white/20'
               }`}

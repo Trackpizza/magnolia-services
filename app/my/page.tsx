@@ -37,6 +37,12 @@ export default async function PortalPage({
   const { t } = await searchParams
   return (
     <div className="portal-dark min-h-screen">
+      {/* 20% larger everywhere on the patient's page (2026-10-01, Eric —
+          many patients are seniors). Tailwind sizes are rem, so this scales
+          text, spacing and the photo viewer together. Rendered with the page,
+          so it leaves when they navigate away; the rest of the site is
+          unchanged. */}
+      <style>{'html{font-size:120%}'}</style>
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link href="/">
