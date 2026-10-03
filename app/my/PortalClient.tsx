@@ -180,7 +180,7 @@ const quietBtn = 'text-sm text-brand-600 hover:text-brand-700'
 
 export default function PortalClient({ token }: { token: string }) {
   const [view, setView] = useState<View | null>(null)
-  const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'error'>('loading')
+  const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'busy' | 'error'>('loading')
 
   // 'idle' → 'sending' → 'entering' → unlocked (which lives on `view`)
   const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
@@ -248,7 +248,11 @@ export default function PortalClient({ token }: { token: string }) {
     try {
       // The stored session rides along on the first call, so a trusted device
       // arrives with history already open rather than being asked again.
-      const { ok, data } = await call({ session: readSession(token) })
+      const { ok, status, data } = await call({ session: readSession(token) })
+      // 429 is "too many just now", not "no such page": showing Find your
+      // page for it sent a patient whose link was fine hunting for another
+      // (10-02). Keep what is on screen if there is something.
+      if (status === 429) { setState((s) => (s === 'ok' ? s : 'busy')); return }
       if (!ok) { setState('gone'); return }
       setView(data as View)
       setState('ok')
@@ -264,8 +268,16 @@ export default function PortalClient({ token }: { token: string }) {
   // form they have just signed shows as signed instead of still waiting
   // (2026-09-25).
   useEffect(() => {
-    const onShow = (e: PageTransitionEvent) => { if (e.persisted) load() }
-    const onVisible = () => { if (document.visibilityState === 'visible') load() }
+    // At most every 20 s: flicking between tabs reloaded the page each time,
+    // and each reload counts against the link's hourly allowance.
+    let last = Date.now()
+    const again = () => {
+      if (Date.now() - last < 20_000) return
+      last = Date.now()
+      load()
+    }
+    const onShow = (e: PageTransitionEvent) => { if (e.persisted) again() }
+    const onVisible = () => { if (document.visibilityState === 'visible') again() }
     window.addEventListener('pageshow', onShow)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
@@ -327,6 +339,18 @@ export default function PortalClient({ token }: { token: string }) {
   // use with us — answered on the spot.
   if (state === 'gone') {
     return <FindMyPage />
+  }
+
+  if (state === 'busy') {
+    return (
+      <div className={card}>
+        <h1 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>Please try again in a few minutes</h1>
+        <p className="text-gray-700">
+          Your page has been opened a lot in the last little while, so we are pausing it briefly to keep it
+          safe. Nothing is wrong with your link — try again shortly, or call or text us.
+        </p>
+      </div>
+    )
   }
 
   if (state === 'error' || !view) {
