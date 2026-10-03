@@ -8,6 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FindMyPage from './FindMyPage'
+import PortalTips from './PortalTips'
 import { forgetSession, readSession, writeSession } from './session'
 import BookTreatment from '@/components/BookTreatment'
 import PortalJourney, { portalLoader, type Journey } from './PortalJourney'
@@ -487,6 +488,9 @@ export default function PortalClient({ token }: { token: string }) {
           Sign out
         </button>
       </div>
+
+      {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
+      <PortalTips />
 
       {/* ── Still to do ───────────────────────────────────────────────────
           First when there is anything, because it is the only part of this
