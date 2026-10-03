@@ -40,6 +40,18 @@ export function readSession(token: string): string {
   }
 }
 
+/** Forget this page's sign-in on this device — and the old single key too
+ *  when it holds this same sign-in, or the fallback would sign them back in. */
+export function forgetSession(token: string) {
+  const s = readSession(token)
+  writeSession(token, '')
+  try {
+    if (s && localStorage.getItem(SESSION_KEY) === s) localStorage.removeItem(SESSION_KEY)
+  } catch {
+    /* nothing to forget */
+  }
+}
+
 /** Remember (or, with '', forget) this page's sign-in on this device. */
 export function writeSession(token: string, v: string) {
   try {

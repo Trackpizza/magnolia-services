@@ -8,7 +8,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import FindMyPage from './FindMyPage'
-import { readSession, writeSession } from './session'
+import { forgetSession, readSession, writeSession } from './session'
 import BookTreatment from '@/components/BookTreatment'
 import PortalJourney, { portalLoader, type Journey } from './PortalJourney'
 import PortalShare, { type JourneyShare } from './PortalShare'
@@ -462,10 +462,30 @@ export default function PortalClient({ token }: { token: string }) {
 
   return (
     <div className="space-y-4">
-      <div className="px-1">
+      <div className="px-1 flex items-start justify-between gap-3">
         <h1 className="text-3xl font-semibold text-plum-900" style={heading}>
           Hello{view.firstName ? `, ${view.firstName}` : ''}
         </h1>
+        {/* Sign out (10-02): a shared or borrowed phone should not stay signed
+            in for 90 days. Ends the session on the server too, then this
+            device asks for a code again. */}
+        <button
+          onClick={async () => {
+            const s = readSession(token)
+            try {
+              await call({ action: 'sign-out', session: s })
+            } catch {
+              /* forgotten here regardless */
+            }
+            forgetSession(token)
+            setCode('')
+            setGate('idle')
+            await load()
+          }}
+          className={quietBtn + ' shrink-0 mt-2'}
+        >
+          Sign out
+        </button>
       </div>
 
       {/* ── Still to do ───────────────────────────────────────────────────
