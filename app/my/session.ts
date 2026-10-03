@@ -63,3 +63,16 @@ export function writeSession(token: string, v: string) {
     /* It just asks for a code again next time. */
   }
 }
+
+/** Every sign-in held on this device — for a page that is not the portal
+ *  (the follow-up photo link) to ask whether any of them opens this chart. */
+export function allSessions(): string[] {
+  const out = new Set(Object.values(readMap()).filter(Boolean))
+  try {
+    const legacy = localStorage.getItem(SESSION_KEY)
+    if (legacy) out.add(legacy)
+  } catch {
+    /* none */
+  }
+  return Array.from(out)
+}

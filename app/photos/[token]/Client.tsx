@@ -23,6 +23,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import AngleGuide from './AngleGuide'
+import { allSessions, writeSession } from '../../my/session'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -63,7 +64,25 @@ export default function PhotoRequestClient() {
    *  not re-render, and this decides what the shooting stage draws. Somebody
    *  who only ever picks photos from their library never starts a camera. */
   const [cameraOn, setCameraOn] = useState(false)
+  /** Which camera. The FRONT one by default — they are photographing
+   *  themselves — or the BACK one when a friend or family member is taking
+   *  them (10-03): better camera, and the helper sees the preview. */
+  const [facing, setFacing] = useState<'user' | 'environment'>('user')
   const [uploading, setUploading] = useState(false)
+
+  // ── The ghost: their earlier photo of this angle, at 50%, with a slider ──
+  // The clinic camera's overlay (10-03). Served only to a portal sign-in for
+  // this chart — this link opens without a code, and a ghost would show their
+  // face to anyone it was forwarded to. Signed in on this phone already: it
+  // appears. Otherwise "Show my earlier photo as a guide" sends a code.
+  const [guide, setGuide] = useState<{ slots: string[]; sms: boolean; email: boolean; last4: string } | null>(null)
+  const [guideSession, setGuideSession] = useState('')
+  const [guideUrls, setGuideUrls] = useState<Record<string, string>>({})
+  const [ghost, setGhost] = useState(0.5)
+  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  const [gateCode, setGateCode] = useState('')
+  const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
+  const [gateError, setGateError] = useState('')
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -75,6 +94,82 @@ export default function PhotoRequestClient() {
       body: JSON.stringify({ token, ...payload }),
     })
     return { ok: res.ok, status: res.status, data: await res.json().catch(() => ({})) }
+  }
+
+  // Which angles have an earlier photo, and whether this phone may see them.
+  useEffect(() => {
+    if (!view) return
+    let live = true
+    ;(async () => {
+      const { ok, data } = await post({ action: 'guide', sessions: allSessions() })
+      if (!live || !ok || !Array.isArray(data.slots) || data.slots.length === 0) return
+      setGuide({ slots: data.slots, sms: !!data.sms, email: !!data.email, last4: String(data.last4 ?? '') })
+      setGateChannel(data.sms ? 'sms' : 'email')
+      if (data.session) setGuideSession(String(data.session))
+    })()
+    return () => {
+      live = false
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view])
+
+  // Signed in: fetch each angle's earlier photo once, as a local image.
+  useEffect(() => {
+    if (!guide || !guideSession) return
+    let live = true
+    const made: string[] = []
+    ;(async () => {
+      for (const slot of guide.slots) {
+        try {
+          const res = await fetch(`${API}/api/public/photo-request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, action: 'guide-photo', session: guideSession, slot }),
+          })
+          if (!res.ok) continue
+          const url = URL.createObjectURL(await res.blob())
+          made.push(url)
+          if (live) setGuideUrls((m) => ({ ...m, [slot]: url }))
+        } catch {
+          /* no ghost for that angle — the camera still works */
+        }
+      }
+    })()
+    return () => {
+      live = false
+      made.forEach((u) => URL.revokeObjectURL(u))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [guide, guideSession])
+
+  const sendGuideCode = async (channel = gateChannel) => {
+    setGate('sending')
+    setGateError('')
+    setGateChannel(channel)
+    const { ok } = await post({ action: 'guide-code', channel })
+    if (!ok) {
+      setGateError('We could not send a code just now. You can still take the photos without the guide.')
+      setGate('idle')
+      return
+    }
+    setGate('entering')
+  }
+
+  const checkGuideCode = async () => {
+    setGate('checking')
+    setGateError('')
+    const { ok, data } = await post({ action: 'guide-unlock', channel: gateChannel, code: gateCode })
+    if (!ok || !data.session) {
+      setGateError('That code did not work. Check it and try again, or send a new one.')
+      setGate('entering')
+      return
+    }
+    // Remembered like a portal sign-in, so the next follow-up link opens with
+    // the guide straight away.
+    writeSession(`photo:${token}`, String(data.session))
+    setGuideSession(String(data.session))
+    setGate('idle')
+    setGateCode('')
   }
 
   useEffect(() => {
@@ -119,14 +214,20 @@ export default function PhotoRequestClient() {
     el.play().catch(() => {})
   }, [stage, index])
 
-  const startCamera = async () => {
+  const startCamera = async (face: 'user' | 'environment' = facing) => {
     setMessage('')
+    // Switching cameras: let go of the one that is running first, or some
+    // phones refuse the second.
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+    setFacing(face)
     try {
       streamRef.current = await navigator.mediaDevices.getUserMedia({
         video: {
-          // The FRONT camera: they are photographing themselves, at arm's
+          // FRONT by default: they are photographing themselves, at arm's
           // length, and cannot see a rear-camera preview while they do it.
-          facingMode: { ideal: 'user' },
+          // BACK when somebody else is holding the phone.
+          facingMode: { ideal: face },
           aspectRatio: { ideal: TARGET_RATIO },
           width: { ideal: 1080 },
           height: { ideal: 1920 },
@@ -135,6 +236,13 @@ export default function PhotoRequestClient() {
       })
       setCameraOn(true)
       setStage('shooting')
+      // The <video> is already on screen when switching, so the effect that
+      // attaches a new stream on a stage change will not run — attach here.
+      const el = videoRef.current
+      if (el && streamRef.current) {
+        el.srcObject = streamRef.current
+        el.play().catch(() => {})
+      }
     } catch {
       // Not a dead end any more: there is a file picker underneath this, and
       // a phone that will not give up its camera will still give up its
@@ -346,15 +454,22 @@ export default function PhotoRequestClient() {
               <li key={s}>{s}</li>
             ))}
           </ul>
-          <button onClick={startCamera} className={primary}>
-            Start
+          <button onClick={() => startCamera('user')} className={primary}>
+            Start — I&rsquo;ll take them myself
+          </button>
+          <button
+            onClick={() => startCamera('environment')}
+            className={outline + ' mt-3'}
+          >
+            Someone else is taking them for me
           </button>
           <div className="mt-3">
             {filePicker('Choose photos from your phone', outline)}
           </div>
           <p className="text-xs text-gray-500 mt-3">
             Somewhere bright, with a window in front of you rather than behind, and hold the
-            phone upright.
+            phone upright. A friend or family member using the back camera usually gets the
+            clearest photos.
           </p>
         </>
       )}
@@ -394,11 +509,83 @@ export default function PhotoRequestClient() {
                 muted
                 playsInline
                 className="h-full w-full object-cover"
-                // Mirrored for them only. The captured file is not flipped.
-                style={{ transform: 'scaleX(-1)' }}
+                // Mirrored for the selfie camera only (what people expect to
+                // see). The captured file is never flipped.
+                style={{ transform: facing === 'user' ? 'scaleX(-1)' : 'none' }}
+              />
+            )}
+            {/* The earlier shot of this angle over the live preview, mirrored
+                with it so it lines up with what they see. Never part of the
+                captured photo. */}
+            {stage === 'shooting' && cameraOn && guideUrls[slot] && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={guideUrls[slot]}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                style={{ opacity: ghost, transform: facing === 'user' ? 'scaleX(-1)' : 'none' }}
               />
             )}
           </div>
+
+          {stage === 'shooting' && cameraOn && guideUrls[slot] && (
+            <label className="mb-4 flex items-center gap-3 text-xs text-gray-600">
+              <span className="shrink-0">Earlier photo</span>
+              <input
+                type="range"
+                min={0}
+                max={0.9}
+                step={0.05}
+                value={ghost}
+                onChange={(e) => setGhost(Number(e.target.value))}
+                className="flex-1 accent-brand-600"
+                aria-label="Earlier photo overlay strength"
+              />
+            </label>
+          )}
+
+          {/* Not signed in: offer the guide behind the same code as their page. */}
+          {stage === 'shooting' && guide && !guideSession && (
+            <div className="mb-4 rounded-xl bg-cream-100 px-4 py-3 text-sm text-gray-700">
+              {gate === 'entering' || gate === 'checking' ? (
+                <div className="space-y-2">
+                  <p>
+                    {gateChannel === 'sms'
+                      ? `We texted a code to the mobile ending ${guide.last4}.`
+                      : 'We emailed a code to the address we have for you.'}
+                  </p>
+                  <input
+                    value={gateCode}
+                    onChange={(e) => setGateCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="Code"
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base tracking-widest"
+                  />
+                  <button onClick={checkGuideCode} disabled={gate === 'checking' || gateCode.length < 4} className={primary}>
+                    {gate === 'checking' ? 'Checking…' : 'Show the guide'}
+                  </button>
+                  <button onClick={() => sendGuideCode()} className={quiet}>Send a new code</button>
+                </div>
+              ) : (
+                <>
+                  <p className="mb-2">
+                    Line up with your earlier photo: we show it faintly over the camera so every set
+                    matches. For your privacy we check it is you first.
+                  </p>
+                  <button onClick={() => sendGuideCode()} disabled={gate === 'sending'} className={outline}>
+                    {gate === 'sending' ? 'Sending…' : 'Show my earlier photo as a guide'}
+                  </button>
+                  {guide.sms && guide.email && (
+                    <button onClick={() => sendGuideCode(gateChannel === 'sms' ? 'email' : 'sms')} className={quiet + ' mt-2'}>
+                      {gateChannel === 'sms' ? 'Email me the code instead' : 'Text me the code instead'}
+                    </button>
+                  )}
+                </>
+              )}
+              {gateError && <p className="mt-2 text-plum-900">{gateError}</p>}
+            </div>
+          )}
 
           {stage === 'shooting' && (
             <div className="space-y-3">
@@ -407,8 +594,18 @@ export default function PhotoRequestClient() {
                   Take the photo
                 </button>
               ) : (
-                <button onClick={startCamera} className={primary}>
+                <button onClick={() => startCamera()} className={primary}>
                   Use the camera
+                </button>
+              )}
+              {cameraOn && (
+                <button
+                  onClick={() => startCamera(facing === 'user' ? 'environment' : 'user')}
+                  className={outline}
+                >
+                  {facing === 'user'
+                    ? 'Someone else taking it? Use the back camera'
+                    : 'Taking it yourself? Use the selfie camera'}
                 </button>
               )}
               {filePicker(
