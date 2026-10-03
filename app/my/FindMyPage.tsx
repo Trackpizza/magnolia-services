@@ -96,7 +96,7 @@ export default function FindMyPage() {
         // Logged in already: the code they just read back is the same proof
         // the portal's own login asks for, and sending them to a locked page
         // to do it twice would be two codes to open one page.
-        if (d.session) writeSession(String(d.session))
+        if (d.session) writeSession(String(d.token), String(d.session))
         // A whole navigation rather than a router push: the token belongs in
         // the address bar, so the page they land on is one they can bookmark.
         window.location.href = `/my?t=${encodeURIComponent(String(d.token))}`

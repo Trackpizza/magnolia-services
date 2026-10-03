@@ -203,7 +203,7 @@ export default function PortalClient({ token }: { token: string }) {
     setBusy(action)
     setLinkError('')
     try {
-      const { ok, data } = await call({ action, session: readSession() })
+      const { ok, data } = await call({ action, session: readSession(token) })
       if (!ok || !data.url) {
         setLinkError('We could not open that just now. Please try again, or call or text us.')
         return
@@ -218,7 +218,7 @@ export default function PortalClient({ token }: { token: string }) {
 
   // One loader per session, so the photos' effects do not re-fetch on every
   // render of this page.
-  const session = view && !view.locked ? readSession() : ''
+  const session = view && !view.locked ? readSession(token) : ''
   const photoLoader = useMemo(() => portalLoader(token, session), [token, session])
 
   const [booking, setBooking] = useState(false)
@@ -248,7 +248,7 @@ export default function PortalClient({ token }: { token: string }) {
     try {
       // The stored session rides along on the first call, so a trusted device
       // arrives with history already open rather than being asked again.
-      const { ok, data } = await call({ session: readSession() })
+      const { ok, data } = await call({ session: readSession(token) })
       if (!ok) { setState('gone'); return }
       setView(data as View)
       setState('ok')
@@ -308,7 +308,7 @@ export default function PortalClient({ token }: { token: string }) {
       // which is also exactly what every later visit on this device does, so
       // the logged-in path is the same code as the returning path rather than
       // a second one that can drift.
-      writeSession(String(data.session ?? ''))
+      writeSession(token, String(data.session ?? ''))
       setGate('idle')
       setCode('')
       await load()
@@ -717,7 +717,7 @@ export default function PortalClient({ token }: { token: string }) {
             share={view.journeyShare ?? null}
             load={photoLoader}
             token={token}
-            session={readSession()}
+            session={readSession(token)}
             onChanged={load}
           />
         </Section>
@@ -801,7 +801,7 @@ export default function PortalClient({ token }: { token: string }) {
           plan rather than on a treatment picker. */}
       {booking && (
         <div ref={bookingRef}>
-          <BookTreatment portal={{ token, session: readSession() }} />
+          <BookTreatment portal={{ token, session: readSession(token) }} />
         </div>
       )}
 
