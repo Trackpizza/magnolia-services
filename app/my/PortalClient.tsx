@@ -122,13 +122,47 @@ interface OpenView {
   journeyShare?: JourneyShare
   /** Dr. David's photo consults (Visage Clinical), newest first — the video
    *  links he has sent. Filed on the chart by Visage's onShareForRecords. */
-  photoConsults?: { title: string; url: string; readyAt: string }[]
+  photoConsults?: PhotoConsultVideo[]
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
   history: History | null
 }
 
 type View = LockedView | OpenView
+
+/** One video from Dr. David. `kind` "ai" = AI photo consult (simulations);
+ *  "real" = a journey of their own photos, which can end on AI next-step
+ *  images when they authorized them (`ai`). Older API answers carry neither
+ *  field: treated as the AI consult, which is all there was. */
+interface PhotoConsultVideo {
+  title: string
+  url: string
+  readyAt: string
+  kind?: 'ai' | 'real'
+  ai?: boolean
+}
+
+/** "Photo consult · September 29" / "Your journey · October 2". */
+function videoLabel(v: PhotoConsultVideo): string {
+  const what = v.kind === 'real' ? 'Your journey' : 'Photo consult'
+  return v.readyAt && shortDate(v.readyAt) ? `${what} · ${shortDate(v.readyAt)}` : what
+}
+
+/** What is in it, in a line — the honest part about AI included. */
+function videoNote(v: PhotoConsultVideo): string {
+  if (v.kind === 'real') {
+    return v.ai
+      ? 'Your own photos from your visits. Any image marked AI is a simulation, not a guarantee of results.'
+      : 'Your own photos from your visits.'
+  }
+  return 'What Dr. David sees and would suggest. Includes AI simulations — not a guarantee of results.'
+}
+
+/** The walkthrough's own name, when it says more than the label does. */
+function videoTitle(v: PhotoConsultVideo): string {
+  const t = v.title.trim()
+  return t && !/^photo consult$/i.test(t) ? t : ''
+}
 
 
 /** A form link that knows its way back here: the form page shows "Back to your
@@ -629,30 +663,46 @@ export default function PortalClient({ token }: { token: string }) {
         </Section>
       ))}
 
-      {/* Dr. David's photo consult — the walkthrough he recorded in Visage
-          Clinical from a photo the clinic sent. First among the photo
+      {/* Dr. David's videos — walkthroughs he recorded in Visage Clinical:
+          the AI photo consult and the real-photo journey, in ONE card (to
+          the patient both are "a video from Dr. David"), each labelled. A new
+          video is ADDED, never replaces one: newest first as the big button,
+          older ones dated underneath (10-02, Eric). First among the photo
           sections: it is what the text they just got points at. */}
-      {(view.photoConsults ?? []).length > 0 && (
-        <Section title="Your photo consult" badge={`${view.photoConsults!.length}`}>
-          <p className="text-sm text-gray-600 mb-4">
-            Dr. David&rsquo;s video walkthrough of what he sees and what he would suggest. The images
-            in it are AI simulations to help the conversation — not a guarantee of results.
-          </p>
-          <div className="space-y-2">
-            {view.photoConsults!.map((c) => (
-              <a
-                key={c.url}
-                href={c.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={primaryBtn + ' text-center block'}
-              >
-                ▶ Watch{c.readyAt ? ` — ${shortDate(c.readyAt)}` : ''}
-              </a>
-            ))}
-          </div>
-        </Section>
-      )}
+      {(view.photoConsults ?? []).length > 0 && (() => {
+        const [latest, ...older] = view.photoConsults!
+        return (
+          <Section title="Your videos from Dr. David" badge={`${view.photoConsults!.length}`}>
+            <div className="mb-4">
+              <p className="text-sm font-semibold text-gray-900">{videoLabel(latest)}</p>
+              {videoTitle(latest) && <p className="text-sm text-gray-700">{videoTitle(latest)}</p>}
+              <p className="text-sm text-gray-600 mt-1">{videoNote(latest)}</p>
+            </div>
+            <a href={latest.url} target="_blank" rel="noopener noreferrer" className={primaryBtn + ' text-center block'}>
+              ▶ Watch
+            </a>
+            {older.length > 0 && (
+              <div className="mt-5 pt-4 border-t border-gray-100">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Earlier videos</p>
+                <ul className="divide-y divide-gray-100">
+                  {older.map((v) => (
+                    <li key={v.url} className="py-3 flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-gray-900">{videoLabel(v)}</p>
+                        {videoTitle(v) && <p className="text-sm text-gray-700 truncate">{videoTitle(v)}</p>}
+                        <p className="text-xs text-gray-600 mt-0.5">{videoNote(v)}</p>
+                      </div>
+                      <a href={v.url} target="_blank" rel="noopener noreferrer" className={quietBtn + ' shrink-0 font-semibold'}>
+                        ▶ Watch
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </Section>
+        )
+      })()}
 
       {/* Your progress — their own photos, first & latest or every one. */}
       {view.journey && view.journey.points.length > 0 && (
