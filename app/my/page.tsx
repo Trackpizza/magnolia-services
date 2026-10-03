@@ -19,7 +19,7 @@
  * Noindex AND no-referrer: the URL carries a token, and a token in a query
  * string otherwise rides the Referer header to every third-party asset.
  */
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import PortalClient from './PortalClient'
 
@@ -27,6 +27,17 @@ export const metadata: Metadata = {
   title: 'Your page | Magnolia Skin Center',
   robots: { index: false, follow: false },
   referrer: 'no-referrer',
+  // Installable (10-03): "Add to Home Screen" makes a real app icon. On an
+  // iPhone that matters for staying signed in — Safari erases a site's saved
+  // sign-in after 7 days without a visit, and an installed web app is exempt.
+  // Scoped to /my in the manifest, so the marketing site is NOT an app. No
+  // start_url: the icon opens the page it was added from, token included.
+  manifest: '/portal/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Magnolia', statusBarStyle: 'black-translucent' },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#1a1b1a',
 }
 
 export default async function PortalPage({

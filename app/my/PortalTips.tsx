@@ -11,9 +11,12 @@
  *    that browser keeps its own storage, so the sign-in will not be there
  *    next time. Say so, and how to open it in Safari / Chrome. A page cannot
  *    open Safari itself, so there is a Copy link as well.
- *  - Otherwise, once: "Add this page to your Home Screen". There is no web app
- *    manifest, so on an iPhone the icon opens in Safari and keeps the same
- *    sign-in — one tap, signed in, for 90 days.
+ *  - Otherwise, once: "Add this page to your Home Screen". The page is an
+ *    installable web app (public/portal/manifest.webmanifest), so the icon
+ *    opens it as its own app — exempt from Safari erasing a sign-in after 7
+ *    days without a visit, so it lasts the full 90. The app keeps its OWN
+ *    storage, so they sign in once more inside it; the tip says so. Inside
+ *    the installed app (standalone) no tip shows.
  */
 import { useState } from 'react'
 
@@ -83,9 +86,9 @@ export default function PortalTips() {
       <p className="font-semibold text-plum-900 mb-1">Keep your page one tap away</p>
       <p>
         {env.ios ? (
-          <>Tap the <strong>Share</strong> button (the square with the arrow), then <strong>Add to Home Screen</strong>. You will stay signed in on this phone for 90 days.</>
+          <>Tap the <strong>Share</strong> button (the square with the arrow), then <strong>Add to Home Screen</strong>. Open it from the new Magnolia icon and sign in once more — after that it stays signed in for 90 days.</>
         ) : env.android ? (
-          <>Tap <strong>⋮</strong> at the top, then <strong>Add to Home screen</strong>. You will stay signed in on this phone for 90 days.</>
+          <>Tap <strong>⋮</strong> at the top, then <strong>Add to Home screen</strong> (or <strong>Install app</strong>). Open it from the new Magnolia icon — it stays signed in for 90 days.</>
         ) : (
           <>Bookmark this page — you will stay signed in on this computer for 90 days.</>
         )}
