@@ -107,6 +107,10 @@ interface OpenView {
   plan: PlanItem[]
   consents: ConsentItem[]
   questionnaireNeeded: boolean
+  /** "Has anything changed in your health history?" — sent in the week before
+   *  a booked visit until they answer (records app, lib/healthReview.ts).
+   *  `since` is when it was last reviewed or signed. Absent on older APIs. */
+  healthCheck?: { since: string | null } | null
   bookingUrl: string
   clinicPhone: string
   clinicAddress: string
@@ -459,7 +463,34 @@ export default function PortalClient({ token }: { token: string }) {
     )
   }
 
-  const toDo = view.consents.length + (view.questionnaireNeeded ? 1 : 0)
+  const toDo = view.consents.length + (view.questionnaireNeeded ? 1 : 0) + (view.healthCheck ? 1 : 0)
+
+  // "Has anything changed?" — No records that they were asked and said so;
+  // Yes opens their health history form already filled in (the grant rides
+  // in the #fragment, after ?return=, and is used once by the form page).
+  const answerHealth = async (changed: boolean) => {
+    setBusy(changed ? 'health-update' : 'health-confirm')
+    setLinkError('')
+    try {
+      const { ok, data } = await call({
+        action: changed ? 'health-update' : 'health-confirm',
+        session: readSession(token),
+      })
+      if (!ok || (changed && !data.url)) {
+        setLinkError('We could not do that just now. Please try again, or call or text us.')
+        return
+      }
+      if (changed) {
+        window.location.href = `${withReturn(String(data.url))}${data.grant ? `#g=${data.grant}` : ''}`
+        return
+      }
+      await load()
+    } catch {
+      setLinkError('We could not do that just now. Please try again, or call or text us.')
+    } finally {
+      setBusy('')
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -516,6 +547,35 @@ export default function PortalClient({ token }: { token: string }) {
                 Read and sign: {c.names.join(' · ')}
               </a>
             ))}
+            {view.healthCheck && (
+              <div className="rounded-xl border border-gray-200 p-4">
+                <p className="text-base font-semibold text-gray-900">
+                  Has anything changed in your health history
+                  {view.healthCheck.since && shortDate(view.healthCheck.since)
+                    ? ` since ${shortDate(view.healthCheck.since)}`
+                    : ''}
+                  ?
+                </p>
+                <p className="mt-1 text-sm text-gray-600">
+                  New medications, allergies, conditions, a pregnancy, a procedure — anything at all.
+                </p>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <button onClick={() => answerHealth(false)} disabled={busy !== ''} className={primaryBtn}>
+                    {busy === 'health-confirm' ? 'Saving…' : 'No changes'}
+                  </button>
+                  <button
+                    onClick={() => answerHealth(true)}
+                    disabled={busy !== ''}
+                    className="w-full border border-brand-600 text-brand-700 hover:bg-brand-50 text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50"
+                  >
+                    {busy === 'health-update' ? 'Opening…' : 'Yes, update it'}
+                  </button>
+                </div>
+              </div>
+            )}
+            {linkError && busy === '' && view.healthCheck && (
+              <p className="text-sm text-red-700">{linkError}</p>
+            )}
           </div>
         </Section>
       )}
