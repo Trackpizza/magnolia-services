@@ -40,7 +40,23 @@ function key(slot: string): string {
     .trim();
 }
 
+/**
+ * The clinic's sets since 10-04 name every face angle twice — "Left 35°
+ * Smile" / "Left 35° Non-smile" — and use 35° where they used 45°. The smile
+ * part is said as its own sentence after the turn; the turn is worked out
+ * from the rest. 35° and 45° are both "about halfway" (the older 45° names
+ * are still on photos taken before).
+ */
 export function angleGuide(slot: string): Guide {
+  const nonSmile = /non[\s-]?smil/i.test(slot)
+  const smile = !nonSmile && /smil/i.test(slot)
+  const g = baseGuide(slot.replace(/non[\s-]?smil(e|ing)?|smil(e|ing)/gi, ' '))
+  if (nonSmile) return { ...g, how: `${g.how} Relax your face — no smile.` }
+  if (smile) return { ...g, how: `${g.how} Smile naturally.` }
+  return g
+}
+
+function baseGuide(slot: string): Guide {
   const k = key(slot);
 
   if (k === "front") {
@@ -61,9 +77,15 @@ export function angleGuide(slot: string): Guide {
 
   // Their right side towards the camera means turning towards the LEFT
   // shoulder. See the note at the top of this file before changing it.
-  if (k === "right 45") {
+  if (k === "back of head" || k === "back") {
     return {
-      turn: -45,
+      turn: null,
+      how: "Turn your back to the camera, head level, so we can see the back of your head. This one is easiest with someone else holding the phone.",
+    };
+  }
+  if (k === "right 45" || k === "right 35") {
+    return {
+      turn: k.endsWith("35") ? -35 : -45,
       how: "We need the right side of your face. Turn your head towards your left shoulder, about halfway.",
     };
   }
@@ -73,9 +95,9 @@ export function angleGuide(slot: string): Guide {
       how: "Turn your head towards your left shoulder until you are looking straight sideways — a full profile of your right side.",
     };
   }
-  if (k === "left 45") {
+  if (k === "left 45" || k === "left 35") {
     return {
-      turn: 45,
+      turn: k.endsWith("35") ? 35 : 45,
       how: "We need the left side of your face. Turn your head towards your right shoulder, about halfway.",
     };
   }
