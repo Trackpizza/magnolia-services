@@ -190,7 +190,7 @@ export default function ManageClient({ token }: { token: string }) {
         <h1 className="text-2xl font-semibold text-plum-900 mb-3" style={heading}>Appointment cancelled</h1>
         {view && <p className="text-gray-700 mb-2">{longDate(view.date)} at {to12h(view.start)}</p>}
         <p className="text-sm text-gray-600">Nothing further to do. You can rebook any time.</p>
-        <a href="/bookings" className="inline-block mt-6 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
+        <a href="/booking" className="inline-block mt-6 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
           Book another appointment
         </a>
       </div>

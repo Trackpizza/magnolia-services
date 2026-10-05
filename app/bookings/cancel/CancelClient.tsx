@@ -114,7 +114,7 @@ export default function CancelClient({ token }: { token: string }) {
         <p className="text-sm text-gray-600">
           Nothing further to do. If you would like to rebook, you can do that any time.
         </p>
-        <a href="/bookings"
+        <a href="/booking"
           className="inline-block mt-6 bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
           Book another appointment
         </a>
@@ -134,7 +134,7 @@ export default function CancelClient({ token }: { token: string }) {
         className="w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors disabled:opacity-50">
         {working ? 'Cancelling\u2026' : 'Yes, cancel it'}
       </button>
-      <a href="/bookings" className="block mt-4 text-sm text-brand-600 hover:text-brand-700">
+      <a href="/booking" className="block mt-4 text-sm text-brand-600 hover:text-brand-700">
         No, keep my appointment
       </a>
     </div>

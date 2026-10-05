@@ -322,7 +322,7 @@ export default function ServicesSearch({ categories, bookingUrl, phone }: {
                   ))}
                 </div>
                 <div className="mt-6 text-right">
-                  <Link href="/bookings"
+                  <Link href="/booking"
                     className="text-sm text-brand-600 hover:text-brand-700 transition-colors">
                     Not sure what treatment is right for you? →
                   </Link>

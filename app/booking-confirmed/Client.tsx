@@ -90,7 +90,7 @@ export default function BookingConfirmedClient() {
           Nothing has been charged and the time you picked has been released. You are welcome to
           book again whenever suits you.
         </p>
-        <Link href="/bookings"
+        <Link href="/booking"
           className="inline-block bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-8 py-4 rounded-xl transition-colors">
           Back to booking
         </Link>
@@ -151,7 +151,7 @@ export default function BookingConfirmedClient() {
           Stripe session — a bookmark, a shared link, a stripped query string —
           gets a page with two sentences and nowhere to go. */}
       <WelcomeVideo />
-      <Link href="/bookings" className="inline-block text-brand-600 hover:text-brand-700 underline">
+      <Link href="/booking" className="inline-block text-brand-600 hover:text-brand-700 underline">
         Back to booking
       </Link>
     </div>

@@ -118,7 +118,7 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
           <Link href="/photo-consult" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
             Get a complimentary photo consult
           </Link>
-          <Link href="/bookings" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
+          <Link href="/booking" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
             Book an in-person visit
           </Link>
         </div>

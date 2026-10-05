@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     { url: BASE_URL, lastModified: now, changeFrequency: 'weekly', priority: 1 },
-    { url: `${BASE_URL}/bookings`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/booking`, lastModified: now, changeFrequency: 'monthly', priority: 0.9 },
     // /photo-consult belongs here at launch — it is deliberately absent while the
     // Cloud BAA is outstanding. See app/robots.ts.
     { url: `${BASE_URL}/privacy`, lastModified: now, changeFrequency: 'yearly', priority: 0.3 },

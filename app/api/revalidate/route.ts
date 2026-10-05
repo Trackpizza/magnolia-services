@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   // [slug] guide pages from the CDN so a save shows everywhere on the next request.
   revalidatePath('/', 'layout')
   revalidatePath('/')
-  revalidatePath('/bookings')
+  revalidatePath('/booking')
   // Terms is editable in /admin, so a save has to evict it too — otherwise the
   // clinic changes its cancellation policy and the page keeps serving the old
   // one for up to a minute, which is exactly the page where that matters.
