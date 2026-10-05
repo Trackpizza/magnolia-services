@@ -1,14 +1,17 @@
 /**
- * PREVIEW — what /bookings will look like once the Cloud BAA is signed.
+ * /booking — THE booking page (10-04). The video consult button, plus the
+ * treatment / in-person booking widget.
  *
- * Identical to the real page, with no staging banner, so it can be shown to
- * Eileen as the finished thing. Kept off the index and out of robots.txt, and
- * linked from nowhere.
+ * It was /bookingpreview (hidden) while /bookings had the video call only.
+ * /bookings is on printed material and the Google Business Profile, so it and
+ * /bookingpreview both permanently redirect here (next.config.mjs) — query
+ * strings (?treatment=, ?c=) carry over. /bookings/manage and /bookings/cancel
+ * are separate pages and stay where they are: confirmation emails link them.
  *
- * ⚠️ Bookings made here are REAL — the widget talks to the live API. The master
- * switch (Settings → Scheduler Setup → "Let patients book online") is what
- * decides whether anything can be booked at all; leave it off unless a demo is
- * actually happening. See medspa_records/docs/PATIENT-BOOKING-SPEC.md.
+ * Bookings made here are REAL — the widget talks to the live records API. The
+ * master switch (records Settings → Scheduler Setup → "Let patients book
+ * online") decides whether the widget shows at all; off, this page is the video
+ * consult page it always was. See medspa_records/docs/PATIENT-BOOKING-SPEC.md.
  */
 import type { Metadata } from 'next'
 import Link from 'next/link'
@@ -26,7 +29,7 @@ export const revalidate = 60
 
 export const metadata: Metadata = {
   title: 'Book an Appointment | Magnolia Skin Center',
-  robots: { index: false, follow: false },
+  alternates: { canonical: '/booking' },
   description:
     'Book your complimentary 15-minute video consultation with Magnolia Skin Center in Burbank, CA. Pick a time online and meet our team.',
 }
@@ -51,7 +54,7 @@ const CameraIcon = ({ className }: { className: string }) => (
   </svg>
 )
 
-export default async function BookingPreviewPage() {
+export default async function BookingPage() {
   const links = await getLinks()
   const { mainFooter: f, hours } = links
 
