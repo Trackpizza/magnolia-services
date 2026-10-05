@@ -11,6 +11,22 @@ after-care guides, and book a complimentary video consultation.
 
 ---
 
+## 2026-10-04 — `/booking` is THE booking page
+- `/bookingpreview`'s page moved to **`/booking`** (video consult button +
+  `BookTreatment`, which hides itself while the records app's "Let patients
+  book online" switch is off). Indexed, canonical `/booking`, in the sitemap,
+  revalidated by `/api/revalidate`.
+- **`/bookings`** (printed material + Google Business Profile) and
+  **`/bookingpreview`** → **308 to `/booking`** in `next.config.mjs`, query
+  string kept (`?treatment=`, `?c=`). EXACT paths only: `/bookings/manage` and
+  `/bookings/cancel` are real pages that confirmation emails link — never add
+  a `/bookings/:path*` redirect.
+- Internal links point at `/booking`; records app `PUBLIC_BOOKING_URL` too
+  (records `c5ae156`). Verified live 10-04: both redirects 308, `/booking`
+  200 without noindex, `/bookings/manage` 200.
+- Commits `30f9c6c` (page move only — a git slip), `5ef941d` (redirects +
+  links), `86cf53a` (indexable page).
+
 ## 0. Newest first — 2026-09-16 → 09-20
 
 ### The angle diagram on /photos, and the convention behind it (2026-09-20)
