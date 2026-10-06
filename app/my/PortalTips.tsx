@@ -17,8 +17,31 @@
  *    days without a visit, so it lasts the full 90. The app keeps its OWN
  *    storage, so they sign in once more inside it; the tip says so. Inside
  *    the installed app (standalone) no tip shows.
+ *
+ * Install app (10-06, Eric): Chrome and Edge — on a computer and on Android
+ * — offer a one-click install. The browser announces it with
+ * `beforeinstallprompt`, often BEFORE this tip mounts (the page signs in
+ * first), so it is caught at module load and kept. With it, the tip shows an
+ * **Install app** button; without it (Safari, Firefox, already installed),
+ * the old wording. An installed app on a computer shares the browser's
+ * storage, so it opens already signed in.
  */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+type InstallPrompt = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }> }
+let deferred: InstallPrompt | null = null
+const listeners = new Set<() => void>()
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault() // ours to offer, in words a patient understands
+    deferred = e as InstallPrompt
+    listeners.forEach((f) => f())
+  })
+  window.addEventListener('appinstalled', () => {
+    deferred = null
+    listeners.forEach((f) => f())
+  })
+}
 
 const DISMISS_KEY = 'msc_portal_home_tip_dismissed'
 
@@ -50,6 +73,30 @@ export default function PortalTips() {
     }
   })
   const [copied, setCopied] = useState(false)
+  const [canInstall, setCanInstall] = useState(() => deferred !== null)
+  const [installed, setInstalled] = useState(false)
+  useEffect(() => {
+    const f = () => setCanInstall(deferred !== null)
+    listeners.add(f)
+    f()
+    return () => {
+      listeners.delete(f)
+    }
+  }, [])
+  const install = async () => {
+    const d = deferred
+    if (!d) return
+    deferred = null
+    setCanInstall(false)
+    await d.prompt()
+    const { outcome } = await d.userChoice.catch(() => ({ outcome: 'dismissed' as const }))
+    if (outcome === 'accepted') setInstalled(true)
+    else {
+      // Declined: Chrome may offer again later; keep the button meanwhile.
+      deferred = d
+      setCanInstall(true)
+    }
+  }
 
   const box = 'rounded-2xl border border-brand-100 bg-cream-100 px-5 py-4 text-sm text-gray-700'
 
@@ -81,6 +128,48 @@ export default function PortalTips() {
 
   if (env.standalone || dismissed) return null
 
+  if (installed) {
+    return (
+      <div className={box}>
+        <p className="font-semibold text-plum-900 mb-1">Installed</p>
+        <p>Open it any time from the Magnolia icon — it stays signed in for 90 days.</p>
+      </div>
+    )
+  }
+
+  if (canInstall) {
+    return (
+      <div className={box}>
+        <p className="font-semibold text-plum-900 mb-1">Keep your page one tap away</p>
+        <p>
+          Install it as an app — it gets its own Magnolia icon{env.android ? ' on your home screen' : ' on your computer'} and
+          stays signed in for 90 days.
+        </p>
+        <div className="mt-3 flex items-center gap-4">
+          <button
+            onClick={install}
+            className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
+          >
+            Install app
+          </button>
+          <button
+            onClick={() => {
+              setDismissed(true)
+              try {
+                localStorage.setItem(DISMISS_KEY, '1')
+              } catch {
+                /* shows again next time — harmless */
+              }
+            }}
+            className="text-sm font-semibold text-brand-600 hover:text-brand-700"
+          >
+            Not now
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={box}>
       <p className="font-semibold text-plum-900 mb-1">Keep your page one tap away</p>
@@ -90,7 +179,7 @@ export default function PortalTips() {
         ) : env.android ? (
           <>Tap <strong>⋮</strong> at the top, then <strong>Add to Home screen</strong> (or <strong>Install app</strong>). Open it from the new Magnolia icon — it stays signed in for 90 days.</>
         ) : (
-          <>Bookmark this page — you will stay signed in on this computer for 90 days.</>
+          <>Bookmark this page — you will stay signed in on this computer for 90 days. In Safari on a Mac you can also choose <strong>File → Add to Dock</strong> to make it an app.</>
         )}
       </p>
       <button
