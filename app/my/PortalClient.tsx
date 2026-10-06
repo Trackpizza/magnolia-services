@@ -839,9 +839,10 @@ export default function PortalClient({ token }: { token: string }) {
       {view.photoAuth && !view.photoAuth.signed && (
         <Section title="Your before-and-after photos">
           <p className="text-sm text-gray-600 mb-4">
-            With your permission, we may share your before-and-after photos — on our website,
-            social media or in the clinic — to help others see what is possible. Your full name is
-            never shown without separate permission, and you can withdraw at any time. Entirely
+            With your permission, we may share your before-and-after photos to help others see
+            what is possible. You choose how: privately only (consultations and private links),
+            everywhere including our website and social media, or not at all. Your full name is
+            never shown, and you can change or withdraw your choice at any time. Entirely
             optional, and it makes no difference to your care.
           </p>
           <button onClick={() => openLink('marketing-consent')} disabled={busy !== ''} className={primaryBtn}>
