@@ -23,17 +23,26 @@ import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import PortalClient from './PortalClient'
 
-export const metadata: Metadata = {
-  title: 'Your page | Magnolia Skin Center',
-  robots: { index: false, follow: false },
-  referrer: 'no-referrer',
-  // Installable (10-03): "Add to Home Screen" makes a real app icon. On an
-  // iPhone that matters for staying signed in — Safari erases a site's saved
-  // sign-in after 7 days without a visit, and an installed web app is exempt.
-  // Scoped to /my in the manifest, so the marketing site is NOT an app. No
-  // start_url: the icon opens the page it was added from, token included.
-  manifest: '/portal/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'Magnolia', statusBarStyle: 'black-translucent' },
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ t?: string }>
+}): Promise<Metadata> {
+  const { t } = await searchParams
+  const token = /^[0-9a-f]{32}$/.test(t ?? '') ? t : ''
+  return {
+    title: 'Your page | Magnolia Skin Center',
+    robots: { index: false, follow: false },
+    referrer: 'no-referrer',
+    // Installable (10-03): "Add to Home Screen" makes a real app icon. On an
+    // iPhone that matters for staying signed in — Safari erases a site's saved
+    // sign-in after 7 days without a visit, and an installed web app is exempt.
+    // Scoped to /my, so the marketing site is NOT an app. Per page (10-06):
+    // its start_url is this page, token included — Chrome / Edge only offer
+    // "Install app" when a manifest has one (app/my/manifest/route.ts).
+    manifest: token ? `/my/manifest?t=${token}` : '/portal/manifest.webmanifest',
+    appleWebApp: { capable: true, title: 'Magnolia', statusBarStyle: 'black-translucent' },
+  }
 }
 
 export const viewport: Viewport = {
