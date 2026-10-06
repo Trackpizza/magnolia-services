@@ -298,7 +298,20 @@ export default function PortalClient({ token }: { token: string }) {
     try {
       const { ok, data } = await call({ action: 'code', channel })
       if (!ok) {
-        setGateError('We could not send a code just now. Please call or text us.')
+        // Say WHICH failure (10-06): one message for all three left patients
+        // (and Eric) guessing whether to wait, switch, or call.
+        const err = String(data?.error ?? '')
+        setGateError(
+          err === 'rate_limited'
+            ? 'Too many codes have been sent for this page. Please wait an hour and try again, or call or text us.'
+            : err === 'unavailable'
+              ? channel === 'email'
+                ? 'We do not have an email address for you. Use the text option, or call or text us.'
+                : 'We do not have a mobile number for you. Use the email option, or call or text us.'
+              : channel === 'sms'
+                ? 'We could not text a code just now. Try “email it to me instead”, or call or text us.'
+                : 'We could not send a code just now. Please call or text us.',
+        )
         setGate('idle')
         return
       }

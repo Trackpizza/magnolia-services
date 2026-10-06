@@ -66,7 +66,11 @@ export default function FindMyPage() {
         body: JSON.stringify({ action: 'start', ...contact() }),
       })
       if (!res.ok) {
-        setError('We could not send a code just now. Please call or text us.')
+        setError(
+          res.status === 429
+            ? 'Too many codes have been sent. Please wait an hour and try again, or call or text us.'
+            : 'We could not send a code just now. Please call or text us.',
+        )
         setStep('contact')
         return
       }
