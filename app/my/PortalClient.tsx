@@ -304,6 +304,10 @@ export default function PortalClient({ token }: { token: string }) {
         setGateError(
           err === 'rate_limited'
             ? 'Too many codes have been sent for this page. Please wait an hour and try again, or call or text us.'
+            : err === 'bad_number'
+              ? data?.emailOk
+                ? 'The mobile number we have for you can’t receive texts. Tap “email it to me instead”, and let us know your current number.'
+                : 'The mobile number we have for you can’t receive texts. Please call or text us so we can update it.'
             : err === 'unavailable'
               ? channel === 'email'
                 ? 'We do not have an email address for you. Use the text option, or call or text us.'
