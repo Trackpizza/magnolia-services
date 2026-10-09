@@ -48,6 +48,10 @@ interface Appt {
   treatment: string
   provider: string
   manageUrl: string | null
+  /** "How to prepare" — the records app's tracked link (a click shows the
+   *  clinic it was read), forwarding to this site's pre-treatment guide.
+   *  Null when the treatment has none; absent on older APIs. */
+  prepUrl?: string | null
 }
 
 interface PlanItem {
@@ -70,7 +74,13 @@ interface ConsentItem { names: string[]; url: string }
  *  the records app, so this renders it without interpreting anything. */
 interface PortalLink { label: string; href: string; emoji: string }
 
-interface PastVisit { date: string; treatment: string; provider: string }
+interface PastVisit {
+  date: string
+  treatment: string
+  provider: string
+  /** This site's after-care guide for it, when there is one. */
+  afterCareUrl?: string | null
+}
 interface SignedConsent { names: string[]; signedAt: string | null }
 
 /** An ISO timestamp as a patient would say it. Used for "we have your video
@@ -111,6 +121,9 @@ interface OpenView {
    *  a booked visit until they answer (records app, lib/healthReview.ts).
    *  `since` is when it was last reviewed or signed. Absent on older APIs. */
   healthCheck?: { since: string | null } | null
+  /** The soonest appointment whose preparation has started (inside its lead
+   *  time, 8 days by default) — a line in "Before your next visit". */
+  prepNow?: { treatment: string; date: string; url: string } | null
   bookingUrl: string
   clinicPhone: string
   clinicAddress: string
@@ -480,7 +493,8 @@ export default function PortalClient({ token }: { token: string }) {
     )
   }
 
-  const toDo = view.consents.length + (view.questionnaireNeeded ? 1 : 0) + (view.healthCheck ? 1 : 0)
+  const toDo =
+    view.consents.length + (view.questionnaireNeeded ? 1 : 0) + (view.healthCheck ? 1 : 0) + (view.prepNow ? 1 : 0)
 
   // "Has anything changed?" — No records that they were asked and said so;
   // Yes opens their health history form already filled in (the grant rides
@@ -547,7 +561,9 @@ export default function PortalClient({ token }: { token: string }) {
       {toDo > 0 && (
         <Section title="Before your next visit" badge={`${toDo} to do`} urgent>
           <p className="text-sm text-gray-600 mb-4">
-            A couple of minutes on your phone, and there is nothing to fill in when you arrive.
+            {toDo === 1 && view.prepNow
+              ? 'A few minutes of reading now saves a rescheduled visit.'
+              : 'A couple of minutes on your phone, and there is nothing to fill in when you arrive.'}
           </p>
           <div className="space-y-2">
             {view.questionnaireNeeded && (
@@ -590,6 +606,23 @@ export default function PortalClient({ token }: { token: string }) {
                 </div>
               </div>
             )}
+            {/* Preparation that has already started (10-09) — backs up the
+                reminder email for anyone who never opened it. */}
+            {view.prepNow && (
+              <a
+                href={view.prepNow.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-xl border border-brand-600 p-4 hover:bg-brand-50 transition-colors"
+              >
+                <span className="block text-base font-semibold text-gray-900">
+                  Start preparing for {view.prepNow.treatment} &rarr;
+                </span>
+                <span className="block mt-1 text-sm text-gray-600">
+                  Your visit on {longDate(view.prepNow.date)} — some things need to stop a week or more before.
+                </span>
+              </a>
+            )}
             {linkError && busy === '' && view.healthCheck && (
               <p className="text-sm text-red-700">{linkError}</p>
             )}
@@ -623,11 +656,23 @@ export default function PortalClient({ token }: { token: string }) {
                     over the phone offered no way to move it, which is the one
                     thing this page is opened to do. The records API mints a
                     token for any that lack one when it serves this page. */}
-                {a.manageUrl && (
-                  <a href={a.manageUrl} className="inline-block mt-2 text-sm text-brand-600 hover:text-brand-700">
-                    Reschedule or cancel &rarr;
-                  </a>
-                )}
+                <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
+                  {a.prepUrl && (
+                    <a
+                      href={a.prepUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-brand-600 hover:text-brand-700"
+                    >
+                      How to prepare &rarr;
+                    </a>
+                  )}
+                  {a.manageUrl && (
+                    <a href={a.manageUrl} className="text-sm text-brand-600 hover:text-brand-700">
+                      Reschedule or cancel &rarr;
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -932,7 +977,7 @@ export default function PortalClient({ token }: { token: string }) {
       )}
 
       {view.history && (
-        <Section title="Your treatment history">
+        <Section title="History and aftercare instructions">
 
           {view.history.visits.length === 0 ? (
             <p className="text-sm text-gray-700">Nothing recorded yet — your first visit is still to come.</p>
@@ -943,6 +988,16 @@ export default function PortalClient({ token }: { token: string }) {
                   <span className="min-w-0">
                     <span className="block text-gray-900">{v.treatment}</span>
                     <span className="block text-sm text-gray-600">with {v.provider}</span>
+                    {v.afterCareUrl && (
+                      <a
+                        href={v.afterCareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+                      >
+                        Aftercare instructions &rarr;
+                      </a>
+                    )}
                   </span>
                   <span className="shrink-0 text-sm text-gray-600">{pastDate(v.date)}</span>
                 </li>
