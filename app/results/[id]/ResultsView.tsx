@@ -64,10 +64,12 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
   }, [id])
 
   const book = 'block w-full rounded-xl px-5 py-4 text-center text-base font-semibold transition-colors'
+  /** On every photo: no right-click save, no drag-out (10-10, Eric). */
+  const noSave = { draggable: false, onContextMenu: (e: React.MouseEvent) => e.preventDefault() }
   const img = (src: string | undefined, label: string) => (
     <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-black/40">
       {/* eslint-disable-next-line @next/next/no-img-element -- a blob from the records app */}
-      {src && <img src={src} alt={label} className="h-full w-full object-cover" />}
+      {src && <img src={src} alt={label} {...noSave} className="h-full w-full select-none object-cover [-webkit-touch-callout:none]" />}
       <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2 py-0.5 text-xs font-semibold text-white">{label}</span>
     </div>
   )
@@ -91,6 +93,15 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
             <p className="text-sm text-gray-600 mb-4">
               Clients of Magnolia Skin Center in Burbank who agreed to share their results. Tap a pair to see it larger.
             </p>
+            <div role="note" className="mb-5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <p className="font-semibold">For your review only</p>
+              <p className="mt-1">
+                These photos belong to our clients, who agreed to share them privately with people considering
+                treatment. They are shared with you only to review results with us. Please don&rsquo;t save,
+                screenshot, forward, post or use them for anything else. This private link stops working after
+                30 days.
+              </p>
+            </div>
             <div className="space-y-5">
               {pairs.map((p, i) => (
                 <button key={p.id} onClick={() => setOpen(i)} className="block w-full text-left">
@@ -143,11 +154,14 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
             {(['before', 'after'] as const).map((side) => (
               <div key={side} className="relative flex min-h-0 items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element -- a blob from the records app */}
-                {urls[current.id]?.[side] && <img src={urls[current.id]![side]} alt={side} className="max-h-full max-w-full object-contain" />}
+                {urls[current.id]?.[side] && <img src={urls[current.id]![side]} alt={side} {...noSave} className="max-h-full max-w-full select-none object-contain [-webkit-touch-callout:none]" />}
                 <span className="absolute left-2 top-2 rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-semibold">{side === 'before' ? 'Before' : 'After'}</span>
               </div>
             ))}
           </div>
+          <p className="px-4 pt-2 text-center text-xs text-white/60">
+            For your review only &mdash; please don&rsquo;t save, screenshot or share these photos.
+          </p>
           <div className="flex items-center justify-between px-4 py-3">
             <button disabled={open === 0} onClick={() => setOpen((v) => (v ?? 1) - 1)} className="rounded-lg border border-white/30 px-4 py-2 disabled:opacity-30">‹ Previous</button>
             <button disabled={open === pairs.length - 1} onClick={() => setOpen((v) => (v ?? 0) + 1)} className="rounded-lg border border-white/30 px-4 py-2 disabled:opacity-30">Next ›</button>

@@ -65,4 +65,8 @@ body {
 .portal-dark .text-brand-800,
 .portal-dark .hover\:text-brand-800:hover { color: #9dc2b2; }
 .portal-dark .hover\:bg-brand-600:hover { background-color: #79a090; color: #1a1b1a; }
+/* Amber notices (10-10: the results page's "For your review only"). */
+.portal-dark .bg-amber-50 { background-color: #2e2a1f; }
+.portal-dark .border-amber-300 { border-color: #6b5a2e; }
+.portal-dark .text-amber-900 { color: #e8d5a6; }
 .portal-dark input, .portal-dark select, .portal-dark textarea { background-color: #242524; color: #f2efee; border-color: #474845; }
