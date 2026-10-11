@@ -94,13 +94,16 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
               Clients of Magnolia Skin Center in Burbank who agreed to share their results. Tap a pair to see it larger.
             </p>
             <div role="note" className="mb-5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-              <p className="font-semibold">For your review only</p>
+              <p className="font-semibold">&#9888;&#xFE0F; Private photos &mdash; for your review only</p>
               <p className="mt-1">
                 These photos belong to our clients, who agreed to share them privately with people considering
-                treatment. They are shared with you only to review results with us. Please don&rsquo;t save,
-                screenshot, forward, post or use them for anything else. This private link stops working after
-                30 days.
+                treatment. They are shared with you only to review results with Magnolia Skin Center.
               </p>
+              <p className="mt-2 font-semibold">
+                You may not use these images for any other purpose. Do not save, screenshot, copy, forward, post or
+                publish them.
+              </p>
+              <p className="mt-2">This private link stops working after 30 days.</p>
             </div>
             <div className="space-y-5">
               {pairs.map((p, i) => (
@@ -160,7 +163,7 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
             ))}
           </div>
           <p className="px-4 pt-2 text-center text-xs text-white/60">
-            For your review only &mdash; please don&rsquo;t save, screenshot or share these photos.
+            For your review only &mdash; these images may not be used for any other purpose. Do not save, screenshot or share them.
           </p>
           <div className="flex items-center justify-between px-4 py-3">
             <button disabled={open === 0} onClick={() => setOpen((v) => (v ?? 1) - 1)} className="rounded-lg border border-white/30 px-4 py-2 disabled:opacity-30">‹ Previous</button>
