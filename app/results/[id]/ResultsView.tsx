@@ -22,7 +22,13 @@ const post = (body: Record<string, unknown>) =>
     cache: 'no-store',
   })
 
-export default function ResultsView({ id, videoConsultUrl, phone }: { id: string; videoConsultUrl: string; phone: string }) {
+export default function ResultsView({ id, videoConsultUrl, phone, learnMore }: {
+  id: string
+  videoConsultUrl: string
+  phone: string
+  /** Set in /admin → Before & After Results Page (10-11, Eric). */
+  learnMore: { label: string; url: string }[]
+}) {
   const [pairs, setPairs] = useState<Pair[]>([])
   const [urls, setUrls] = useState<Urls>({})
   const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'error'>('loading')
@@ -74,6 +80,8 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
     </div>
   )
   const current = open !== null ? pairs[open] : null
+  /** Only web links and pages on this site — never javascript: or the like. */
+  const links = learnMore.filter((l) => /^https?:\/\//i.test(l.url) || /^\/(?!\/)/.test(l.url))
 
   return (
     <div className="space-y-4">
@@ -120,6 +128,24 @@ export default function ResultsView({ id, videoConsultUrl, phone }: { id: string
           </>
         )}
       </Section>
+
+      {links.length > 0 && (
+        <Section title="Learn more">
+          <div className="space-y-3">
+            {links.map((l, i) =>
+              l.url.startsWith('/') ? (
+                <Link key={i} href={l.url} className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
+                  {l.label || l.url}
+                </Link>
+              ) : (
+                <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className={`${book} border border-brand-600 text-brand-700 hover:bg-brand-50`}>
+                  {l.label || l.url}
+                </a>
+              ),
+            )}
+          </div>
+        </Section>
+      )}
 
       <Section title="Curious what we&rsquo;d suggest for you?">
         <p className="text-sm text-gray-600 mb-5">

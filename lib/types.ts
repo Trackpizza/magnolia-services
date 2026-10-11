@@ -41,6 +41,7 @@ export interface ServiceLinks {
   afterCareVideoDates: Record<string, string> // id → after-care video upload date for VideoObject
   afterCareContent: Record<string, string> // id → After Care markdown
   hours: Record<DayKey, DayHours>  // business hours → openingHoursSpecification schema
+  resultsLinks?: FooterLink[]  // "Learn more" links on every shared Before & After page (/results/<id>)
 }
 
 export const DEFAULT_LINKS: ServiceLinks = {

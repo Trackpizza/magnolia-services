@@ -47,16 +47,20 @@ function Input({ label, value, onChange, placeholder, hint }: {
   )
 }
 
-function FooterLinksEditor({ links, onAdd, onUpdate, onRemove }: {
+function FooterLinksEditor({ links, onAdd, onUpdate, onRemove, title = 'Footer Links', help, first }: {
   links: { label: string; url: string }[]
   onAdd: () => void
   onUpdate: (i: number, key: 'label' | 'url', val: string) => void
   onRemove: (i: number) => void
+  title?: string
+  help?: string
+  /** No divider above — the editor is the whole section. */
+  first?: boolean
 }) {
   return (
-    <div className="mt-6 pt-6 border-t border-gray-100">
+    <div className={first ? '' : 'mt-6 pt-6 border-t border-gray-100'}>
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-sm font-semibold text-gray-900">Footer Links</h3>
+        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
         <button
           type="button"
           onClick={onAdd}
@@ -65,7 +69,7 @@ function FooterLinksEditor({ links, onAdd, onUpdate, onRemove }: {
           <span className="text-lg leading-none">+</span> Add link
         </button>
       </div>
-      <p className="text-xs text-gray-400 mb-4">Add any links you want in the footer (Instagram, Facebook, TikTok, reviews, etc.). Each needs a name and a URL.</p>
+      <p className="text-xs text-gray-400 mb-4">{help ?? 'Add any links you want in the footer (Instagram, Facebook, TikTok, reviews, etc.). Each needs a name and a URL.'}</p>
 
       {links.length === 0 ? (
         <p className="text-sm text-gray-400 italic">No links yet — click &ldquo;+ Add link&rdquo; to create one.</p>
@@ -199,6 +203,7 @@ export default function AdminPage() {
         hours: Object.fromEntries(
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,
+        resultsLinks: data.resultsLinks ?? [],
       }))
     } else {
       setAuthError('Incorrect password')
@@ -226,6 +231,7 @@ export default function AdminPage() {
         hours: Object.fromEntries(
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,
+        resultsLinks: data.resultsLinks ?? [],
       }))
     }
     setLoading(false)
@@ -265,6 +271,13 @@ export default function AdminPage() {
       ...l,
       [footer]: { ...l[footer], customLinks: l[footer].customLinks.filter((_, idx) => idx !== i) },
     }))
+
+  const addResultsLink = () =>
+    setLinks(l => ({ ...l, resultsLinks: [...(l.resultsLinks ?? []), { label: '', url: '' }] }))
+  const updateResultsLink = (i: number, key: 'label' | 'url', val: string) =>
+    setLinks(l => ({ ...l, resultsLinks: (l.resultsLinks ?? []).map((link, idx) => idx === i ? { ...link, [key]: val } : link) }))
+  const removeResultsLink = (i: number) =>
+    setLinks(l => ({ ...l, resultsLinks: (l.resultsLinks ?? []).filter((_, idx) => idx !== i) }))
 
   const updateServiceFooter = (key: keyof ServiceLinks['serviceFooter'], val: string) =>
     setLinks(l => ({ ...l, serviceFooter: { ...l.serviceFooter, [key]: val } }))
@@ -425,6 +438,26 @@ export default function AdminPage() {
             onAdd={() => addCustomLink('serviceFooter')}
             onUpdate={(i, k, v) => updateCustomLink('serviceFooter', i, k, v)}
             onRemove={i => removeCustomLink('serviceFooter', i)}
+          />
+        </section>
+
+        {/* ── Before & After results page ─────────────────────── */}
+        <section className="bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Before &amp; After Results Page</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Links in a &ldquo;Learn more&rdquo; section on every shared results page (the private Before &amp; After links sent to prospective clients)</p>
+            </div>
+            <SaveButton section="results" onClick={() => save('results', { resultsLinks: (links.resultsLinks ?? []).filter(l => l.url.trim()) })} />
+          </div>
+          <FooterLinksEditor
+            first
+            title="Learn more links"
+            help="Shown in this order, as buttons. Each needs a name and a URL — a full https:// link, or a page on this site such as /services/botox."
+            links={links.resultsLinks ?? []}
+            onAdd={addResultsLink}
+            onUpdate={updateResultsLink}
+            onRemove={removeResultsLink}
           />
         </section>
 

@@ -40,7 +40,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
         </div>
       </header>
       <main className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
-        <ResultsView id={id} videoConsultUrl={links.mainFooter.bookingUrl} phone={links.mainFooter.phone} />
+        <ResultsView id={id} videoConsultUrl={links.mainFooter.bookingUrl} phone={links.mainFooter.phone} learnMore={links.resultsLinks ?? []} />
       </main>
     </div>
   )

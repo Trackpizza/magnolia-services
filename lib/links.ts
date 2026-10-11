@@ -35,6 +35,7 @@ export async function getLinks(): Promise<ServiceLinks> {
       afterCareVideoDates: data.afterCareVideoDates ?? {},
       afterCareContent: data.afterCareContent ?? {},
       hours,
+      resultsLinks: cleanLinks(data.resultsLinks),
     }
   } catch {
     return DEFAULT_LINKS
