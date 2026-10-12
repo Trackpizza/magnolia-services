@@ -25,8 +25,7 @@ import { useParams } from 'next/navigation'
 import AngleGuide from './AngleGuide'
 import { allSessions, writeSession } from '../../my/session'
 
-import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode, toE164 } from '@/lib/phoneSignIn'
-import type { ConfirmationResult } from 'firebase/auth'
+import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
 /** Portrait, because every one of these is a face. */
@@ -81,10 +80,9 @@ export default function PhotoRequestClient() {
   const [guideSession, setGuideSession] = useState('')
   const [guideUrls, setGuideUrls] = useState<Record<string, string>>({})
   const [ghost, setGhost] = useState(0.5)
-  const [gate, setGate] = useState<'idle' | 'phone' | 'sending' | 'entering' | 'checking'>('idle')
-  // Google phone sign-in (10-12, lib/phoneSignIn.ts): the number they type and the pending text.
-  const [gatePhone, setGatePhone] = useState('')
-  const guideConfirm = useRef<ConfirmationResult | null>(null)
+  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  // One-tap Google text (10-12): the records server's handle for the code it sent.
+  const guideHandle = useRef('')
   const [gateCode, setGateCode] = useState('')
   const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
   const [gateError, setGateError] = useState('')
@@ -154,27 +152,22 @@ export default function PhotoRequestClient() {
   const sendGuideCode = async (channel = gateChannel) => {
     setGateError('')
     setGateChannel(channel)
-    // Google: ask for their mobile first (it must end in the chart's last four).
-    if (channel === 'sms' && googleGuide && gate !== 'phone') {
-      setGate('phone')
-      return
-    }
+    // One tap, through Google (10-12): the records server texts the chart's number.
     if (channel === 'sms' && googleGuide) {
-      const e164 = toE164(gatePhone)
-      if (!e164 || e164.slice(-4) !== guide?.phoneLast4) {
-        setGateError(`Please enter the mobile we have for you (it ends in ${guide?.phoneLast4}).`)
-        return
-      }
       setGate('sending')
       try {
-        guideConfirm.current = await sendPhoneCode(e164, 'photos-recaptcha')
+        const recaptchaToken = await robotCheckToken('photos-recaptcha')
+        const { ok, data } = await post({ action: 'guide-code', channel: 'sms', recaptchaToken })
+        if (!ok || !data.handle) throw new Error('We could not text a code just now. You can still take the photos without the guide.')
+        guideHandle.current = String(data.handle)
         setGate('entering')
       } catch (e) {
         setGateError(e instanceof Error ? e.message : 'We could not text a code just now.')
-        setGate('phone')
+        setGate('idle')
       }
       return
     }
+    guideHandle.current = ''
     setGate('sending')
     const { ok } = await post({ action: 'guide-code', channel })
     if (!ok) {
@@ -188,19 +181,10 @@ export default function PhotoRequestClient() {
   const checkGuideCode = async () => {
     setGate('checking')
     setGateError('')
-    let phoneToken = ''
-    if (gateChannel === 'sms' && googleGuide && guideConfirm.current) {
-      try {
-        phoneToken = await confirmPhoneCode(guideConfirm.current, gateCode)
-      } catch (e) {
-        setGateError(e instanceof Error ? e.message : 'That code did not work.')
-        setGate('entering')
-        return
-      }
-    }
+    const handle = gateChannel === 'sms' ? guideHandle.current : ''
     const { ok, data } = await post(
-      phoneToken
-        ? { action: 'guide-unlock', channel: 'sms', phoneToken }
+      handle
+        ? { action: 'guide-unlock', channel: 'sms', handle, code: gateCode }
         : { action: 'guide-unlock', channel: gateChannel, code: gateCode },
     )
     if (!ok || !data.session) {
@@ -593,26 +577,7 @@ export default function PhotoRequestClient() {
             <div className="mb-4 rounded-xl bg-cream-100 px-4 py-3 text-sm text-gray-700">
               {/* The invisible "not a robot" check for Google's texted code. */}
               <div id="photos-recaptcha" />
-              {gate === 'phone' || (gate === 'sending' && gateChannel === 'sms' && googleGuide) ? (
-                <div className="space-y-2">
-                  <label className="block">
-                    Your mobile number <span className="text-gray-600">(ends in {guide.phoneLast4})</span>
-                    <input
-                      value={gatePhone}
-                      onChange={(e) => setGatePhone(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
-                      inputMode="tel"
-                      autoComplete="tel"
-                      placeholder="Type your mobile number"
-                      autoFocus
-                      className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base"
-                    />
-                  </label>
-                  <button onClick={() => sendGuideCode('sms')} disabled={gate === 'sending'} className={primary}>
-                    {gate === 'sending' ? 'Sending…' : 'Text me the code'}
-                  </button>
-                  <button onClick={() => { setGate('idle'); setGateError('') }} className={quiet}>Back</button>
-                </div>
-              ) : gate === 'entering' || gate === 'checking' ? (
+              {gate === 'entering' || gate === 'checking' ? (
                 <div className="space-y-2">
                   <p>
                     {gateChannel === 'sms'
@@ -630,7 +595,7 @@ export default function PhotoRequestClient() {
                   <button onClick={checkGuideCode} disabled={gate === 'checking' || gateCode.length < 4} className={primary}>
                     {gate === 'checking' ? 'Checking…' : 'Show the guide'}
                   </button>
-                  <button onClick={() => (gateChannel === 'sms' && googleGuide ? setGate('phone') : sendGuideCode())} className={quiet}>Send a new code</button>
+                  <button onClick={() => sendGuideCode()} className={quiet}>Send a new code</button>
                 </div>
               ) : (
                 <>

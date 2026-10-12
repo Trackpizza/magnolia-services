@@ -50,6 +50,24 @@ function resetVerifier() {
   verifier = null
 }
 
+/** Only the invisible "not a robot" check (10-12, one-tap portal and photo
+ *  page): its token goes to the records server, which texts the number ON THE
+ *  CHART itself (records lib/googleSms.ts) — so the patient types nothing and
+ *  the number never comes to the browser. */
+export async function robotCheckToken(containerId: string): Promise<string> {
+  if (!phoneSignInConfigured) throw new Error('Text codes are not available just now. Please use email, or call us.')
+  resetVerifier()
+  try {
+    verifier = new RecaptchaVerifier(auth(), containerId, { size: 'invisible' })
+    const token = await verifier.verify()
+    resetVerifier()
+    return token
+  } catch (e) {
+    resetVerifier()
+    throw new Error(friendlyError(e))
+  }
+}
+
 /** Text a code. `containerId`: an empty element on the page for the invisible
  *  "not a robot" check. */
 export async function sendPhoneCode(phone: string, containerId: string): Promise<ConfirmationResult> {

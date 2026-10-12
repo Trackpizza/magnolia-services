@@ -16,8 +16,7 @@ import PortalShare, { type JourneyShare } from './PortalShare'
 import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
 import AgreeBox from './AgreeBox'
-import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode, toE164 } from '@/lib/phoneSignIn'
-import type { ConfirmationResult } from 'firebase/auth'
+import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -225,10 +224,9 @@ export default function PortalClient({ token, learnMore = [] }: {
   const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'busy' | 'error'>('loading')
 
   // 'idle' → 'sending' → 'entering' → unlocked (which lives on `view`)
-  const [gate, setGate] = useState<'idle' | 'phone' | 'sending' | 'entering' | 'checking'>('idle')
-  // Google phone sign-in (10-12): the number they type, and the pending text.
-  const [phoneInput, setPhoneInput] = useState('')
-  const confirmRef = useRef<ConfirmationResult | null>(null)
+  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  // One-tap Google text (10-12): the server's handle for the code it sent.
+  const smsHandle = useRef('')
   const [code, setCode] = useState('')
   const [last4, setLast4] = useState('')
   const [sentTo, setSentTo] = useState('')
@@ -336,6 +334,7 @@ export default function PortalClient({ token, learnMore = [] }: {
   }, [load])
 
   const sendCode = async (channel: 'sms' | 'email' = gateChannel) => {
+    smsHandle.current = ''
     setGate('sending')
     setGateError('')
     setGateChannel(channel)
@@ -372,26 +371,34 @@ export default function PortalClient({ token, learnMore = [] }: {
     }
   }
 
-  // Texted code through Google (10-12, lib/phoneSignIn.ts). The number they
-  // type must end in the chart's last four — checked here so a typo never
-  // texts a stranger, and again on the server against the whole number.
-  const textCode = async (last4Wanted: string) => {
+  // One tap, through Google (10-12): the browser proves it is not a robot,
+  // the records server texts the number ON THE CHART (lib/googleSms.ts there).
+  // Nothing to type; the number never comes to this page.
+  const textCode = async () => {
+    setGate('sending')
     setGateError('')
     setGateChannel('sms')
-    const e164 = toE164(phoneInput)
-    if (!e164) { setGateError('Please enter your 10-digit mobile number.'); return }
-    if (e164.slice(-4) !== last4Wanted) {
-      setGateError(`That isn’t the mobile we have for you (ours ends in ${last4Wanted}). Use email instead, or call or text us.`)
-      return
-    }
-    setGate('sending')
     try {
-      confirmRef.current = await sendPhoneCode(e164, 'portal-recaptcha')
-      setLast4(last4Wanted)
+      const recaptchaToken = await robotCheckToken('portal-recaptcha')
+      const { ok, data } = await call({ action: 'code', channel: 'sms', recaptchaToken })
+      if (!ok || !data.handle) {
+        const reason = String(data?.reason ?? '')
+        setGateError(
+          reason === 'quota'
+            ? 'Text codes are paused for today. Please use email, or call or text us.'
+            : reason === 'bad_number'
+              ? 'The mobile we have for you can’t receive texts. Use email instead, and let us know your current number.'
+              : `We could not text a code just now. Please use email, or call or text us.${data?.detail ? ` (${data.detail})` : ''}`,
+        )
+        setGate('idle')
+        return
+      }
+      smsHandle.current = String(data.handle)
+      setLast4(String(data.last4 ?? ''))
       setGate('entering')
     } catch (e) {
       setGateError(e instanceof Error ? e.message : 'We could not text a code just now.')
-      setGate('phone')
+      setGate('idle')
     }
   }
 
@@ -399,20 +406,11 @@ export default function PortalClient({ token, learnMore = [] }: {
     setGate('checking')
     setGateError('')
     try {
-      // Google path: the code is checked by Google here, and the proof goes on.
-      let phoneToken = ''
-      if (gateChannel === 'sms' && confirmRef.current) {
-        try {
-          phoneToken = await confirmPhoneCode(confirmRef.current, code)
-        } catch (e) {
-          setGateError(e instanceof Error ? e.message : 'That code did not work.')
-          setGate('entering')
-          return
-        }
-      }
+      // A one-tap Google text: the server checks the code with Google.
+      const handle = gateChannel === 'sms' ? smsHandle.current : ''
       const { ok, data } = await call(
-        phoneToken
-          ? { action: 'unlock', phoneToken, channel: 'sms', agreeTerms: agree }
+        handle
+          ? { action: 'unlock', handle, code, channel: 'sms', agreeTerms: agree }
           : { action: 'unlock', code, channel: gateChannel, agreeTerms: agree },
       )
       if (!ok) {
@@ -478,9 +476,7 @@ export default function PortalClient({ token, learnMore = [] }: {
     const googleSms = phoneSignInConfigured && !!view.phoneLast4
     const canSms = googleSms || view.channels.sms
     const canEmail = view.channels.email
-    const startSms = () => {
-      if (googleSms) { setGateError(''); setGateChannel('sms'); setGate('phone') } else sendCode('sms')
-    }
+    const startSms = () => (googleSms ? textCode() : sendCode('sms'))
     return (
       <div className={card}>
         <h1 className="text-2xl font-semibold text-plum-900 mb-2" style={heading}>
@@ -496,33 +492,7 @@ export default function PortalClient({ token, learnMore = [] }: {
         {/* The invisible "not a robot" check for Google's texted code. */}
         <div id="portal-recaptcha" />
 
-        {gate === 'phone' || (gate === 'sending' && gateChannel === 'sms' && googleSms) ? (
-          <div className="space-y-3">
-            <label className="block text-sm font-medium text-gray-900">
-              Your mobile number <span className="font-normal text-gray-600">(ends in {view.phoneLast4})</span>
-              <input
-                value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
-                inputMode="tel"
-                autoComplete="tel"
-                placeholder="Type your mobile number"
-                autoFocus
-                className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 text-lg"
-              />
-            </label>
-            <button onClick={() => textCode(view.phoneLast4 ?? '')} disabled={gate === 'sending'} className={primaryBtn}>
-              {gate === 'sending' ? 'Sending…' : 'Text me the code'}
-            </button>
-            <div className="flex flex-wrap gap-4">
-              {canEmail && (
-                <button onClick={() => sendCode('email')} disabled={gate === 'sending'} className={quietBtn}>
-                  Email it to me instead
-                </button>
-              )}
-              <button onClick={() => { setGate('idle'); setGateError('') }} className={quietBtn}>Back</button>
-            </div>
-          </div>
-        ) : gate === 'entering' || gate === 'checking' ? (
+        {gate === 'entering' || gate === 'checking' ? (
           <div className="space-y-3">
             <p className="text-sm text-gray-700">
               {gateChannel === 'email' ? (
@@ -544,7 +514,7 @@ export default function PortalClient({ token, learnMore = [] }: {
               {gate === 'checking' ? 'Checking…' : 'Open my page'}
             </button>
             <div className="flex flex-wrap gap-4">
-              <button onClick={() => (gateChannel === 'sms' && googleSms ? setGate('phone') : sendCode())} disabled={gate === 'checking'} className={quietBtn}>
+              <button onClick={() => (gateChannel === 'sms' && googleSms ? textCode() : sendCode())} disabled={gate === 'checking'} className={quietBtn}>
                 Send a new code
               </button>
               {gateChannel === 'sms' && canEmail && (
