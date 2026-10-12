@@ -36,13 +36,25 @@ env:
     availability:
       - BUILD
       - RUNTIME
-  # Google phone sign-in (10-12, lib/phoneSignIn.ts) — OFF until the records
-  # project's console steps are done (Phone provider on, this site an
-  # authorized domain, SMS region US, daily cap). Turn ON by restoring these
-  # three variables (records project's PUBLIC web config, also in its bundle):
-  #   NEXT_PUBLIC_RECORDS_FIREBASE_API_KEY = AIzaSyBjtb4AufcGSS0MMydTB-a5SsIPQvzFhy4
-  #   NEXT_PUBLIC_RECORDS_FIREBASE_AUTH_DOMAIN = medspa-reports.firebaseapp.com
-  #   NEXT_PUBLIC_RECORDS_FIREBASE_PROJECT_ID = medspa-reports
-  # Without them every texted code still goes through Twilio, as before.
+  # Google phone sign-in (10-12, lib/phoneSignIn.ts) — ON since 10-12, after
+  # the records console steps (Phone provider, this site an authorized domain,
+  # SMS region US, "Send Verification Code per day" = 100). The RECORDS
+  # project's public web config — the same values ship in its own bundle.
+  # Remove these three to fall back to Twilio.
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_API_KEY
+    value: AIzaSyBjtb4AufcGSS0MMydTB-a5SsIPQvzFhy4
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_AUTH_DOMAIN
+    value: medspa-reports.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_PROJECT_ID
+    value: medspa-reports
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: NEXT_PUBLIC_APP_URL
     value: https://magnolia-services--magnolia-services.us-central1.hosted.app
