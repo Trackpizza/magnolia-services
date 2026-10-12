@@ -602,11 +602,12 @@ export default function PhotoRequestClient() {
                       onChange={(e) => setGatePhone(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
                       inputMode="tel"
                       autoComplete="tel"
-                      placeholder="(555) 111-7777"
+                      placeholder="Type your mobile number"
+                      autoFocus
                       className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base"
                     />
                   </label>
-                  <button onClick={() => sendGuideCode('sms')} disabled={gate === 'sending' || !toE164(gatePhone)} className={primary}>
+                  <button onClick={() => sendGuideCode('sms')} disabled={gate === 'sending'} className={primary}>
                     {gate === 'sending' ? 'Sending…' : 'Text me the code'}
                   </button>
                   <button onClick={() => { setGate('idle'); setGateError('') }} className={quiet}>Back</button>

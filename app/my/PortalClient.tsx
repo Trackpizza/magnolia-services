@@ -505,11 +505,12 @@ export default function PortalClient({ token, learnMore = [] }: {
                 onChange={(e) => setPhoneInput(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
                 inputMode="tel"
                 autoComplete="tel"
-                placeholder="(555) 111-7777"
+                placeholder="Type your mobile number"
+                autoFocus
                 className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 text-lg"
               />
             </label>
-            <button onClick={() => textCode(view.phoneLast4 ?? '')} disabled={gate === 'sending' || toE164(phoneInput) === ''} className={primaryBtn}>
+            <button onClick={() => textCode(view.phoneLast4 ?? '')} disabled={gate === 'sending'} className={primaryBtn}>
               {gate === 'sending' ? 'Sending…' : 'Text me the code'}
             </button>
             <div className="flex flex-wrap gap-4">
