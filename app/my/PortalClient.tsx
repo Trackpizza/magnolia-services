@@ -16,6 +16,8 @@ import PortalShare, { type JourneyShare } from './PortalShare'
 import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
 import AgreeBox from './AgreeBox'
+import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode, toE164 } from '@/lib/phoneSignIn'
+import type { ConfirmationResult } from 'firebase/auth'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -106,6 +108,9 @@ interface LockedView {
   locked: true
   /** Offering a button the API answers 503 to is worse than offering nothing. */
   channels: { sms: boolean; email: boolean }
+  /** Last four of the chart's mobile — Google phone sign-in (10-12): the
+   *  patient types their number and it must end in these. */
+  phoneLast4?: string
   clinicPhone: string
   /** Public documents. They belong on the login screen too — the privacy
    *  policy should not sit behind the login it describes. */
@@ -220,7 +225,10 @@ export default function PortalClient({ token, learnMore = [] }: {
   const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'busy' | 'error'>('loading')
 
   // 'idle' → 'sending' → 'entering' → unlocked (which lives on `view`)
-  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  const [gate, setGate] = useState<'idle' | 'phone' | 'sending' | 'entering' | 'checking'>('idle')
+  // Google phone sign-in (10-12): the number they type, and the pending text.
+  const [phoneInput, setPhoneInput] = useState('')
+  const confirmRef = useRef<ConfirmationResult | null>(null)
   const [code, setCode] = useState('')
   const [last4, setLast4] = useState('')
   const [sentTo, setSentTo] = useState('')
@@ -364,11 +372,49 @@ export default function PortalClient({ token, learnMore = [] }: {
     }
   }
 
+  // Texted code through Google (10-12, lib/phoneSignIn.ts). The number they
+  // type must end in the chart's last four — checked here so a typo never
+  // texts a stranger, and again on the server against the whole number.
+  const textCode = async (last4Wanted: string) => {
+    setGateError('')
+    setGateChannel('sms')
+    const e164 = toE164(phoneInput)
+    if (!e164) { setGateError('Please enter your 10-digit mobile number.'); return }
+    if (e164.slice(-4) !== last4Wanted) {
+      setGateError(`That isn’t the mobile we have for you (ours ends in ${last4Wanted}). Use email instead, or call or text us.`)
+      return
+    }
+    setGate('sending')
+    try {
+      confirmRef.current = await sendPhoneCode(e164, 'portal-recaptcha')
+      setLast4(last4Wanted)
+      setGate('entering')
+    } catch (e) {
+      setGateError(e instanceof Error ? e.message : 'We could not text a code just now.')
+      setGate('phone')
+    }
+  }
+
   const unlock = async () => {
     setGate('checking')
     setGateError('')
     try {
-      const { ok, data } = await call({ action: 'unlock', code, channel: gateChannel, agreeTerms: agree })
+      // Google path: the code is checked by Google here, and the proof goes on.
+      let phoneToken = ''
+      if (gateChannel === 'sms' && confirmRef.current) {
+        try {
+          phoneToken = await confirmPhoneCode(confirmRef.current, code)
+        } catch (e) {
+          setGateError(e instanceof Error ? e.message : 'That code did not work.')
+          setGate('entering')
+          return
+        }
+      }
+      const { ok, data } = await call(
+        phoneToken
+          ? { action: 'unlock', phoneToken, channel: 'sms', agreeTerms: agree }
+          : { action: 'unlock', code, channel: gateChannel, agreeTerms: agree },
+      )
       if (!ok) {
         setGateError('That code did not work. Check it and try again, or send a new one.')
         setGate('entering')
@@ -427,8 +473,14 @@ export default function PortalClient({ token, learnMore = [] }: {
   // This is the whole portal now, not a second gate on one section. The page
   // below never renders for somebody who has only got hold of a link.
   if (view.locked) {
-    const canSms = view.channels.sms
+    // Google phone sign-in when the chart has a mobile (10-12); the old
+    // Twilio send only if this build has no Google config.
+    const googleSms = phoneSignInConfigured && !!view.phoneLast4
+    const canSms = googleSms || view.channels.sms
     const canEmail = view.channels.email
+    const startSms = () => {
+      if (googleSms) { setGateError(''); setGateChannel('sms'); setGate('phone') } else sendCode('sms')
+    }
     return (
       <div className={card}>
         <h1 className="text-2xl font-semibold text-plum-900 mb-2" style={heading}>
@@ -439,10 +491,37 @@ export default function PortalClient({ token, learnMore = [] }: {
         <p className="text-sm text-gray-600 mb-5">
           Your treatment plan, your appointments and anything still to sign are inside. To
           keep them private we send a code first, to the number or address we already have
-          for you — there is nothing to type.
+          for you.
         </p>
+        {/* The invisible "not a robot" check for Google's texted code. */}
+        <div id="portal-recaptcha" />
 
-        {gate === 'entering' || gate === 'checking' ? (
+        {gate === 'phone' || (gate === 'sending' && gateChannel === 'sms' && googleSms) ? (
+          <div className="space-y-3">
+            <label className="block text-sm font-medium text-gray-900">
+              Your mobile number <span className="font-normal text-gray-600">(ends in {view.phoneLast4})</span>
+              <input
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="(555) 111-7777"
+                className="mt-1 w-full rounded-xl border border-gray-300 px-4 py-3 text-lg"
+              />
+            </label>
+            <button onClick={() => textCode(view.phoneLast4 ?? '')} disabled={gate === 'sending' || toE164(phoneInput) === ''} className={primaryBtn}>
+              {gate === 'sending' ? 'Sending…' : 'Text me the code'}
+            </button>
+            <div className="flex flex-wrap gap-4">
+              {canEmail && (
+                <button onClick={() => sendCode('email')} disabled={gate === 'sending'} className={quietBtn}>
+                  Email it to me instead
+                </button>
+              )}
+              <button onClick={() => { setGate('idle'); setGateError('') }} className={quietBtn}>Back</button>
+            </div>
+          </div>
+        ) : gate === 'entering' || gate === 'checking' ? (
           <div className="space-y-3">
             <p className="text-sm text-gray-700">
               {gateChannel === 'email' ? (
@@ -464,7 +543,7 @@ export default function PortalClient({ token, learnMore = [] }: {
               {gate === 'checking' ? 'Checking…' : 'Open my page'}
             </button>
             <div className="flex flex-wrap gap-4">
-              <button onClick={() => sendCode()} disabled={gate === 'checking'} className={quietBtn}>
+              <button onClick={() => (gateChannel === 'sms' && googleSms ? setGate('phone') : sendCode())} disabled={gate === 'checking'} className={quietBtn}>
                 Send a new code
               </button>
               {gateChannel === 'sms' && canEmail && (
@@ -481,7 +560,7 @@ export default function PortalClient({ token, learnMore = [] }: {
                 code to the same inbox would put the door and its key in one
                 place. */}
             {canSms && (
-              <button onClick={() => sendCode('sms')} disabled={gate === 'sending'} className={primaryBtn}>
+              <button onClick={startSms} disabled={gate === 'sending'} className={primaryBtn}>
                 {gate === 'sending' ? 'Sending…' : 'Text me a code'}
               </button>
             )}

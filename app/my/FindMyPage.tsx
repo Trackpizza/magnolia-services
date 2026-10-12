@@ -14,9 +14,11 @@
  * mobile both end in the same place — so what it says there is "we could not
  * match that to a single page", which is true of both and gives away neither.
  */
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { writeSession } from './session'
 import AgreeBox from './AgreeBox'
+import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode } from '@/lib/phoneSignIn'
+import type { ConfirmationResult } from 'firebase/auth'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -59,9 +61,23 @@ export default function FindMyPage() {
   const contact = () =>
     channel === 'email' ? { channel: 'email', email: email.trim() } : { phone: digits }
 
+  // Google phone sign-in (10-12, lib/phoneSignIn.ts) for texts; email as before.
+  const google = channel === 'sms' && phoneSignInConfigured
+  const confirmRef = useRef<ConfirmationResult | null>(null)
+
   const send = async () => {
     setStep('sending')
     setError('')
+    if (google) {
+      try {
+        confirmRef.current = await sendPhoneCode(digits, 'findme-recaptcha')
+        setStep('code')
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'We could not text a code just now.')
+        setStep('contact')
+      }
+      return
+    }
     try {
       const res = await fetch(`${API}/api/public/findme`, {
         method: 'POST',
@@ -87,11 +103,25 @@ export default function FindMyPage() {
   const check = async () => {
     setStep('checking')
     setError('')
+    let phoneToken = ''
+    if (google && confirmRef.current) {
+      try {
+        phoneToken = await confirmPhoneCode(confirmRef.current, code)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'That code did not work.')
+        setStep('code')
+        return
+      }
+    }
     try {
       const res = await fetch(`${API}/api/public/findme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', ...contact(), code, agreeTerms: agree }),
+        body: JSON.stringify(
+          phoneToken
+            ? { action: 'check', phone: digits, phoneToken, agreeTerms: agree }
+            : { action: 'check', ...contact(), code, agreeTerms: agree },
+        ),
       })
       const d = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -127,6 +157,8 @@ export default function FindMyPage() {
   return (
     <div className={card}>
       <h1 className="text-2xl font-semibold text-plum-900 mb-2">Find your page</h1>
+      {/* The invisible "not a robot" check for Google's texted code. */}
+      <div id="findme-recaptcha" />
       <p className="text-sm text-gray-600 mb-5">
         Your page lives at a link we sent you. Lost it? Give us the mobile or email you use
         with us and we will send a code to check it is you.

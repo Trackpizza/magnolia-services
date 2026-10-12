@@ -15,6 +15,8 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import BookingConfirmed from '@/components/BookingConfirmed'
+import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode } from '@/lib/phoneSignIn'
+import type { ConfirmationResult } from 'firebase/auth'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -116,9 +118,23 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
   const idTarget = idChannel === 'email' ? idEmail.trim() : idPhone.replace(/\D/g, '')
   const idReady = idChannel === 'email' ? EMAIL_RE.test(idEmail.trim()) : idTarget.length === 10
 
+  // Google phone sign-in (10-12, lib/phoneSignIn.ts) for texted codes.
+  const idConfirm = useRef<ConfirmationResult | null>(null)
+  const idGoogle = idChannel === 'sms' && phoneSignInConfigured
+
   const idSend = async () => {
     setIdStep('sending')
     setIdError('')
+    if (idGoogle) {
+      try {
+        idConfirm.current = await sendPhoneCode(idTarget, 'book-recaptcha')
+        setIdStep('code')
+      } catch (e) {
+        setIdError(e instanceof Error ? e.message : 'We could not text a code just now. Please fill the form in.')
+        setIdStep('phone')
+      }
+      return
+    }
     try {
       const res = await fetch(`${API}/api/public/identify`, {
         method: 'POST',
@@ -148,6 +164,16 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
   const idCheck = async () => {
     setIdStep('checking')
     setIdError('')
+    let phoneToken = ''
+    if (idGoogle && idConfirm.current) {
+      try {
+        phoneToken = await confirmPhoneCode(idConfirm.current, idCode)
+      } catch (e) {
+        setIdError(e instanceof Error ? e.message : 'That code did not work.')
+        setIdStep('code')
+        return
+      }
+    }
     try {
       const res = await fetch(`${API}/api/public/identify`, {
         method: 'POST',
@@ -155,7 +181,9 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
         body: JSON.stringify(
           idChannel === 'email'
             ? { action: 'check', channel: 'email', email: idTarget, code: idCode }
-            : { action: 'check', phone: idTarget, code: idCode },
+            : phoneToken
+              ? { action: 'check', phone: idTarget, phoneToken }
+              : { action: 'check', phone: idTarget, code: idCode },
         ),
       })
       const d = await res.json().catch(() => ({}))
@@ -335,9 +363,23 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
   /** Ask the records API to text a code. Failing here BLOCKS the booking:
    *  letting it through when the code could not be sent would mean verification
    *  quietly stops happening and nothing says so. */
+  const bookConfirm = useRef<ConfirmationResult | null>(null)
   const sendCode = async (opts?: { silent?: boolean }) => {
     setLoading(true)
     if (!opts?.silent) setError(null)
+    // Google phone sign-in (10-12): Google texts the code; no Twilio.
+    if (phoneSignInConfigured) {
+      try {
+        bookConfirm.current = await sendPhoneCode(digits, 'book-recaptcha')
+        setStep('verify')
+        return true
+      } catch (e) {
+        setError(`${e instanceof Error ? e.message : 'We could not text you a code just now.'} Your booking was not taken yet.`)
+        return false
+      } finally {
+        setLoading(false)
+      }
+    }
     try {
       const res = await fetch(`${API}/api/public/verify/start`, {
         method: 'POST',
@@ -364,11 +406,21 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
   const verifyAndBook = async () => {
     setLoading(true)
     setError(null)
+    let phoneToken = ''
+    if (phoneSignInConfigured && bookConfirm.current) {
+      try {
+        phoneToken = await confirmPhoneCode(bookConfirm.current, code)
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'That code did not match. Check the text and try again.')
+        setLoading(false)
+        return
+      }
+    }
     try {
       const res = await fetch(`${API}/api/public/verify/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: digits, code: code.replace(/\D/g, '') }),
+        body: JSON.stringify(phoneToken ? { phoneToken } : { phone: digits, code: code.replace(/\D/g, '') }),
       })
       const d = await res.json()
       if (!res.ok) {
@@ -548,6 +600,8 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
 
   return (
     <div ref={cardRef} className={card}>
+      {/* The invisible "not a robot" check for Google's texted codes (10-12). */}
+      <div id="book-recaptcha" />
       <div className="flex items-start justify-between gap-4 mb-6">
         <h2 className="text-2xl font-semibold text-plum-900" style={heading}>
           Book a service or in-person consult

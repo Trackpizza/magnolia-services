@@ -25,6 +25,8 @@ import { useParams } from 'next/navigation'
 import AngleGuide from './AngleGuide'
 import { allSessions, writeSession } from '../../my/session'
 
+import { confirmPhoneCode, phoneSignInConfigured, sendPhoneCode, toE164 } from '@/lib/phoneSignIn'
+import type { ConfirmationResult } from 'firebase/auth'
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
 /** Portrait, because every one of these is a face. */
@@ -75,11 +77,14 @@ export default function PhotoRequestClient() {
   // this chart — this link opens without a code, and a ghost would show their
   // face to anyone it was forwarded to. Signed in on this phone already: it
   // appears. Otherwise "Show my earlier photo as a guide" sends a code.
-  const [guide, setGuide] = useState<{ slots: string[]; sms: boolean; email: boolean; last4: string } | null>(null)
+  const [guide, setGuide] = useState<{ slots: string[]; sms: boolean; email: boolean; last4: string; phoneLast4: string } | null>(null)
   const [guideSession, setGuideSession] = useState('')
   const [guideUrls, setGuideUrls] = useState<Record<string, string>>({})
   const [ghost, setGhost] = useState(0.5)
-  const [gate, setGate] = useState<'idle' | 'sending' | 'entering' | 'checking'>('idle')
+  const [gate, setGate] = useState<'idle' | 'phone' | 'sending' | 'entering' | 'checking'>('idle')
+  // Google phone sign-in (10-12, lib/phoneSignIn.ts): the number they type and the pending text.
+  const [gatePhone, setGatePhone] = useState('')
+  const guideConfirm = useRef<ConfirmationResult | null>(null)
   const [gateCode, setGateCode] = useState('')
   const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
   const [gateError, setGateError] = useState('')
@@ -103,8 +108,10 @@ export default function PhotoRequestClient() {
     ;(async () => {
       const { ok, data } = await post({ action: 'guide', sessions: allSessions() })
       if (!live || !ok || !Array.isArray(data.slots) || data.slots.length === 0) return
-      setGuide({ slots: data.slots, sms: !!data.sms, email: !!data.email, last4: String(data.last4 ?? '') })
-      setGateChannel(data.sms ? 'sms' : 'email')
+      const phoneLast4 = String(data.phoneLast4 ?? '')
+      const google = phoneSignInConfigured && !!phoneLast4
+      setGuide({ slots: data.slots, sms: google || !!data.sms, email: !!data.email, last4: String(data.last4 ?? '') || phoneLast4, phoneLast4 })
+      setGateChannel(google || data.sms ? 'sms' : 'email')
       if (data.session) setGuideSession(String(data.session))
     })()
     return () => {
@@ -142,10 +149,33 @@ export default function PhotoRequestClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [guide, guideSession])
 
+  const googleGuide = phoneSignInConfigured && !!guide?.phoneLast4
+
   const sendGuideCode = async (channel = gateChannel) => {
-    setGate('sending')
     setGateError('')
     setGateChannel(channel)
+    // Google: ask for their mobile first (it must end in the chart's last four).
+    if (channel === 'sms' && googleGuide && gate !== 'phone') {
+      setGate('phone')
+      return
+    }
+    if (channel === 'sms' && googleGuide) {
+      const e164 = toE164(gatePhone)
+      if (!e164 || e164.slice(-4) !== guide?.phoneLast4) {
+        setGateError(`Please enter the mobile we have for you (it ends in ${guide?.phoneLast4}).`)
+        return
+      }
+      setGate('sending')
+      try {
+        guideConfirm.current = await sendPhoneCode(e164, 'photos-recaptcha')
+        setGate('entering')
+      } catch (e) {
+        setGateError(e instanceof Error ? e.message : 'We could not text a code just now.')
+        setGate('phone')
+      }
+      return
+    }
+    setGate('sending')
     const { ok } = await post({ action: 'guide-code', channel })
     if (!ok) {
       setGateError('We could not send a code just now. You can still take the photos without the guide.')
@@ -158,7 +188,21 @@ export default function PhotoRequestClient() {
   const checkGuideCode = async () => {
     setGate('checking')
     setGateError('')
-    const { ok, data } = await post({ action: 'guide-unlock', channel: gateChannel, code: gateCode })
+    let phoneToken = ''
+    if (gateChannel === 'sms' && googleGuide && guideConfirm.current) {
+      try {
+        phoneToken = await confirmPhoneCode(guideConfirm.current, gateCode)
+      } catch (e) {
+        setGateError(e instanceof Error ? e.message : 'That code did not work.')
+        setGate('entering')
+        return
+      }
+    }
+    const { ok, data } = await post(
+      phoneToken
+        ? { action: 'guide-unlock', channel: 'sms', phoneToken }
+        : { action: 'guide-unlock', channel: gateChannel, code: gateCode },
+    )
     if (!ok || !data.session) {
       setGateError('That code did not work. Check it and try again, or send a new one.')
       setGate('entering')
@@ -547,7 +591,27 @@ export default function PhotoRequestClient() {
           {/* Not signed in: offer the guide behind the same code as their page. */}
           {stage === 'shooting' && guide && !guideSession && (
             <div className="mb-4 rounded-xl bg-cream-100 px-4 py-3 text-sm text-gray-700">
-              {gate === 'entering' || gate === 'checking' ? (
+              {/* The invisible "not a robot" check for Google's texted code. */}
+              <div id="photos-recaptcha" />
+              {gate === 'phone' || (gate === 'sending' && gateChannel === 'sms' && googleGuide) ? (
+                <div className="space-y-2">
+                  <label className="block">
+                    Your mobile number <span className="text-gray-600">(ends in {guide.phoneLast4})</span>
+                    <input
+                      value={gatePhone}
+                      onChange={(e) => setGatePhone(e.target.value.replace(/[^\d()\-\s+]/g, '').slice(0, 16))}
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="(555) 111-7777"
+                      className="mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base"
+                    />
+                  </label>
+                  <button onClick={() => sendGuideCode('sms')} disabled={gate === 'sending' || !toE164(gatePhone)} className={primary}>
+                    {gate === 'sending' ? 'Sending…' : 'Text me the code'}
+                  </button>
+                  <button onClick={() => { setGate('idle'); setGateError('') }} className={quiet}>Back</button>
+                </div>
+              ) : gate === 'entering' || gate === 'checking' ? (
                 <div className="space-y-2">
                   <p>
                     {gateChannel === 'sms'
@@ -565,7 +629,7 @@ export default function PhotoRequestClient() {
                   <button onClick={checkGuideCode} disabled={gate === 'checking' || gateCode.length < 4} className={primary}>
                     {gate === 'checking' ? 'Checking…' : 'Show the guide'}
                   </button>
-                  <button onClick={() => sendGuideCode()} className={quiet}>Send a new code</button>
+                  <button onClick={() => (gateChannel === 'sms' && googleGuide ? setGate('phone') : sendGuideCode())} className={quiet}>Send a new code</button>
                 </div>
               ) : (
                 <>

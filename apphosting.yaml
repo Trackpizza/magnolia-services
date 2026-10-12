@@ -36,5 +36,24 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  # The RECORDS project's public web config (10-12) — for Google phone sign-in
+  # (lib/phoneSignIn.ts): the code is texted under medspa-reports, which the
+  # Google Cloud BAA covers; nothing about it touches this project. Public
+  # values: the same ones ship in the records app's own bundle.
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_API_KEY
+    value: AIzaSyBjtb4AufcGSS0MMydTB-a5SsIPQvzFhy4
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_AUTH_DOMAIN
+    value: medspa-reports.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_RECORDS_FIREBASE_PROJECT_ID
+    value: medspa-reports
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: NEXT_PUBLIC_APP_URL
     value: https://magnolia-services--magnolia-services.us-central1.hosted.app
