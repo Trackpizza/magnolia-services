@@ -1,11 +1,19 @@
 import { adminDb } from './firebase/admin'
 import type { ServiceLinks, DayKey, DayHours } from './types'
 import { DEFAULT_LINKS, DAY_KEYS, DEFAULT_HOURS } from './types'
+import { DEFAULT_AFTERCARE, DEFAULT_PREP, withGuideDefaults } from '@/config/guideDefaults'
+
+/** Nothing stored (or unreadable): the defaults, with the code-written guides. */
+const FALLBACK: ServiceLinks = {
+  ...DEFAULT_LINKS,
+  prepContent: withGuideDefaults({}, DEFAULT_PREP),
+  afterCareContent: withGuideDefaults({}, DEFAULT_AFTERCARE),
+}
 
 export async function getLinks(): Promise<ServiceLinks> {
   try {
     const snap = await adminDb.collection('serviceLinks').doc('config').get()
-    if (!snap.exists) return DEFAULT_LINKS
+    if (!snap.exists) return FALLBACK
     const data = snap.data() as Partial<ServiceLinks>
     // Keep only well-formed links with an actual destination
     const cleanLinks = (links: unknown) =>
@@ -30,14 +38,14 @@ export async function getLinks(): Promise<ServiceLinks> {
       content: data.content ?? {},
       prepVideos: data.prepVideos ?? {},
       prepVideoDates: data.prepVideoDates ?? {},
-      prepContent: data.prepContent ?? {},
+      prepContent: withGuideDefaults(data.prepContent, DEFAULT_PREP),
       afterCareVideos: data.afterCareVideos ?? {},
       afterCareVideoDates: data.afterCareVideoDates ?? {},
-      afterCareContent: data.afterCareContent ?? {},
+      afterCareContent: withGuideDefaults(data.afterCareContent, DEFAULT_AFTERCARE),
       hours,
       resultsLinks: cleanLinks(data.resultsLinks),
     }
   } catch {
-    return DEFAULT_LINKS
+    return FALLBACK
   }
 }

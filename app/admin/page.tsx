@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import type { ServiceLinks, DayKey, DayHours } from '@/lib/types'
 import { DEFAULT_LINKS, DAY_KEYS, DEFAULT_HOURS } from '@/lib/types'
 import { SERVICES } from '@/config/services'
+import { DEFAULT_AFTERCARE, DEFAULT_PREP, withGuideDefaults } from '@/config/guideDefaults'
 
 const DAY_LABELS: Record<DayKey, string> = {
   monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
@@ -196,10 +197,10 @@ export default function AdminPage() {
         terms: data.terms ?? '',
         prepVideos: data.prepVideos ?? {},
         prepVideoDates: backfillVideoDates(data.prepVideos ?? {}, data.prepVideoDates ?? {}),
-        prepContent: data.prepContent ?? {},
+        prepContent: withGuideDefaults(data.prepContent, DEFAULT_PREP),
         afterCareVideos: data.afterCareVideos ?? {},
         afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
-        afterCareContent: data.afterCareContent ?? {},
+        afterCareContent: withGuideDefaults(data.afterCareContent, DEFAULT_AFTERCARE),
         hours: Object.fromEntries(
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,
@@ -224,10 +225,10 @@ export default function AdminPage() {
         terms: data.terms ?? '',
         prepVideos: data.prepVideos ?? {},
         prepVideoDates: backfillVideoDates(data.prepVideos ?? {}, data.prepVideoDates ?? {}),
-        prepContent: data.prepContent ?? {},
+        prepContent: withGuideDefaults(data.prepContent, DEFAULT_PREP),
         afterCareVideos: data.afterCareVideos ?? {},
         afterCareVideoDates: backfillVideoDates(data.afterCareVideos ?? {}, data.afterCareVideoDates ?? {}),
-        afterCareContent: data.afterCareContent ?? {},
+        afterCareContent: withGuideDefaults(data.afterCareContent, DEFAULT_AFTERCARE),
         hours: Object.fromEntries(
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,

@@ -12,6 +12,9 @@ export interface ServiceEntry {
   howItWorks: { step: string; title: string; body: string }[]
   disclaimer: string
   alsoKnownAs: string[]
+  /** No video for this treatment (10-12): the service page and both guides
+   *  show no video and no "coming soon" box. */
+  noVideo?: boolean
 }
 
 export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids: string[] }> = [
@@ -53,7 +56,7 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
   {
     name: 'Dermal Fillers',
     description: 'Hyaluronic acid fillers for natural-looking volume, contour, and lip enhancement.',
-    ids: ['revanesse-versa', 'revanesse-lip'],
+    ids: ['revanesse-versa', 'revanesse-lip', 'radiesse'],
   },
   {
     name: 'Chemical Peels',
@@ -674,6 +677,35 @@ export const SERVICES: ServiceEntry[] = [
     ],
     disclaimer: DISCLAIMER,
     alsoKnownAs: ['cheek filler', 'face filler', 'nasolabial fold filler', 'smile line filler', 'under eye filler', 'hollow cheek treatment', 'facial volume loss'],
+  },
+  {
+    id: 'radiesse',
+    noVideo: true,
+    slug: 'radiesse-filler-for-jawline-contour-deep-folds-hand-rejuvenation-collagen-burbank-ca',
+    name: 'RADIESSE® Dermal Filler',
+    category: 'Dermal Fillers',
+    tagline:
+      'Calcium hydroxylapatite filler that adds structure and contour while prompting your body to make its own collagen — for deep folds, jawline definition and hands.',
+    searchDescription:
+      'RADIESSE calcium hydroxylapatite filler in Burbank adds structure and contour and stimulates natural collagen — for deep facial folds, jawline contouring and hand volume.',
+    keywords: ['radiesse burbank', 'calcium hydroxylapatite filler', 'jawline filler burbank', 'collagen stimulating filler', 'hand rejuvenation filler', 'radiesse plus lidocaine'],
+    highlights: [
+      { icon: '', title: 'Structure and contour, not just volume', body: 'RADIESSE is made of calcium hydroxylapatite (CaHA) microspheres in a smooth gel, giving firm, lifting support where the face needs structure — deep folds and the jawline.' },
+      { icon: '', title: 'Stimulates your own collagen', body: 'Beyond the immediate correction, the CaHA microspheres prompt your body\'s natural collagen production (neocollagenesis), so results continue to build over the following weeks.' },
+      { icon: '', title: 'Approved for face, jawline and hands', body: 'Approved uses vary by formulation and include moderate-to-severe facial folds, hand volume restoration and jawline contouring with RADIESSE (+).' },
+      { icon: '', title: 'A lidocaine option for comfort', body: 'RADIESSE (+) is pre-mixed with lidocaine, a local anesthetic, to make treatment more comfortable.' },
+      { icon: '', title: 'Different from hyaluronic acid fillers', body: 'RADIESSE is not a hyaluronic acid filler and cannot be dissolved with hyaluronidase — your provider will talk through whether it is the right choice for you.' },
+    ],
+    treats: ['Nasolabial Folds', 'Marionette Lines', 'Jawline Contour', 'Hand Volume Loss', 'Mid-Face Structure', 'Collagen Loss'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'RADIESSE is injected with a fine needle or cannula into the areas your provider has planned with you — deep folds, the jawline, or the backs of the hands. The gel carrier gives immediate correction; over time the body absorbs the gel while the calcium hydroxylapatite microspheres act as a scaffold for your own new collagen, which helps sustain the result. The formulation, amount and placement are chosen at your consultation and recorded in your chart. Results are temporary and vary from person to person, and maintenance treatments keep them going.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['radiesse', 'radiesse plus', 'caha filler', 'jawline filler', 'hand filler', 'collagen filler', 'biostimulator filler'],
   },
   {
     id: 'revanesse-lip',

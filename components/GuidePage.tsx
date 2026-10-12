@@ -66,7 +66,8 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
         </h1>
       </section>
 
-      {/* Video (or coming-soon placeholder) */}
+      {/* Video (or coming-soon placeholder) — neither for a noVideo treatment */}
+      {(embedUrl || !service.noVideo) && (
       <section className="max-w-5xl mx-auto px-6 pb-2">
         <div className="w-full lg:w-72 mx-auto">
           {embedUrl ? (
@@ -86,6 +87,7 @@ export default function GuidePage({ service, guideTitle, videoUrl, videoDate, ma
           )}
         </div>
       </section>
+      )}
 
       {/* Markdown text (hidden if empty) */}
       <ServiceContent markdown={markdown} />

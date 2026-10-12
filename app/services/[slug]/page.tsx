@@ -114,7 +114,8 @@ export default async function ServicePage({ params }: Props) {
       <section className="max-w-5xl mx-auto px-6 py-10">
         <div className="flex flex-col lg:flex-row gap-10 items-start">
 
-          {/* Video */}
+          {/* Video — none at all for a noVideo treatment (no placeholder) */}
+          {(embedUrl || !service.noVideo) && (
           <div className="w-full lg:w-72 shrink-0 mx-auto lg:mx-0">
             {embedUrl ? (
               <YouTubeEmbed url={videoUrl} title={`${service.name} treatment video`} priority />
@@ -132,6 +133,7 @@ export default async function ServicePage({ params }: Props) {
               </div>
             )}
           </div>
+          )}
 
           {/* Highlights */}
           <div className="flex-1">
