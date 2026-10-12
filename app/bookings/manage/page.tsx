@@ -19,6 +19,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import ManageClient from './ManageClient'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const metadata: Metadata = {
   title: 'Your appointment | Magnolia Skin Center',
@@ -44,6 +45,7 @@ export default async function ManagePage({
       <main className="max-w-xl mx-auto px-6 py-12 sm:py-16">
         <ManageClient token={t ?? ''} />
       </main>
+      <PolicyFooter />
     </div>
   )
 }

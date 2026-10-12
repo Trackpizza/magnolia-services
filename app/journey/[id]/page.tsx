@@ -16,6 +16,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import JourneyView from './JourneyView'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const revalidate = 60
 
@@ -46,6 +47,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ id: st
           phone={links.mainFooter.phone}
         />
       </main>
+      <PolicyFooter />
     </div>
   )
 }

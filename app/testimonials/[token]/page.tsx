@@ -7,6 +7,7 @@
  */
 import type { Metadata } from 'next'
 import TestimonialUploader from './Client'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const metadata: Metadata = {
   title: 'Share your story | Magnolia Skin Center',
@@ -20,6 +21,7 @@ export default function TestimonialPage() {
       <div className="max-w-xl mx-auto bg-white border border-gray-200 rounded-2xl shadow-sm p-6 sm:p-8">
         <TestimonialUploader />
       </div>
+      <PolicyFooter />
     </main>
   )
 }

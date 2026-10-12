@@ -16,6 +16,7 @@
  */
 import { useState } from 'react'
 import { writeSession } from './session'
+import AgreeBox from './AgreeBox'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
@@ -44,6 +45,8 @@ function nextPhoneValue(raw: string, prev: string): string {
 }
 
 export default function FindMyPage() {
+  // The Terms tick box beside the code (10-11) — recorded with the sign-in.
+  const [agree, setAgree] = useState(false)
   const [channel, setChannel] = useState<'sms' | 'email'>('sms')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
@@ -88,7 +91,7 @@ export default function FindMyPage() {
       const res = await fetch(`${API}/api/public/findme`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', ...contact(), code }),
+        body: JSON.stringify({ action: 'check', ...contact(), code, agreeTerms: agree }),
       })
       const d = await res.json().catch(() => ({}))
       if (!res.ok) {
@@ -186,7 +189,8 @@ export default function FindMyPage() {
             placeholder="6-digit code"
             className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg tracking-widest text-center"
           />
-          <button onClick={check} disabled={step === 'checking' || code.length < 4} className={primary}>
+          <AgreeBox checked={agree} onChange={setAgree} />
+          <button onClick={check} disabled={step === 'checking' || code.length < 4 || !agree} className={primary}>
             {step === 'checking' ? 'Checking…' : 'Open my page'}
           </button>
           <button onClick={send} disabled={step === 'checking'} className={quiet}>

@@ -445,8 +445,8 @@ export default function AdminPage() {
         <section className="bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Before &amp; After Results Page</h2>
-              <p className="text-sm text-gray-500 mt-0.5">Links in a &ldquo;Learn more&rdquo; section on every shared results page (the private Before &amp; After links sent to prospective clients)</p>
+              <h2 className="text-lg font-bold text-gray-900">Real Results — Learn More Links</h2>
+              <p className="text-sm text-gray-500 mt-0.5">Shown under &ldquo;Real results from our clients&rdquo; in the client portal (the Before &amp; After albums staff send from the records app)</p>
             </div>
             <SaveButton section="results" onClick={() => save('results', { resultsLinks: (links.resultsLinks ?? []).filter(l => l.url.trim()) })} />
           </div>
@@ -461,31 +461,18 @@ export default function AdminPage() {
           />
         </section>
 
-        {/* ── Terms of Service ────────────────────────────────── */}
+        {/* ── Terms of Service ──────────────────────────────────
+            Moved 10-11: the Privacy notice and Terms are edited in the
+            RECORDS app (Settings → Privacy Notice & Terms — the text) and
+            this site's /privacy and /terms show that text. */}
         <section className="bg-white rounded-2xl border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h2 className="text-lg font-bold text-gray-900">Terms of Service</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
-                The page at /terms, linked from the booking button, every patient email and
-                the portal.
-              </p>
-            </div>
-            <SaveButton section="terms" onClick={() => save('terms', { terms: links.terms ?? '' })} />
-          </div>
-          <p className="text-xs text-gray-400 mb-5">
-            Markdown. Leave it empty to show the starter draft that ships with the site —
-            which is a developer&rsquo;s draft, not legal advice, and should be read by a
-            lawyer before anyone relies on it. Cancellation notice, deposits, and &ldquo;no
-            result is guaranteed&rdquo; are the parts that matter.
+          <h2 className="text-lg font-bold text-gray-900">Privacy Notice &amp; Terms of Service</h2>
+          <p className="text-sm text-gray-500 mt-1">
+            Edited in the records app: <strong>Settings → Privacy Notice &amp; Terms — the text</strong>. The{' '}
+            <a href="/privacy" target="_blank" className="text-brand-600 underline">/privacy</a> and{' '}
+            <a href="/terms" target="_blank" className="text-brand-600 underline">/terms</a> pages here show that text
+            (within 5 minutes of a save), and patients agree to it in their portal.
           </p>
-          <textarea
-            value={links.terms ?? ''}
-            onChange={e => setLinks(l => ({ ...l, terms: e.target.value }))}
-            rows={16}
-            placeholder="## Terms of Service&#10;&#10;Leave empty to use the starter draft."
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono text-gray-900 bg-white"
-          />
         </section>
 
         {/* ── Business Hours ──────────────────────────────────── */}

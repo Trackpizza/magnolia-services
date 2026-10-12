@@ -14,6 +14,8 @@ import BookTreatment from '@/components/BookTreatment'
 import PortalJourney, { portalLoader, type Journey } from './PortalJourney'
 import PortalShare, { type JourneyShare } from './PortalShare'
 import Section from './Section'
+import RealResults, { type RealResultsAlbum } from './RealResults'
+import AgreeBox from './AgreeBox'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -143,10 +145,23 @@ interface OpenView {
   photoConsults?: PhotoConsultVideo[]
   /** Photos the clinic has asked for and is still waiting on. */
   photoRequests?: { label: string; slots: string[]; procedureName: string; url: string }[]
+  /** Real results from our clients — Before & After albums the clinic sent
+   *  to this patient (records app, 10-11). Absent on older APIs. */
+  realResults?: RealResultsAlbum[]
   history: History | null
+  termsNeeded?: undefined
 }
 
-type View = LockedView | OpenView
+/** Signed in, but not yet agreed to the CURRENT Terms + privacy notice
+ *  (10-11) — nothing of the chart until they do. `updated`: they agreed to
+ *  an earlier version. */
+interface TermsView {
+  locked?: false
+  termsNeeded: { privacyUrl: string; termsUrl: string; updated: boolean }
+  clinicPhone: string
+}
+
+type View = LockedView | OpenView | TermsView
 
 /** One video from Dr. David. `kind` "ai" = AI photo consult (simulations);
  *  "real" = a journey of their own photos, which can end on AI next-step
@@ -196,7 +211,11 @@ const primaryBtn =
   'w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
 const quietBtn = 'text-sm text-brand-600 hover:text-brand-700'
 
-export default function PortalClient({ token }: { token: string }) {
+export default function PortalClient({ token, learnMore = [] }: {
+  token: string
+  /** "Learn more" links under Real results — services /admin. */
+  learnMore?: { label: string; url: string }[]
+}) {
   const [view, setView] = useState<View | null>(null)
   const [state, setState] = useState<'loading' | 'ok' | 'gone' | 'busy' | 'error'>('loading')
 
@@ -210,6 +229,10 @@ export default function PortalClient({ token }: { token: string }) {
   // a page saying "check your phone".
   const [gateChannel, setGateChannel] = useState<'sms' | 'email'>('sms')
   const [gateError, setGateError] = useState('')
+  // "I agree to the Terms of Service and acknowledge the Notice of Privacy
+  // Practices" — ticked beside the code, sent with it (10-11).
+  const [agree, setAgree] = useState(false)
+  const [agreeBusy, setAgreeBusy] = useState(false)
   // The booking widget, shown on request. Both Book buttons open it and scroll
   // to it — a picker that is always open would make the page about booking,
   // and the page is about the plan.
@@ -345,7 +368,7 @@ export default function PortalClient({ token }: { token: string }) {
     setGate('checking')
     setGateError('')
     try {
-      const { ok, data } = await call({ action: 'unlock', code, channel: gateChannel })
+      const { ok, data } = await call({ action: 'unlock', code, channel: gateChannel, agreeTerms: agree })
       if (!ok) {
         setGateError('That code did not work. Check it and try again, or send a new one.')
         setGate('entering')
@@ -436,7 +459,8 @@ export default function PortalClient({ token }: { token: string }) {
               placeholder="6-digit code"
               className="w-full rounded-xl border border-gray-300 px-4 py-3 text-lg tracking-widest text-center"
             />
-            <button onClick={unlock} disabled={gate === 'checking' || code.length < 4} className={primaryBtn}>
+            <AgreeBox checked={agree} onChange={setAgree} />
+            <button onClick={unlock} disabled={gate === 'checking' || code.length < 4 || !agree} className={primaryBtn}>
               {gate === 'checking' ? 'Checking…' : 'Open my page'}
             </button>
             <div className="flex flex-wrap gap-4">
@@ -489,6 +513,42 @@ export default function PortalClient({ token }: { token: string }) {
         <div className="mt-6">
           <LegalFooter links={view.legalLinks} />
         </div>
+      </div>
+    )
+  }
+
+  // ── Signed in, Terms not yet agreed (or changed since) ───────────────────
+  if (view.termsNeeded) {
+    const accept = async () => {
+      setAgreeBusy(true)
+      setGateError('')
+      try {
+        const { ok } = await call({ action: 'accept-terms', agreeTerms: true, session: readSession(token) })
+        if (!ok) throw new Error('accept')
+        await load()
+      } catch {
+        setGateError('Something went wrong. Please try again, or call or text us.')
+      } finally {
+        setAgreeBusy(false)
+      }
+    }
+    return (
+      <div className={card}>
+        <h1 className="text-2xl font-semibold text-plum-900 mb-2" style={heading}>
+          {view.termsNeeded.updated ? 'We have updated our terms' : 'One more step'}
+        </h1>
+        <p className="text-sm text-gray-600 mb-5">
+          {view.termsNeeded.updated
+            ? 'Please read and agree to our updated Terms of Service and Notice of Privacy Practices to open your page.'
+            : 'Please read and agree to our Terms of Service and Notice of Privacy Practices to open your page.'}
+        </p>
+        <div className="space-y-3">
+          <AgreeBox checked={agree} onChange={setAgree} />
+          <button onClick={accept} disabled={!agree || agreeBusy} className={primaryBtn}>
+            {agreeBusy ? 'Opening…' : 'Open my page'}
+          </button>
+        </div>
+        {gateError && <p className="mt-3 text-sm text-plum-900 bg-cream-100 rounded-xl px-4 py-3">{gateError}</p>}
       </div>
     )
   }
@@ -893,6 +953,11 @@ export default function PortalClient({ token }: { token: string }) {
         </Section>
       )}
 
+      {/* Real results from our clients — albums the clinic sent (10-11). */}
+      {view.realResults && view.realResults.length > 0 && (
+        <RealResults albums={view.realResults} token={token} session={session} learnMore={learnMore} />
+      )}
+
       {/* Your before-and-after photos — the photo & marketing authorization.
           Eileen used to have to ask in the chair; here the patient decides on
           their own time, or she texts "it's on your page". Optional, so it is
@@ -1084,10 +1149,14 @@ export default function PortalClient({ token }: { token: string }) {
 }
 
 /** Privacy, Terms and whatever else the clinic lists in Settings. Quiet, at
- *  the bottom, present for the person who goes looking. Renders nothing at all
- *  when the list is empty rather than leaving an orphaned separator. */
-function LegalFooter({ links }: { links?: PortalLink[] }) {
-  if (!links?.length) return null
+ *  the bottom, present for the person who goes looking. The clinic's own
+ *  Privacy notice and Terms are always there (10-11); Settings adds more. */
+function LegalFooter({ links: extra }: { links?: PortalLink[] }) {
+  const own: PortalLink[] = [
+    { label: 'Notice of Privacy Practices', href: '/privacy', emoji: '' },
+    { label: 'Terms of Service', href: '/terms', emoji: '' },
+  ]
+  const links = [...own, ...(extra ?? []).filter((l) => !/\/(privacy|terms)(#|$)/.test(l.href))]
   return (
     <p className="text-center text-xs text-gray-400 px-4 pb-2">
       {links.map((l, i) => (

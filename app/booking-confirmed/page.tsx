@@ -13,6 +13,7 @@
 import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import BookingConfirmedClient from './Client'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const metadata: Metadata = {
   title: 'Booking confirmed | Magnolia Skin Center',
@@ -31,6 +32,7 @@ export default function BookingConfirmedPage() {
           <BookingConfirmedClient />
         </Suspense>
       </div>
+      <PolicyFooter />
     </main>
   )
 }

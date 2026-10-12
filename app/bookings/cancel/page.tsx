@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import CancelClient from './CancelClient'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const metadata: Metadata = {
   title: 'Cancel an appointment | Magnolia Skin Center',
@@ -26,6 +27,7 @@ export default async function CancelPage({
       <main className="max-w-xl mx-auto px-6 py-16">
         <CancelClient token={t ?? ''} />
       </main>
+      <PolicyFooter />
     </div>
   )
 }

@@ -9,14 +9,19 @@ const heading = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
  * heading says when something is waiting. A native <details>, so it works
  * without JavaScript and with a keyboard.
  */
-export default function Section({ title, badge, urgent, children }: {
+export default function Section({ title, badge, urgent, children, onOpen }: {
   title: string
   badge?: string
   urgent?: boolean
   children: ReactNode
+  /** Called each time it is opened — Real results loads its photos then. */
+  onOpen?: () => void
 }) {
   return (
-    <details className="group bg-white rounded-2xl border border-gray-100">
+    <details
+      className="group bg-white rounded-2xl border border-gray-100"
+      onToggle={onOpen ? (e) => { if ((e.currentTarget as HTMLDetailsElement).open) onOpen() } : undefined}
+    >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-5 sm:px-8 [&::-webkit-details-marker]:hidden">
         <h2 className="text-lg font-semibold text-plum-900" style={heading}>{title}</h2>
         <span className="flex shrink-0 items-center gap-2">

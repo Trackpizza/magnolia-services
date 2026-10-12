@@ -22,6 +22,7 @@
 import type { Metadata, Viewport } from 'next'
 import Link from 'next/link'
 import PortalClient from './PortalClient'
+import { getLinks } from '@/lib/links'
 
 export async function generateMetadata({
   searchParams,
@@ -71,7 +72,7 @@ export default async function PortalPage({
         </div>
       </header>
       <main className="max-w-xl mx-auto px-6 py-10 sm:py-14">
-        <PortalClient token={t ?? ''} />
+        <PortalClient token={t ?? ''} learnMore={(await getLinks()).resultsLinks ?? []} />
       </main>
     </div>
   )

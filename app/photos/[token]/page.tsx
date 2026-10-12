@@ -9,6 +9,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import PhotoRequestClient from './Client'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const metadata: Metadata = {
   title: 'Send us a photo | Magnolia Skin Center',
@@ -36,6 +37,7 @@ export default function PhotoRequestPage() {
       <main className="max-w-xl mx-auto px-6 py-10 sm:py-14">
         <PhotoRequestClient />
       </main>
+      <PolicyFooter />
     </div>
   )
 }

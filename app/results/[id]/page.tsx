@@ -16,6 +16,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import ResultsView from './ResultsView'
+import PolicyFooter from '@/components/PolicyFooter'
 
 export const revalidate = 60
 
@@ -42,6 +43,7 @@ export default async function ResultsPage({ params }: { params: Promise<{ id: st
       <main className="max-w-3xl mx-auto px-6 py-10 sm:py-14">
         <ResultsView id={id} videoConsultUrl={links.mainFooter.bookingUrl} phone={links.mainFooter.phone} learnMore={links.resultsLinks ?? []} />
       </main>
+      <PolicyFooter />
     </div>
   )
 }
