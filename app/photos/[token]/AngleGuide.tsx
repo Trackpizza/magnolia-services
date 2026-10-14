@@ -185,7 +185,7 @@ export default function AngleGuide({ slot }: { slot: string }) {
             <path d="M54 66 L60 76 L66 66 Z" className="fill-plum-900" />
 
             {/* Which side is whose. Seen from above with the face pointing at
-                the camera, the patient's RIGHT is on the LEFT of the picture —
+                the camera, the client's RIGHT is on the LEFT of the picture —
                 true, and the single most confusing thing about this drawing
                 until it is labelled. Counter-rotated so it stays upright as
                 the head turns, and it is the marker you watch: for a right

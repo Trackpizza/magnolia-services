@@ -31,7 +31,7 @@ export default function BookingTestingPage() {
       </header>
       <main className="max-w-3xl mx-auto px-6 py-12">
         <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-5 py-4">
-          <p className="text-sm font-semibold text-amber-900">Staging — not for patients</p>
+          <p className="text-sm font-semibold text-amber-900">Staging — not for clients</p>
           <p className="text-sm text-amber-800 mt-1">
             This page exists to test online booking before go-live. Bookings made here are
             real: they occupy machine and provider time and email the clinic. Do not share

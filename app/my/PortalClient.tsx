@@ -15,6 +15,7 @@ import PortalJourney, { portalLoader, type Journey } from './PortalJourney'
 import PortalShare, { type JourneyShare } from './PortalShare'
 import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
+import PortalAccount, { type AccountItem } from './PortalAccount'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 
@@ -152,6 +153,9 @@ interface OpenView {
   /** Real results from our clients — Before & After albums the clinic sent
    *  to this patient (records app, 10-11). Absent on older APIs. */
   realResults?: RealResultsAlbum[]
+  /** Packages, deposits & quotes the clinic sent from the chart (records
+   *  lib/money.ts, 10-13) — as they are now. Absent on older APIs. */
+  account?: AccountItem[]
   history: History | null
   termsNeeded?: undefined
 }
@@ -788,6 +792,11 @@ export default function PortalClient({ token, learnMore = [] }: {
           </div>
         )}
       </Section>
+
+      {/* Packages, deposits & quotes the clinic sent from the chart (10-13). */}
+      {view.account && view.account.length > 0 && (
+        <PortalAccount items={view.account} token={token} session={session} />
+      )}
 
       {/* ── The plan ──────────────────────────────────────────────────── */}
       {view.plan.length > 0 && (() => {

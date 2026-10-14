@@ -63,7 +63,7 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
       {/* A title that stays visible, then the two sections closed — the same
           collapsible layout as the portal. */}
       <h1 className="px-1 text-3xl font-semibold text-plum-900" style={heading}>
-        A patient&rsquo;s journey
+        A client&rsquo;s journey
       </h1>
       <Section
         title="Their before & after photos"
@@ -81,7 +81,7 @@ export default function JourneyView({ id, videoConsultUrl, phone }: {
         {state === 'ok' && journey && (
           <>
             <p className="text-sm text-gray-600 mb-4">
-              Shared with you by one of our patients at Magnolia Skin Center in Burbank. Pick an angle
+              Shared with you by one of our clients at Magnolia Skin Center in Burbank. Pick an angle
               to compare the same view over time.
             </p>
             <PortalJourney journey={journey} load={load} />

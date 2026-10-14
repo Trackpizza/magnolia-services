@@ -635,7 +635,7 @@ function BookTreatmentInner({ deposit, portal }: { deposit: boolean; portal?: Po
             className="block text-left border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors"
           >
             <span className="block font-medium text-gray-900">
-              I&apos;m an existing patient — log in to my page
+              I&apos;m an existing client — log in to my page
             </span>
             <span className="block text-sm text-gray-600">
               Your plan and your appointments, and booking with nothing to type. We text you

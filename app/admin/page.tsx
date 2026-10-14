@@ -472,7 +472,7 @@ export default function AdminPage() {
             Edited in the records app: <strong>Settings → Privacy Notice &amp; Terms — the text</strong>. The{' '}
             <a href="/privacy" target="_blank" className="text-brand-600 underline">/privacy</a> and{' '}
             <a href="/terms" target="_blank" className="text-brand-600 underline">/terms</a> pages here show that text
-            (within 5 minutes of a save), and patients agree to it in their portal.
+            (within 5 minutes of a save), and clients agree to it in their portal.
           </p>
         </section>
 

@@ -21,7 +21,7 @@ import PolicyFooter from '@/components/PolicyFooter'
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'A patient journey | Magnolia Skin Center',
+  title: 'A client journey | Magnolia Skin Center',
   description: 'Real results from Magnolia Skin Center in Burbank, CA.',
   robots: { index: false, follow: false },
   referrer: 'no-referrer',

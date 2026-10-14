@@ -138,7 +138,7 @@ export default async function ServicePage({ params }: Props) {
           {/* Highlights */}
           <div className="flex-1">
             <h2 className="text-3xl font-semibold text-plum-900 mb-6" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
-              Why patients choose {service.name}
+              Why clients choose {service.name}
             </h2>
             <div className="space-y-3">
               {service.highlights.map((item, i) => (
