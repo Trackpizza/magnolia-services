@@ -36,7 +36,7 @@ const unitWord = (unit: string, n: number) => (n === 1 && unit.endsWith('s') ? u
 function Dots({ total, left }: { total: number; left: number }) {
   if (total > 30) {
     return (
-      <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-gray-200" aria-hidden>
+      <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-gray-300" aria-hidden>
         <div className="h-full bg-brand-600" style={{ width: `${Math.max(0, Math.min(100, (left / total) * 100))}%` }} />
       </div>
     )
@@ -72,7 +72,7 @@ export default function PortalAccount({ items, token, session }: { items: Accoun
   const deposits = items.filter((i) => i.kind === 'deposit')
   const quotes = items.filter((i) => i.kind === 'quote')
   const notes = items.filter((i) => i.kind === 'note')
-  const card = 'rounded-2xl border border-gray-100 bg-gray-50/60 p-4'
+  const card = 'rounded-2xl border border-gray-100 bg-gray-50 p-4'
   const label = 'mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500'
 
   return (
