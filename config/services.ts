@@ -188,7 +188,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'No surgery or general anesthesia required', body: 'Agnes RF achieves meaningful tissue remodeling through a minimally invasive approach, eliminating the risks and recovery associated with surgical lifting procedures.' },
       { icon: '', title: 'Targets jowls, neck, and nasolabial folds precisely', body: 'The treatment is customizable to address each area of concern with appropriate energy settings, depth, and tip selection.' },
       { icon: '', title: 'Deeper tissue remodeling for structural results', body: 'RF energy reaches the subdermal layer where jowling and fold depth originate, addressing the structural cause rather than surface appearance alone.' },
-      { icon: '', title: 'Fully customizable per patient concern', body: 'Agnes RF offers nine needle tips with adjustable energy output, allowing the provider to tailor the protocol to each individual\'s anatomy and goals.' },
+      { icon: '', title: 'Fully customizable per client concern', body: 'Agnes RF offers nine needle tips with adjustable energy output, allowing the provider to tailor the protocol to each individual\'s anatomy and goals.' },
       { icon: '', title: 'Long-lasting collagen response', body: 'The collagen remodeling cascade initiated by Agnes RF continues for months after treatment, with results that can last several years with appropriate maintenance.' },
     ],
     treats: ['Jowls', 'Neck Laxity', 'Nasolabial Folds', 'Facial Contouring', 'Skin Tightening', 'Loss of Definition'],
@@ -196,7 +196,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'Agnes RF delivers square-wave radiofrequency energy through insulated microneedles into the subdermal layer of the face and neck — the tissue layer responsible for jowling, fold depth, and loss of facial definition. The controlled thermal injury at this depth triggers a sustained collagen remodeling response that gradually tightens the overlying skin and repositions facial contours. Treatment is customized to the patient\'s anatomy with precise needle depth and energy settings for each target area, and results continue to develop over the three to six months following treatment.',
+        body: 'Agnes RF delivers square-wave radiofrequency energy through insulated microneedles into the subdermal layer of the face and neck — the tissue layer responsible for jowling, fold depth, and loss of facial definition. The controlled thermal injury at this depth triggers a sustained collagen remodeling response that gradually tightens the overlying skin and repositions facial contours. Treatment is customized to the client\'s anatomy with precise needle depth and energy settings for each target area, and results continue to develop over the three to six months following treatment.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -217,7 +217,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Stimulates collagen, elastin, and hyaluronic acid simultaneously', body: 'The short-pulse RF mechanism activates all three structural components of the dermis in a single treatment session.' },
       { icon: '', title: 'Short-pulse RF for enhanced comfort', body: 'The short-pulse delivery reduces heat accumulation in the skin, making the procedure more comfortable than conventional RF microneedling devices.' },
       { icon: '', title: 'Treats face, neck, and chest in one protocol', body: 'Scarlet PRO SRF can be applied across multiple treatment zones in a single visit, addressing aging consistently across connected areas.' },
-      { icon: '', title: 'Safe for all skin tones', body: 'Unlike some energy-based devices, Scarlet PRO SRF does not rely on chromophore targeting, making it appropriate for patients across the full range of Fitzpatrick skin types.' },
+      { icon: '', title: 'Safe for all skin tones', body: 'Unlike some energy-based devices, Scarlet PRO SRF does not rely on chromophore targeting, making it appropriate for clients across the full range of Fitzpatrick skin types.' },
     ],
     treats: ['Fine Lines', 'Wrinkles', 'Skin Laxity', 'Pore Size', 'Skin Texture', 'Neck & Chest Aging'],
     howItWorks: [
@@ -241,10 +241,10 @@ export const SERVICES: ServiceEntry[] = [
       'Scarlet SRF body tightening addresses stretch marks, spider veins, and sagging skin across body areas using short-pulse RF microneedling safe for all skin types.',
     keywords: ['stretch marks treatment', 'body tightening burbank', 'scarlet srf body', 'spider veins', 'sagging skin', 'postpartum skin', 'skin laxity'],
     highlights: [
-      { icon: '', title: 'Safe for all skin types including darker tones', body: 'Scarlet SRF does not rely on light-based targeting, making it one of the few body tightening options appropriate for patients across all Fitzpatrick skin types.' },
+      { icon: '', title: 'Safe for all skin types including darker tones', body: 'Scarlet SRF does not rely on light-based targeting, making it one of the few body tightening options appropriate for clients across all Fitzpatrick skin types.' },
       { icon: '', title: 'Treats stretch marks with consistent results', body: 'RF energy remodels the collagen structure in and around stretch marks, gradually reducing their depth and improving their texture over a series of sessions.' },
       { icon: '', title: 'Addresses spider veins on the body', body: 'SRF microneedling can improve the appearance of superficial spider veins and vascular irregularities on body skin.' },
-      { icon: '', title: 'Minimal downtime — return to normal activity quickly', body: 'Most patients experience mild redness for 24 to 48 hours following treatment, with no significant restriction on daily activities.' },
+      { icon: '', title: 'Minimal downtime — return to normal activity quickly', body: 'Most clients experience mild redness for 24 to 48 hours following treatment, with no significant restriction on daily activities.' },
       { icon: '', title: 'Body-specific RF microneedling protocol', body: 'Treatment parameters are calibrated for the thicker tissue of body skin, allowing effective delivery of RF energy across a larger surface area.' },
     ],
     treats: ['Stretch Marks', 'Sagging Skin', 'Spider Veins', 'Body Skin Laxity', 'Uneven Texture', 'Skin Tone'],
@@ -382,10 +382,10 @@ export const SERVICES: ServiceEntry[] = [
     keywords: ['eyelid lift non surgical', 'hooded eyelids treatment', 'plasmage eyelid', 'non surgical blepharoplasty', 'eye area tightening burbank', 'droopy eyelids'],
     highlights: [
       { icon: '', title: 'Safe for the sensitive eyelid and periorbital area', body: 'Plasmage\'s contactless plasma delivery is specifically suitable for the thin, delicate skin of the eyelid where many laser devices carry unacceptable risk.' },
-      { icon: '', title: 'Non-surgical blepharoplasty alternative', body: 'For patients with mild to moderate eyelid hooding, Plasmage can achieve meaningful skin tightening without incisions, anesthesia, or surgical recovery.' },
+      { icon: '', title: 'Non-surgical blepharoplasty alternative', body: 'For clients with mild to moderate eyelid hooding, Plasmage can achieve meaningful skin tightening without incisions, anesthesia, or surgical recovery.' },
       { icon: '', title: 'Tightens hooded upper eyelid skin', body: 'Controlled plasma pulses cause immediate tissue contraction in the upper eyelid, lifting and opening the eye area progressively over multiple sessions.' },
       { icon: '', title: 'Smooths fine lines around the eyes and mouth', body: 'The treatment is equally effective on crow\'s feet, laugh lines, frown lines, and perioral lines where delicate skin is prone to laxity.' },
-      { icon: '', title: 'Minimal downtime compared to surgical options', body: 'Most patients experience localized swelling and micro-crusting for five to seven days, significantly less disruption than surgical blepharoplasty.' },
+      { icon: '', title: 'Minimal downtime compared to surgical options', body: 'Most clients experience localized swelling and micro-crusting for five to seven days, significantly less disruption than surgical blepharoplasty.' },
     ],
     treats: ['Hooded Eyelids', 'Eye Area Lines', 'Loose Upper Eyelid Skin', 'Fine Lines Around Eyes', "Crow's Feet", 'Perioral Lines'],
     howItWorks: [
@@ -448,7 +448,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'A small sample of the patient\'s blood is processed using the Cellenis centrifuge system to isolate a concentrated platelet-rich plasma. This concentration process separates the platelets and growth factors from red blood cells and other components, producing a highly potent PRP preparation. The PRP is then introduced into target areas via injection, releasing platelet-derived growth factors that activate fibroblasts, stimulate collagen synthesis, promote cellular regeneration, and gradually restore natural volume. Results develop progressively over the six to eight weeks following each treatment as the tissue remodeling process matures.',
+        body: 'A small sample of the client\'s blood is processed using the Cellenis centrifuge system to isolate a concentrated platelet-rich plasma. This concentration process separates the platelets and growth factors from red blood cells and other components, producing a highly potent PRP preparation. The PRP is then introduced into target areas via injection, releasing platelet-derived growth factors that activate fibroblasts, stimulate collagen synthesis, promote cellular regeneration, and gradually restore natural volume. Results develop progressively over the six to eight weeks following each treatment as the tissue remodeling process matures.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -467,16 +467,16 @@ export const SERVICES: ServiceEntry[] = [
     highlights: [
       { icon: '', title: 'Uses your body\'s own growth factors', body: 'Cellenis PRP is derived from your own blood, delivering the same growth factor signals your body uses naturally for tissue repair — with no synthetic additives.' },
       { icon: '', title: 'Injected at the follicular level for direct stimulation', body: 'PRP is delivered precisely at the depth of the hair follicle, placing growth factors exactly where they need to be to stimulate follicular activity.' },
-      { icon: '', title: 'No synthetic chemicals or hormones', body: 'The Cellenis PRP protocol uses only the patient\'s own blood components, making it an appropriate option for patients who prefer to avoid pharmaceutical interventions.' },
-      { icon: '', title: 'Improves hair density and scalp health', body: 'Over a series of treatments, patients typically see improvements in hair shaft thickness, density, and scalp condition as the follicular environment is restored.' },
-      { icon: '', title: 'Minimal recovery time', body: 'Most patients experience mild tenderness at injection sites for one to two days, with no significant restriction on daily activities following treatment.' },
+      { icon: '', title: 'No synthetic chemicals or hormones', body: 'The Cellenis PRP protocol uses only the client\'s own blood components, making it an appropriate option for clients who prefer to avoid pharmaceutical interventions.' },
+      { icon: '', title: 'Improves hair density and scalp health', body: 'Over a series of treatments, clients typically see improvements in hair shaft thickness, density, and scalp condition as the follicular environment is restored.' },
+      { icon: '', title: 'Minimal recovery time', body: 'Most clients experience mild tenderness at injection sites for one to two days, with no significant restriction on daily activities following treatment.' },
     ],
     treats: ['Hair Thinning', 'Hair Loss', 'Follicle Health', 'Hair Density', 'Scalp Circulation', 'Androgenic Alopecia'],
     howItWorks: [
       {
         step: '1',
         title: 'How It Works',
-        body: 'Cellenis PRP is processed from the patient\'s own blood and injected directly into the scalp at the level of the hair follicles. The concentrated growth factors — including platelet-derived growth factor (PDGF), vascular endothelial growth factor (VEGF), and epidermal growth factor (EGF) — stimulate dormant follicles, prolong the active anagen growth phase, and improve scalp vascularity. The treatment is typically performed in a series of three to four sessions spaced four to six weeks apart, with maintenance treatments recommended every six to twelve months to sustain the benefits.',
+        body: 'Cellenis PRP is processed from the client\'s own blood and injected directly into the scalp at the level of the hair follicles. The concentrated growth factors — including platelet-derived growth factor (PDGF), vascular endothelial growth factor (VEGF), and epidermal growth factor (EGF) — stimulate dormant follicles, prolong the active anagen growth phase, and improve scalp vascularity. The treatment is typically performed in a series of three to four sessions spaced four to six weeks apart, with maintenance treatments recommended every six to twelve months to sustain the benefits.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -521,11 +521,11 @@ export const SERVICES: ServiceEntry[] = [
       'AquaFirme XS uses suction extraction and ultrasound infusion of DE|RIVE plant-based exosomes and stem cells to stimulate hair follicles — completely needle-free.',
     keywords: ['needle free hair restoration', 'aquafirme hair', 'derive exosomes hair', 'non invasive hair growth', 'hair loss treatment burbank', 'exosome hair therapy'],
     highlights: [
-      { icon: '', title: 'Completely needle-free and painless', body: 'AquaFirme XS achieves follicle stimulation without any injections, needles, or surgical procedures, making it appropriate for patients who prefer a non-invasive approach.' },
+      { icon: '', title: 'Completely needle-free and painless', body: 'AquaFirme XS achieves follicle stimulation without any injections, needles, or surgical procedures, making it appropriate for clients who prefer a non-invasive approach.' },
       { icon: '', title: 'DE|RIVE plant-based exosomes and stem cells', body: 'The DE|RIVE serum contains plant-derived exosomes and stem cell signaling compounds that communicate directly with hair follicle cells to reactivate the growth cycle.' },
       { icon: '', title: 'Ultrasound infusion for deep delivery', body: 'Low-frequency ultrasound energy drives the DE|RIVE serum deep into the scalp, achieving a penetration depth that topical application cannot reach.' },
       { icon: '', title: 'Activates follicle signaling pathways', body: 'The exosomes in DE|RIVE carry growth and signaling molecules that directly stimulate the molecular pathways responsible for initiating and sustaining hair follicle activity.' },
-      { icon: '', title: 'No downtime and no discomfort', body: 'The treatment is entirely non-invasive with no recovery period, and most patients describe the experience as comfortable throughout.' },
+      { icon: '', title: 'No downtime and no discomfort', body: 'The treatment is entirely non-invasive with no recovery period, and most clients describe the experience as comfortable throughout.' },
     ],
     treats: ['Hair Thinning', 'Hair Loss', 'Follicle Dormancy', 'Hair Density', 'Scalp Health', 'Fine Hair'],
     howItWorks: [
@@ -549,7 +549,7 @@ export const SERVICES: ServiceEntry[] = [
       'DE|RIVE scalp serum infusion delivers 100% organic, hormone-free plant-based exosomes and Cytokeratin-15 deep into the scalp to activate follicles and promote thicker hair.',
     keywords: ['derive scalp serum', 'organic hair restoration', 'cytokeratin 15', 'plant based hair loss treatment', 'exosome scalp therapy burbank', 'hormonal hair loss treatment'],
     highlights: [
-      { icon: '', title: '100% organic and hormone-free formulation', body: 'DE|RIVE is entirely plant-derived and contains no synthetic hormones or pharmaceutical compounds, making it suitable for patients who prefer a natural approach to hair restoration.' },
+      { icon: '', title: '100% organic and hormone-free formulation', body: 'DE|RIVE is entirely plant-derived and contains no synthetic hormones or pharmaceutical compounds, making it suitable for clients who prefer a natural approach to hair restoration.' },
       { icon: '', title: 'Contains Cytokeratin-15 — a key follicle signaling protein', body: 'Cytokeratin-15 is a structural protein expressed in hair follicle stem cells and plays a direct role in the regulation of the hair growth cycle at the cellular level.' },
       { icon: '', title: 'Plant-based exosomes and stem cells for deep communication', body: 'Exosomes carry molecular signals that communicate between cells; DE|RIVE\'s plant-based exosomes deliver follicle-activating messages that synthetic compounds cannot replicate.' },
       { icon: '', title: 'Addresses multiple causes of hair loss', body: 'DE|RIVE\'s signaling approach is effective across the range of hair loss causes — aging, hormonal changes, post-illness recovery, and environmental factors — without requiring identification of a single cause.' },
@@ -577,11 +577,11 @@ export const SERVICES: ServiceEntry[] = [
       'Daxxify peptide-enhanced neurotoxin delivers faster onset and up to 6 months duration — the longest-lasting FDA-approved neurotoxin for dynamic wrinkle treatment.',
     keywords: ['daxxify burbank', 'longest lasting botox', 'peptide neurotoxin', 'daxxify injections', 'frown lines burbank', 'neurotoxin 6 months'],
     highlights: [
-      { icon: '', title: 'Up to 6 months duration — the longest-lasting neurotoxin', body: 'Clinical studies have demonstrated Daxxify results lasting up to six months in the majority of patients, significantly longer than traditional neurotoxin options.' },
+      { icon: '', title: 'Up to 6 months duration — the longest-lasting neurotoxin', body: 'Clinical studies have demonstrated Daxxify results lasting up to six months in the majority of clients, significantly longer than traditional neurotoxin options.' },
       { icon: '', title: 'Peptide-enhanced formula for superior binding', body: 'Daxxify\'s proprietary peptide stabilizer binds the botulinum toxin more effectively to nerve receptors, contributing to both faster onset and extended duration.' },
-      { icon: '', title: 'Faster onset than standard neurotoxins', body: 'Patients typically begin noticing muscle relaxation within one to two days of treatment, earlier than the three to five days typical of other options.' },
-      { icon: '', title: 'Made in the USA with no animal by-products', body: 'Daxxify is manufactured using a process that does not rely on human serum albumin or any animal-derived components, making it suitable for patients who prefer this distinction.' },
-      { icon: '', title: 'Precise dosing across all dynamic wrinkle areas', body: 'Daxxify is administered in small, accurate doses to achieve natural-looking muscle relaxation tailored to each patient\'s anatomy and desired outcome.' },
+      { icon: '', title: 'Faster onset than standard neurotoxins', body: 'Clients typically begin noticing muscle relaxation within one to two days of treatment, earlier than the three to five days typical of other options.' },
+      { icon: '', title: 'Made in the USA with no animal by-products', body: 'Daxxify is manufactured using a process that does not rely on human serum albumin or any animal-derived components, making it suitable for clients who prefer this distinction.' },
+      { icon: '', title: 'Precise dosing across all dynamic wrinkle areas', body: 'Daxxify is administered in small, accurate doses to achieve natural-looking muscle relaxation tailored to each client\'s anatomy and desired outcome.' },
     ],
     treats: ['Frown Lines', 'Forehead Lines', "Crow's Feet", 'Brow Heaviness', 'Neck Bands', 'Dynamic Wrinkles'],
     howItWorks: [
@@ -606,8 +606,8 @@ export const SERVICES: ServiceEntry[] = [
     keywords: ['jeuveau burbank', 'newtox injections', 'frown lines treatment', 'jaw slimming neurotoxin', "crow's feet burbank", 'aesthetic neurotoxin'],
     highlights: [
       { icon: '', title: 'FDA-approved specifically for aesthetic use', body: 'Jeuveau (prabotulinumtoxinA) received FDA approval for the treatment of moderate to severe glabellar lines and is manufactured exclusively for cosmetic applications.' },
-      { icon: '', title: 'Visible results in 3 to 5 days', body: 'Patients typically notice muscle relaxation and wrinkle smoothing within three to five days following treatment, with full effect visible within two weeks.' },
-      { icon: '', title: '3 to 4 months duration with extended results via maintenance', body: 'Results from a single treatment last three to four months on average, and patients on a regular maintenance schedule often find results extending over time.' },
+      { icon: '', title: 'Visible results in 3 to 5 days', body: 'Clients typically notice muscle relaxation and wrinkle smoothing within three to five days following treatment, with full effect visible within two weeks.' },
+      { icon: '', title: '3 to 4 months duration with extended results via maintenance', body: 'Results from a single treatment last three to four months on average, and clients on a regular maintenance schedule often find results extending over time.' },
       { icon: '', title: 'Treats frown lines, crow\'s feet, and jawline', body: 'Jeuveau is appropriate for multiple treatment areas including the glabella, periorbital area, and masseter muscle for jawline contouring.' },
       { icon: '', title: 'Consistent, predictable outcomes', body: 'Jeuveau\'s purification process produces a consistent formulation that delivers reliable results across treatment sessions.' },
     ],
@@ -630,13 +630,13 @@ export const SERVICES: ServiceEntry[] = [
     tagline:
       'A purified neurotoxin with no accessory proteins — reducing antibody resistance risk over time, with results visible in five to seven days and lasting up to nine months.',
     searchDescription:
-      'Xeomin protein-free neurotoxin reduces antibody resistance risk for long-term patients — results in 5–7 days lasting up to 9 months.',
+      'Xeomin protein-free neurotoxin reduces antibody resistance risk for long-term clients — results in 5–7 days lasting up to 9 months.',
     keywords: ['xeomin burbank', 'protein free botox', 'xeomin injections', 'frown lines', 'neurotoxin resistance', 'long lasting neurotoxin burbank'],
     highlights: [
       { icon: '', title: 'No accessory proteins — reduces antibody resistance risk', body: 'Xeomin contains only the pure botulinum toxin molecule without complexing proteins, reducing the likelihood of the immune system developing neutralizing antibodies over repeated treatments.' },
       { icon: '', title: 'FDA-approved for aesthetic and therapeutic use', body: 'Xeomin holds FDA approval for cosmetic treatment of glabellar frown lines and has an established safety record across both aesthetic and medical applications.' },
-      { icon: '', title: 'Results visible in 5 to 7 days', body: 'Patients typically begin to see muscle relaxation within five to seven days of injection, with the full effect visible within two weeks.' },
-      { icon: '', title: 'Up to 9 months duration reported in some patients', body: 'Xeomin\'s results typically last three to six months, with some patients reporting duration extending to nine months, particularly with consistent treatment schedules.' },
+      { icon: '', title: 'Results visible in 5 to 7 days', body: 'Clients typically begin to see muscle relaxation within five to seven days of injection, with the full effect visible within two weeks.' },
+      { icon: '', title: 'Up to 9 months duration reported in some clients', body: 'Xeomin\'s results typically last three to six months, with some clients reporting duration extending to nine months, particularly with consistent treatment schedules.' },
       { icon: '', title: 'Precise dosing for natural-looking outcomes', body: 'The pure formulation allows for accurate, consistent dosing that produces natural-looking muscle relaxation without an overdone or frozen appearance.' },
     ],
     treats: ['Frown Lines', 'Forehead Lines', "Crow's Feet", 'Neck Bands', 'Brow Heaviness', 'Dynamic Wrinkles'],
@@ -644,7 +644,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'Xeomin contains only the active botulinum toxin type A molecule, without the complexing proteins present in other neurotoxin formulations. This protein-free structure reduces the likelihood of the immune system generating antibodies against the product — an important consideration for patients receiving repeated treatments over years. Injected into targeted facial muscles, Xeomin blocks the release of acetylcholine at the neuromuscular junction, temporarily inhibiting the muscle contractions responsible for dynamic wrinkles. Results are visible within five to seven days and are well-established across both aesthetic and therapeutic clinical applications.',
+        body: 'Xeomin contains only the active botulinum toxin type A molecule, without the complexing proteins present in other neurotoxin formulations. This protein-free structure reduces the likelihood of the immune system generating antibodies against the product — an important consideration for clients receiving repeated treatments over years. Injected into targeted facial muscles, Xeomin blocks the release of acetylcholine at the neuromuscular junction, temporarily inhibiting the muscle contractions responsible for dynamic wrinkles. Results are visible within five to seven days and are well-established across both aesthetic and therapeutic clinical applications.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -662,10 +662,10 @@ export const SERVICES: ServiceEntry[] = [
     keywords: ['revanesse versa burbank', 'hyaluronic acid filler', 'facial volume restoration', 'nasolabial folds filler', 'cheek filler burbank', 'dermal filler less swelling'],
     highlights: [
       { icon: '', title: 'FDA-approved hyaluronic acid filler', body: 'Revanesse Versa holds FDA approval for the treatment of moderate to severe facial wrinkles and folds, with an established clinical safety profile.' },
-      { icon: '', title: 'Less swelling than comparable fillers', body: 'Clinical studies comparing Revanesse Versa to Juvederm Ultra Plus demonstrated significantly less post-injection swelling, making it a preferred choice for patients concerned about downtime appearance.' },
+      { icon: '', title: 'Less swelling than comparable fillers', body: 'Clinical studies comparing Revanesse Versa to Juvederm Ultra Plus demonstrated significantly less post-injection swelling, making it a preferred choice for clients concerned about downtime appearance.' },
       { icon: '', title: 'Smooth, consistent spherical particle texture', body: 'The uniform spherical particle structure of Revanesse Versa integrates smoothly into tissue, producing natural-feeling results without lumpiness or irregularity.' },
       { icon: '', title: 'Restores volume naturally with immediate results', body: 'Hyaluronic acid\'s water-attracting properties provide immediate volumization that mimics natural tissue, with results visible immediately after treatment.' },
-      { icon: '', title: 'Results lasting up to 12 months', body: 'Revanesse Versa maintains its volumizing effect for up to twelve months in most patients, with touch-up treatments available to extend and maintain results.' },
+      { icon: '', title: 'Results lasting up to 12 months', body: 'Revanesse Versa maintains its volumizing effect for up to twelve months in most clients, with touch-up treatments available to extend and maintain results.' },
     ],
     treats: ['Volume Loss', 'Nasolabial Folds', 'Cheek Hollowing', 'Facial Contour', 'Under-Eye Hollows', 'Mid-Face Deflation'],
     howItWorks: [
@@ -721,7 +721,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Contains lidocaine for comfort during treatment', body: 'Revanesse lip filler is pre-mixed with lidocaine, a local anesthetic, significantly reducing the discomfort of lip injection compared to formulas without it.' },
       { icon: '', title: 'Minimal swelling compared to other lip fillers', body: 'Clinical comparisons have demonstrated that Revanesse produces less post-treatment swelling than other leading lip filler options, reducing visible recovery time.' },
       { icon: '', title: 'Natural volume and definition', body: 'The hyaluronic acid formula integrates naturally into lip tissue, producing soft, proportional enhancement rather than an overfilled appearance.' },
-      { icon: '', title: 'Over 95% of clients report visible improvement at 6 months', body: 'Clinical data supporting Revanesse lip filler shows high patient satisfaction with maintained results at the six-month mark.' },
+      { icon: '', title: 'Over 95% of clients report visible improvement at 6 months', body: 'Clinical data supporting Revanesse lip filler shows high client satisfaction with maintained results at the six-month mark.' },
       { icon: '', title: 'Hyaluronic acid is reversible with hyaluronidase', body: 'Like all HA fillers, Revanesse lip results can be adjusted or reversed with hyaluronidase enzyme if needed — providing an important safety margin for lip treatments.' },
     ],
     treats: ['Lip Volume', 'Lip Definition', 'Lip Border', 'Lip Asymmetry', 'Perioral Lines', 'Lip Hydration'],
@@ -746,7 +746,7 @@ export const SERVICES: ServiceEntry[] = [
       'PRX Derm Perfexion patented 33% TCA biostimulator boosts deep dermal collagen with zero peeling and no downtime — results lasting 6–12 months.',
     keywords: ['prx derm perfexion', 'no peel chemical treatment', 'collagen biostimulator', 'prx therapy burbank', 'no downtime skin treatment', 'tca no peel'],
     highlights: [
-      { icon: '', title: 'No peeling and no downtime', body: 'Unlike traditional TCA peels, PRX Derm Perfexion stimulates the dermis without triggering the surface peeling response — allowing patients to return to normal activity immediately.' },
+      { icon: '', title: 'No peeling and no downtime', body: 'Unlike traditional TCA peels, PRX Derm Perfexion stimulates the dermis without triggering the surface peeling response — allowing clients to return to normal activity immediately.' },
       { icon: '', title: 'Patented 33% TCA formula with a unique delivery mechanism', body: 'The proprietary combination of TCA and hydrogen peroxide allows deep penetration without the surface reactivity typically associated with high-concentration acid formulas.' },
       { icon: '', title: 'Boosts collagen deep in the dermis', body: 'The formula reaches and activates fibroblasts in the deeper dermal layer, stimulating a sustained collagen synthesis response without disrupting the epidermis.' },
       { icon: '', title: 'Tightens pores and smooths texture', body: 'Repeated sessions produce measurable improvement in pore size, skin texture, and overall surface refinement as the dermis remodels over time.' },
@@ -777,8 +777,8 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Targets melasma and hyperpigmentation at the cellular level', body: 'PRX-PLUS inhibits melanin synthesis pathways within melanocytes, addressing pigmentation at the source rather than at the skin surface.' },
       { icon: '', title: 'Brightens all skin layers simultaneously', body: 'The formula\'s deep penetration means it addresses both superficial and deeper-seated pigmentation in a single treatment application.' },
       { icon: '', title: 'Stimulates collagen with no surface peeling', body: 'Like the original PRX formula, PRX-PLUS delivers its biostimulating benefits to the dermis without disrupting the epidermal surface.' },
-      { icon: '', title: 'No downtime — suitable year-round', body: 'The absence of surface peeling means patients can schedule treatments at any time without concern for sun sensitivity or visible recovery.' },
-      { icon: '', title: 'Visible improvement in tone and luminosity', body: 'Patients typically notice measurable brightening and improvement in overall skin tone beginning within one to two weeks of treatment.' },
+      { icon: '', title: 'No downtime — suitable year-round', body: 'The absence of surface peeling means clients can schedule treatments at any time without concern for sun sensitivity or visible recovery.' },
+      { icon: '', title: 'Visible improvement in tone and luminosity', body: 'Clients typically notice measurable brightening and improvement in overall skin tone beginning within one to two weeks of treatment.' },
     ],
     treats: ['Hyperpigmentation', 'Melasma', 'Dark Spots', 'Uneven Skin Tone', 'Post-Inflammatory Hyperpigmentation', 'Skin Dullness'],
     howItWorks: [
@@ -831,7 +831,7 @@ export const SERVICES: ServiceEntry[] = [
     keywords: ['sensitive skin peel', 'sensi peel burbank', 'pca skin peel', 'gentle chemical peel', 'reactive skin treatment', 'rosacea skin peel'],
     highlights: [
       { icon: '', title: 'Formulated specifically for sensitive skin types', body: 'PCA Skin developed the Sensi Peel specifically for reactive, rosacea-prone, or sensitized skin types that cannot tolerate standard chemical peel formulations.' },
-      { icon: '', title: 'Minimal irritation during and after treatment', body: 'The low-acid formula is calibrated to resurface the skin without triggering the redness, stinging, or inflammatory response common in sensitive patients with conventional peels.' },
+      { icon: '', title: 'Minimal irritation during and after treatment', body: 'The low-acid formula is calibrated to resurface the skin without triggering the redness, stinging, or inflammatory response common in sensitive clients with conventional peels.' },
       { icon: '', title: 'Brightens and evens complexion', body: 'Despite its gentle formulation, the Sensi Peel delivers meaningful improvement in skin brightness and tone uniformity over a series of treatments.' },
       { icon: '', title: 'Smooths skin texture effectively', body: 'Chemical exfoliation at a tolerable concentration removes dull, uneven surface cells and promotes cellular renewal, improving overall skin texture.' },
       { icon: '', title: 'No significant downtime — safe year-round', body: 'The Sensi Peel does not require a recovery period and can be performed at any time of year without concern for seasonal light sensitivity.' },
@@ -841,7 +841,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'The Sensi Peel uses a carefully calibrated low-acid formula designed to resurface the skin without triggering the irritation response common in sensitive individuals. It gently dissolves the bonds between dead surface cells, allowing them to shed naturally and promoting the emergence of fresher, more evenly pigmented skin beneath. Because the concentration is specifically adjusted for reactive skin, the barrier function is maintained throughout the process, preventing the rebound sensitivity or inflammation that poorly tolerated peels can cause. The treatment is performed in a clinical setting and suitable for patients who have previously found chemical peels too aggressive.',
+        body: 'The Sensi Peel uses a carefully calibrated low-acid formula designed to resurface the skin without triggering the irritation response common in sensitive individuals. It gently dissolves the bonds between dead surface cells, allowing them to shed naturally and promoting the emergence of fresher, more evenly pigmented skin beneath. Because the concentration is specifically adjusted for reactive skin, the barrier function is maintained throughout the process, preventing the rebound sensitivity or inflammation that poorly tolerated peels can cause. The treatment is performed in a clinical setting and suitable for clients who have previously found chemical peels too aggressive.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -859,10 +859,10 @@ export const SERVICES: ServiceEntry[] = [
     keywords: ['ultra peel burbank', 'brightening peel', 'pca skin ultra peel', 'dark patches peel', 'chemical peel all skin types', 'tone evening peel'],
     highlights: [
       { icon: '', title: 'PCA Skin medical-grade formula', body: 'PCA Skin is a leading professional skincare brand with a science-backed formulation philosophy, and the Ultra Peel reflects that standard in concentration and ingredient selection.' },
-      { icon: '', title: 'Suitable for sensitive skin types', body: 'The formula is calibrated to deliver brightening and exfoliating benefits without triggering excessive irritation in patients with reactive or sensitive skin.' },
+      { icon: '', title: 'Suitable for sensitive skin types', body: 'The formula is calibrated to deliver brightening and exfoliating benefits without triggering excessive irritation in clients with reactive or sensitive skin.' },
       { icon: '', title: 'Evens tone and reduces dark patches', body: 'Active brightening agents in the peel address surface discoloration and dark patches, producing a more uniform complexion over a series of treatments.' },
       { icon: '', title: 'Softens fine lines and surface texture', body: 'Chemical exfoliation accelerates cellular turnover, gradually smoothing surface irregularities and reducing the appearance of fine lines with each treatment.' },
-      { icon: '', title: 'Minimal downtime', body: 'Most patients experience light flaking for two to four days following treatment, significantly less than deeper peel options while still delivering visible improvement.' },
+      { icon: '', title: 'Minimal downtime', body: 'Most clients experience light flaking for two to four days following treatment, significantly less than deeper peel options while still delivering visible improvement.' },
     ],
     treats: ['Uneven Skin Tone', 'Dark Patches', 'Fine Lines', 'Dull Complexion', 'Sun Damage', 'Mild Discoloration'],
     howItWorks: [
@@ -888,7 +888,7 @@ export const SERVICES: ServiceEntry[] = [
     highlights: [
       { icon: '', title: 'Targets melasma and post-acne discoloration directly', body: 'The Pigment Peel formula is designed specifically for stubborn pigmentation concerns including melasma and the discoloration left by healed acne lesions.' },
       { icon: '', title: 'Multi-acid synergistic formula', body: 'Several brightening acids work together in the formula, each addressing pigmentation through a different mechanism for a more comprehensive result than single-acid alternatives.' },
-      { icon: '', title: 'Visible results in as little as one week', body: 'Patients typically notice measurable improvement in the evenness and brightness of their skin tone within seven days of treatment as cellular renewal completes.' },
+      { icon: '', title: 'Visible results in as little as one week', body: 'Clients typically notice measurable improvement in the evenness and brightness of their skin tone within seven days of treatment as cellular renewal completes.' },
       { icon: '', title: 'No downtime required', body: 'The Pigment Peel is formulated to deliver meaningful pigmentation improvement without requiring a recovery period, making it practical for active schedules.' },
       { icon: '', title: 'PCA Skin medical-grade professional formula', body: 'The peel uses PCA Skin\'s professional-grade ingredient concentrations, validated for both efficacy and tolerability across skin types.' },
     ],
@@ -973,7 +973,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'MIC triple compound formula', body: 'Methionine, inositol, and choline form a well-established lipotropic combination, each contributing a distinct mechanism to support hepatic fat processing and metabolic function.' },
       { icon: '', title: 'Promotes hepatic fat breakdown and clearance', body: 'The MIC compounds work together to support the liver\'s ability to identify, process, and export accumulated tissue deposits for use as energy.' },
       { icon: '', title: 'Supports hormone balance', body: 'Inositol plays a role in insulin signaling and hormonal regulation, with established benefits for conditions involving hormonal imbalance including PCOS-related metabolic dysfunction.' },
-      { icon: '', title: 'Improves mood and wellbeing', body: 'Inositol is involved in serotonin and dopamine signaling pathways; patients on a regular MIC Blend series sometimes report improvement in mood alongside metabolic benefits.' },
+      { icon: '', title: 'Improves mood and wellbeing', body: 'Inositol is involved in serotonin and dopamine signaling pathways; clients on a regular MIC Blend series sometimes report improvement in mood alongside metabolic benefits.' },
       { icon: '', title: 'Boosts metabolic fat processing comprehensively', body: 'By addressing three distinct steps in the hepatic fat processing pathway, the MIC Blend supports a more comprehensive metabolic response than single-compound approaches.' },
     ],
     treats: ['Fat Metabolism', 'Liver Fat Accumulation', 'Hormonal Imbalance', 'Mood & Energy', 'Metabolic Support', 'Weight Management'],
@@ -1057,7 +1057,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Accelerates metabolic fat processing', body: 'IC LipoLean contains lipotropic compounds that support the liver\'s role in mobilizing and processing stored deposits for energy use, working alongside a healthy lifestyle.' },
       { icon: '', title: 'Boosts overall metabolic rate', body: 'The lipotropic blend supports enzymatic pathways involved in metabolic function, helping increase the rate at which the body processes and utilizes stored energy.' },
       { icon: '', title: 'Helps reduce food cravings', body: 'Certain compounds in the LipoLean formula support neurotransmitter pathways associated with appetite regulation, contributing to reduced cravings when used as part of a comprehensive approach.' },
-      { icon: '', title: 'Visible results within two weeks', body: 'Patients who pair IC LipoLean injections with a balanced diet and regular activity typically begin noticing metabolic and energy improvements within two weeks of starting a treatment series.' },
+      { icon: '', title: 'Visible results within two weeks', body: 'Clients who pair IC LipoLean injections with a balanced diet and regular activity typically begin noticing metabolic and energy improvements within two weeks of starting a treatment series.' },
       { icon: '', title: 'Supports liver detoxification pathways', body: 'Lipotropic compounds support hepatic function and the liver\'s ability to process waste products and metabolic byproducts, contributing to overall wellness.' },
     ],
     treats: ['Slow Metabolism', 'Weight Management', 'Fat Accumulation', 'Food Cravings', 'Liver Detox Support', 'Energy Levels'],
@@ -1086,7 +1086,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Supports lean muscle and body composition', body: 'Growth hormone plays a direct role in muscle protein synthesis and the preferential use of stored tissue for energy, supporting improved body composition over time.' },
       { icon: '', title: 'Stimulates collagen synthesis throughout the body', body: 'HGH stimulates fibroblast activity and collagen production, contributing to improvements in skin firmness, connective tissue strength, and overall tissue quality.' },
       { icon: '', title: 'Improves sleep quality and recovery', body: 'Growth hormone is primarily secreted during deep sleep stages; restoring HGH levels tends to improve sleep depth and the restorative quality of rest.' },
-      { icon: '', title: 'Enhances mental clarity and energy levels', body: 'Growth hormone has neurological effects including improved cognitive function, mood regulation, and energy availability that patients frequently report as among the most noticeable benefits.' },
+      { icon: '', title: 'Enhances mental clarity and energy levels', body: 'Growth hormone has neurological effects including improved cognitive function, mood regulation, and energy availability that clients frequently report as among the most noticeable benefits.' },
     ],
     treats: ['HGH Decline', 'Low Energy', 'Muscle Loss', 'Collagen Depletion', 'Poor Sleep', 'Mental Fog'],
     howItWorks: [
@@ -1113,7 +1113,7 @@ export const SERVICES: ServiceEntry[] = [
       { icon: '', title: 'Replenishes declining NAD+ levels directly', body: 'NAD+ levels drop significantly with age — IV infusion restores them to levels that oral supplementation cannot reliably achieve, due to absorption limitations.' },
       { icon: '', title: 'Boosts mitochondrial energy production', body: 'NAD+ is a critical substrate in the electron transport chain; restoring cellular NAD+ directly supports the mitochondria\'s ability to produce ATP for energy.' },
       { icon: '', title: 'Supports DNA repair mechanisms', body: 'NAD+ is required by PARP enzymes, which detect and repair DNA strand breaks — a fundamental cellular maintenance process that depends on adequate NAD+ availability.' },
-      { icon: '', title: 'Improves mental clarity and cognitive function', body: 'NAD+ plays a role in neuronal health and sirtuins activity; patients frequently report improved focus, mental clarity, and mood following a series of infusions.' },
+      { icon: '', title: 'Improves mental clarity and cognitive function', body: 'NAD+ plays a role in neuronal health and sirtuins activity; clients frequently report improved focus, mental clarity, and mood following a series of infusions.' },
       { icon: '', title: 'Reduces cellular inflammation and improves sleep', body: 'NAD+-dependent pathways regulate inflammatory signaling and circadian rhythm function, contributing to reported improvements in systemic inflammation and sleep quality.' },
     ],
     treats: ['Cellular Energy Decline', 'Mental Fog', 'Poor Sleep', 'Inflammation', 'DNA Damage', 'Age-Related Fatigue'],
@@ -1133,15 +1133,15 @@ export const SERVICES: ServiceEntry[] = [
     name: 'Weight Loss Consultation',
     category: 'Weight Loss',
     tagline:
-      'Comprehensive evaluation for medically supervised weight loss — personalized plans built around your health history, goals, and lifestyle, complimentary for new patients.',
+      'Comprehensive evaluation for medically supervised weight loss — personalized plans built around your health history, goals, and lifestyle, complimentary for new clients.',
     searchDescription:
-      'Medical weight loss consultation — comprehensive evaluation for a personalized, medically supervised weight loss protocol, complimentary for new patients.',
+      'Medical weight loss consultation — comprehensive evaluation for a personalized, medically supervised weight loss protocol, complimentary for new clients.',
     keywords: ['weight loss consultation burbank', 'medical weight loss', 'glp1 consultation', 'free weight loss consultation', 'supervised weight loss', 'weight loss doctor burbank'],
     highlights: [
       { icon: '', title: 'Comprehensive health history evaluation', body: 'The consultation reviews your complete health history including existing conditions, current medications, previous weight loss attempts, and relevant labs to inform the appropriate protocol.' },
       { icon: '', title: 'Fully personalized treatment plan', body: 'No two protocols are identical — the plan developed reflects your specific metabolic status, health constraints, lifestyle, and goals rather than a standardized template.' },
-      { icon: '', title: 'No one-size-fits-all protocols', body: 'Factors including hormonal status, medication interactions, comorbidities, and weight history all influence which approach will be both safe and effective for a given patient.' },
-      { icon: '', title: 'Complimentary for new patients', body: 'The initial medical weight loss consultation is provided at no charge for new patients, removing the financial barrier to getting the information needed to make an informed decision.' },
+      { icon: '', title: 'No one-size-fits-all protocols', body: 'Factors including hormonal status, medication interactions, comorbidities, and weight history all influence which approach will be both safe and effective for a given client.' },
+      { icon: '', title: 'Complimentary for new clients', body: 'The initial medical weight loss consultation is provided at no charge for new clients, removing the financial barrier to getting the information needed to make an informed decision.' },
       { icon: '', title: 'First step toward lasting results', body: 'The consultation is the foundation of the entire program — the quality of the evaluation directly influences the appropriateness and effectiveness of everything that follows.' },
     ],
     treats: ['Weight Management Planning', 'Health History Review', 'Goal Setting', 'Lifestyle Assessment', 'Metabolic Evaluation', 'Treatment Planning'],
@@ -1149,7 +1149,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'The consultation is a thorough one-on-one evaluation of your health history, current metabolic status, weight history, and personal goals. The provider uses this information to determine the most appropriate medically supervised weight loss protocol — whether that involves GLP-1 medications, lifestyle interventions, or a combined approach tailored specifically to your physiology and circumstances. The consultation is complimentary for new patients and serves as the foundation for building a plan that is both medically sound and realistic for your individual situation.',
+        body: 'The consultation is a thorough one-on-one evaluation of your health history, current metabolic status, weight history, and personal goals. The provider uses this information to determine the most appropriate medically supervised weight loss protocol — whether that involves GLP-1 medications, lifestyle interventions, or a combined approach tailored specifically to your physiology and circumstances. The consultation is complimentary for new clients and serves as the foundation for building a plan that is both medically sound and realistic for your individual situation.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -1177,7 +1177,7 @@ export const SERVICES: ServiceEntry[] = [
       {
         step: '1',
         title: 'How It Works',
-        body: 'The program combines FDA-approved GLP-1 receptor agonist medications with a structured nutrition and lifestyle plan developed around each patient\'s individual health history. GLP-1 medications work by mimicking the incretin hormones that regulate appetite, slow gastric emptying, and improve insulin sensitivity — reducing caloric intake through both physiological appetite suppression and improved metabolic efficiency. Regular medical supervision ensures the protocol is adjusted as the body responds, providing a safe and personalized pathway to meaningful, sustainable weight reduction that addresses the underlying metabolic factors rather than relying solely on behavioral restriction.',
+        body: 'The program combines FDA-approved GLP-1 receptor agonist medications with a structured nutrition and lifestyle plan developed around each client\'s individual health history. GLP-1 medications work by mimicking the incretin hormones that regulate appetite, slow gastric emptying, and improve insulin sensitivity — reducing caloric intake through both physiological appetite suppression and improved metabolic efficiency. Regular medical supervision ensures the protocol is adjusted as the body responds, providing a safe and personalized pathway to meaningful, sustainable weight reduction that addresses the underlying metabolic factors rather than relying solely on behavioral restriction.',
       },
     ],
     disclaimer: DISCLAIMER,
@@ -1191,21 +1191,21 @@ export const SERVICES: ServiceEntry[] = [
     tagline:
       'Flexible treatment financing with no impact to your credit score to apply — get pre-approved for a payment plan that fits your budget, risk-free, fast, and easy.',
     searchDescription:
-      'Cherry payment plans allow patients to finance any treatment at Magnolia Skin Center with no credit score impact to apply — flexible terms, fast approval.',
+      'Cherry payment plans allow clients to finance any treatment at Magnolia Skin Center with no credit score impact to apply — flexible terms, fast approval.',
     keywords: ['cherry financing', 'medical financing burbank', 'aesthetic payment plans', 'cherry pay', 'treatment financing', 'no credit check aesthetic financing'],
     highlights: [
       { icon: '', title: 'Applying does not impact your credit score', body: 'Cherry uses a soft credit inquiry for pre-qualification, meaning checking your eligibility will not affect your credit score in any way.' },
       { icon: '', title: 'Fast pre-approval process', body: 'The application takes minutes to complete, and most applicants receive a pre-approval decision quickly — with no lengthy waiting period.' },
-      { icon: '', title: 'Flexible payment terms to fit your budget', body: 'Cherry offers a range of repayment terms, allowing patients to select the monthly payment structure that fits their financial situation.' },
+      { icon: '', title: 'Flexible payment terms to fit your budget', body: 'Cherry offers a range of repayment terms, allowing clients to select the monthly payment structure that fits their financial situation.' },
       { icon: '', title: 'Covers any treatment on the menu', body: 'Cherry financing can be applied toward any service offered at Magnolia Skin Center — including aesthetic treatments, wellness services, memberships, and packages.' },
-      { icon: '', title: 'No financial barrier to starting care', body: 'Cherry is designed specifically for healthcare and aesthetic practices to ensure patients can access the treatment they need without being limited by upfront cost.' },
+      { icon: '', title: 'No financial barrier to starting care', body: 'Cherry is designed specifically for healthcare and aesthetic practices to ensure clients can access the treatment they need without being limited by upfront cost.' },
     ],
     treats: ['Any Aesthetic Treatment', 'Any Wellness Service', 'Multiple Treatments Together', 'Membership Fees', 'Treatment Packages', 'Consultation Fees'],
     howItWorks: [
       {
         step: '1',
         title: 'How It Works',
-        body: 'Cherry is a patient financing platform that allows clients to split their treatment costs into manageable monthly payments. Applying takes minutes and does not affect your credit score. Upon approval, the credit can be applied toward any service or membership at Magnolia Skin Center — making it easy to start the treatment plan that is right for you without financial delay. Cherry\'s terms are transparent and the process is straightforward, with no hidden fees or surprises in the repayment structure.',
+        body: 'Cherry is a client financing platform that allows clients to split their treatment costs into manageable monthly payments. Applying takes minutes and does not affect your credit score. Upon approval, the credit can be applied toward any service or membership at Magnolia Skin Center — making it easy to start the treatment plan that is right for you without financial delay. Cherry\'s terms are transparent and the process is straightforward, with no hidden fees or surprises in the repayment structure.',
       },
     ],
     disclaimer: DISCLAIMER,
