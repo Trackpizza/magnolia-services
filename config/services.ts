@@ -79,11 +79,6 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
     description: 'Medically supervised programs combining clinical guidance, nutrition support, and targeted treatments.',
     ids: ['weight-loss-consultation', 'weight-loss-program'],
   },
-  {
-    name: 'Financing',
-    description: 'Flexible payment options so the treatment you want is never out of reach.',
-    ids: ['cherry-payment-plans'],
-  },
 ]
 
 const DISCLAIMER =
@@ -1183,34 +1178,6 @@ export const SERVICES: ServiceEntry[] = [
     disclaimer: DISCLAIMER,
     alsoKnownAs: ['semaglutide', 'tirzepatide', 'ozempic alternative', 'wegovy alternative', 'glp-1 program', 'weight loss injections', 'medical weight loss'],
   },
-  {
-    id: 'cherry-payment-plans',
-    slug: 'cherry-payment-plans-financing-pay-monthly-no-credit-check-burbank-ca',
-    name: 'Cherry Payment Plans',
-    category: 'Financing',
-    tagline:
-      'Flexible treatment financing with no impact to your credit score to apply — get pre-approved for a payment plan that fits your budget, risk-free, fast, and easy.',
-    searchDescription:
-      'Cherry payment plans allow clients to finance any treatment at Magnolia Skin Center with no credit score impact to apply — flexible terms, fast approval.',
-    keywords: ['cherry financing', 'medical financing burbank', 'aesthetic payment plans', 'cherry pay', 'treatment financing', 'no credit check aesthetic financing'],
-    highlights: [
-      { icon: '', title: 'Applying does not impact your credit score', body: 'Cherry uses a soft credit inquiry for pre-qualification, meaning checking your eligibility will not affect your credit score in any way.' },
-      { icon: '', title: 'Fast pre-approval process', body: 'The application takes minutes to complete, and most applicants receive a pre-approval decision quickly — with no lengthy waiting period.' },
-      { icon: '', title: 'Flexible payment terms to fit your budget', body: 'Cherry offers a range of repayment terms, allowing clients to select the monthly payment structure that fits their financial situation.' },
-      { icon: '', title: 'Covers any treatment on the menu', body: 'Cherry financing can be applied toward any service offered at Magnolia Skin Center — including aesthetic treatments, wellness services, memberships, and packages.' },
-      { icon: '', title: 'No financial barrier to starting care', body: 'Cherry is designed specifically for healthcare and aesthetic practices to ensure clients can access the treatment they need without being limited by upfront cost.' },
-    ],
-    treats: ['Any Aesthetic Treatment', 'Any Wellness Service', 'Multiple Treatments Together', 'Membership Fees', 'Treatment Packages', 'Consultation Fees'],
-    howItWorks: [
-      {
-        step: '1',
-        title: 'How It Works',
-        body: 'Cherry is a client financing platform that allows clients to split their treatment costs into manageable monthly payments. Applying takes minutes and does not affect your credit score. Upon approval, the credit can be applied toward any service or membership at Magnolia Skin Center — making it easy to start the treatment plan that is right for you without financial delay. Cherry\'s terms are transparent and the process is straightforward, with no hidden fees or surprises in the repayment structure.',
-      },
-    ],
-    disclaimer: DISCLAIMER,
-    alsoKnownAs: ['pay monthly', 'treatment financing', 'aesthetic payment plan', 'no credit check financing', 'split treatment cost', 'pay over time'],
-  },
 ]
 
 export function getServiceBySlug(slug: string): ServiceEntry | undefined {
@@ -1229,16 +1196,14 @@ export function getAllSlugs(): string[] {
   return SERVICES.filter(s => !s.hidden).map(s => s.slug)
 }
 
-// Excluded from the /spin game: Financing (payment plans) + the Weight Loss Consultation
-// (its "concerns" are process steps, not symptoms). The Weight Loss Program stays in.
-const SPINNER_EXCLUDED_CATEGORIES = ['Financing']
+// Excluded from the /spin game: the Weight Loss Consultation (its "concerns"
+// are process steps, not symptoms). The Weight Loss Program stays in.
 const SPINNER_EXCLUDED_IDS = ['weight-loss-consultation']
 
 // Treatments eligible for the "guess the treatment" spinner.
 export function getSpinnerServices(): ServiceEntry[] {
   return SERVICES.filter(s =>
     !s.hidden &&
-    !SPINNER_EXCLUDED_CATEGORIES.includes(s.category) &&
     !SPINNER_EXCLUDED_IDS.includes(s.id)
   )
 }

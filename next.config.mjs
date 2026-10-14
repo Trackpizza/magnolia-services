@@ -13,6 +13,13 @@ const nextConfig = {
       // /bookings/manage and /bookings/cancel are real pages that emails link.
       { source: '/bookings', destination: '/booking', permanent: true },
       { source: '/bookingpreview', destination: '/booking', permanent: true },
+      // Cherry payment plans removed (10-13, Eric: not used). The page was
+      // indexed — send it, and its guide pages, to the services directory.
+      {
+        source: '/services/cherry-payment-plans-financing-pay-monthly-no-credit-check-burbank-ca/:path*',
+        destination: '/',
+        permanent: true,
+      },
     ]
   },
 }
