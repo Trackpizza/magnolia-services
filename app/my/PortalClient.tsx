@@ -16,6 +16,7 @@ import PortalShare, { type JourneyShare } from './PortalShare'
 import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
+import ConsultVideo, { EarlierVideo } from './ConsultVideo'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 
@@ -181,6 +182,11 @@ interface PhotoConsultVideo {
   readyAt: string
   kind?: 'ai' | 'real'
   ai?: boolean
+  /** 10-15: the video file + poster, to play in the card, and the notes-free
+   *  copy to share. Absent on older APIs → the Watch link. */
+  file?: string
+  poster?: string
+  shareUrl?: string
 }
 
 /** "Photo consult · September 29" / "Your journey · October 2". */
@@ -967,24 +973,20 @@ export default function PortalClient({ token, learnMore = [] }: {
               {videoTitle(latest) && <p className="text-sm text-gray-700">{videoTitle(latest)}</p>}
               <p className="text-sm text-gray-600 mt-1">{videoNote(latest)}</p>
             </div>
-            <a href={latest.url} target="_blank" rel="noopener noreferrer" className={primaryBtn + ' text-center block'}>
-              ▶ Watch
-            </a>
+            <ConsultVideo v={latest} watchClass={primaryBtn} />
             {older.length > 0 && (
               <div className="mt-5 pt-4 border-t border-gray-100">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">Earlier videos</p>
                 <ul className="divide-y divide-gray-100">
                   {older.map((v) => (
-                    <li key={v.url} className="py-3 flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-gray-900">{videoLabel(v)}</p>
-                        {videoTitle(v) && <p className="text-sm text-gray-700 truncate">{videoTitle(v)}</p>}
-                        <p className="text-xs text-gray-600 mt-0.5">{videoNote(v)}</p>
-                      </div>
-                      <a href={v.url} target="_blank" rel="noopener noreferrer" className={quietBtn + ' shrink-0 font-semibold'}>
-                        ▶ Watch
-                      </a>
-                    </li>
+                    <EarlierVideo
+                      key={v.url}
+                      v={v}
+                      label={videoLabel(v)}
+                      title={videoTitle(v)}
+                      note={videoNote(v)}
+                      watchClass={primaryBtn}
+                    />
                   ))}
                 </ul>
               </div>
