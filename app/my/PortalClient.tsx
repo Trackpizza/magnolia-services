@@ -17,6 +17,7 @@ import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
+import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 
@@ -157,6 +158,8 @@ interface OpenView {
   /** Packages, deposits & quotes the clinic sent from the chart (records
    *  lib/money.ts, 10-13) — as they are now. Absent on older APIs. */
   account?: AccountItem[]
+  /** Medication holds still to do (records lib/medHolds.ts, 10-16). */
+  medHolds?: PortalMedHold[]
   history: History | null
   termsNeeded?: undefined
 }
@@ -673,6 +676,13 @@ export default function PortalClient({ token, learnMore = [] }: {
 
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />
+
+      {/* Talk to your doctor — time sensitive (10-16): medications to pause
+          before a treatment. First of all, because it has the earliest
+          deadline on the page. */}
+      {view.medHolds && view.medHolds.length > 0 && (
+        <PortalMedHolds holds={view.medHolds} token={token} session={session} />
+      )}
 
       {/* ── Still to do ───────────────────────────────────────────────────
           First when there is anything, because it is the only part of this
