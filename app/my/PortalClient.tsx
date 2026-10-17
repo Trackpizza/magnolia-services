@@ -235,6 +235,11 @@ const card = 'bg-white rounded-2xl border border-gray-100 p-6 sm:p-8'
 const primaryBtn =
   'w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
 const quietBtn = 'text-sm text-brand-600 hover:text-brand-700'
+/** A small rounded button — the Text / Call / Directions pills (10-17). */
+const pill =
+  'inline-flex items-center gap-1.5 rounded-full border border-brand-600 px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors'
+/** The clinic on Google Maps (Eric, 10-17). */
+const CLINIC_DIRECTIONS_URL = 'https://maps.app.goo.gl/CsynoEibqcPGhdnAA'
 
 export default function PortalClient({ token, learnMore = [] }: {
   token: string
@@ -1266,11 +1271,24 @@ export default function PortalClient({ token, learnMore = [] }: {
         ) : (
           <p className="text-gray-700">Give us a call or a text any time.</p>
         )}
+        {/* Text / Call pills on a phone (10-17, Eric) — one tap instead of
+            copying the number. sms: and tel: with the US country code. */}
+        {view.clinicPhone && (
+          <div className="mt-3 flex flex-wrap gap-2 sm:hidden">
+            <a href={`sms:+1${view.clinicPhone.replace(/\D/g, '').slice(-10)}`} className={pill}>💬 Text</a>
+            <a href={`tel:+1${view.clinicPhone.replace(/\D/g, '').slice(-10)}`} className={pill}>📞 Call</a>
+          </div>
+        )}
         {/* From settings, not hardcoded. A clinic that moves should not need a
             deploy to stop sending patients to the old address. */}
         {view.clinicAddress && (
           <p className="text-sm text-gray-600 mt-3">{view.clinicAddress}</p>
         )}
+        {/* Directions (10-17): the clinic's Google Maps place. ⚠ A hardcoded
+            link — if the clinic ever moves, change CLINIC_DIRECTIONS_URL too. */}
+        <div className="mt-2">
+          <a href={CLINIC_DIRECTIONS_URL} target="_blank" rel="noopener noreferrer" className={pill}>📍 Directions</a>
+        </div>
       </Section>
 
       <p className="portal-onbg text-center text-xs text-gray-500 px-4">
