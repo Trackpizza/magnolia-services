@@ -4,13 +4,14 @@
  * cards: a colour, two colours, or a drawn scene. It applies at once and is
  * saved on their chart (records portal action "set-background"), so it follows
  * them to every device. The cards, wording and Magnolia colours never change.
+ * Photos show as thumbnails here; the full photo loads only once chosen.
  */
 import { useRef, useState } from 'react'
-import { GRADIENTS, SCENES, SOLIDS, backgroundFor, type BgOption } from './backgrounds'
+import { GRADIENTS, PHOTOS, SOLIDS, backgroundFor, type BgOption } from './backgrounds'
 
 const swatch = 'relative h-14 rounded-xl border-2 transition-transform hover:scale-[1.03] focus:outline-none'
 
-function Swatch({ o, picked, onPick }: { o: BgOption; picked: boolean; onPick: (v: string) => void }) {
+function Swatch({ o, picked, onPick, tall }: { o: BgOption; picked: boolean; onPick: (v: string) => void; tall?: boolean }) {
   const look = backgroundFor(o.value)
   return (
     <button
@@ -18,8 +19,8 @@ function Swatch({ o, picked, onPick }: { o: BgOption; picked: boolean; onPick: (
       onClick={() => onPick(o.value)}
       aria-pressed={picked}
       title={o.name}
-      className={swatch}
-      style={{ background: look?.css, backgroundSize: 'auto', borderColor: picked ? '#ffffff' : 'transparent', boxShadow: picked ? '0 0 0 2px #79a090' : undefined }}
+      className={`${swatch} ${tall ? 'h-28' : ''}`}
+      style={{ background: look?.thumb ?? look?.css, backgroundSize: 'cover', backgroundPosition: 'center', borderColor: picked ? '#ffffff' : 'transparent', boxShadow: picked ? '0 0 0 2px #79a090' : undefined }}
     >
       <span className="absolute inset-x-0 bottom-0 rounded-b-[10px] bg-black/45 px-1 py-0.5 text-[11px] font-semibold text-white">{o.name}</span>
     </button>
@@ -92,10 +93,11 @@ export default function BackgroundPicker({ value, onChange, onClose }: {
       </div>
 
       <div>
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Scenes</p>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {SCENES.map((o) => <Swatch key={o.value} o={o} picked={value === o.value} onPick={pick} />)}
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Photos</p>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+          {PHOTOS.map((o) => <Swatch key={o.value} o={o} picked={value === o.value} onPick={pick} tall />)}
         </div>
+        <p className="mt-2 text-[11px] text-gray-500">Photos from Unsplash.</p>
       </div>
 
       <button type="button" onClick={() => pick('')} className="text-sm font-semibold text-brand-600 hover:text-brand-700" aria-pressed={value === ''}>

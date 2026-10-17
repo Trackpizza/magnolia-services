@@ -343,10 +343,12 @@ export default function PortalClient({ token, learnMore = [] }: {
     const b = document.body
     b.dataset.bg = '1'
     b.style.setProperty('--pbg', look.css)
+    b.style.setProperty('--pbg-wide', look.wide)
     b.style.setProperty('--accent', look.accent)
     return () => {
       delete b.dataset.bg
       b.style.removeProperty('--pbg')
+      b.style.removeProperty('--pbg-wide')
       b.style.removeProperty('--accent')
     }
   }, [bg])

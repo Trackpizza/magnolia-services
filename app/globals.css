@@ -85,8 +85,14 @@ body {
    PortalClient sets <body data-bg> with --pbg (the page) and --accent (five
    small card touches). Cards, wording and Magnolia colours are untouched; text
    that sits straight on the background (.portal-onbg) gets a soft dark pill. */
-body[data-bg] .portal-dark { background: var(--pbg); background-attachment: fixed; }
-@media (hover: none) { body[data-bg] .portal-dark { background-attachment: scroll; } }
+/* The background is its own FIXED layer behind the page — it stays put and
+   sharp while the cards scroll (a fixed background-attachment is ignored on
+   iPhones and would stretch a photo down the whole page). Tall crop on a
+   phone, wide on a computer. */
+body[data-bg] { background: transparent; }
+body[data-bg] .portal-dark { background: transparent; }
+body[data-bg]::before { content: ''; position: fixed; inset: 0; z-index: -1; background: var(--pbg) center / cover no-repeat; }
+@media (min-aspect-ratio: 4/5) { body[data-bg]::before { background: var(--pbg-wide) center / cover no-repeat; } }
 body[data-bg] .portal-dark .portal-onbg { background: rgba(26, 27, 26, .62); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); border-radius: 1rem; padding: .4rem .8rem; width: fit-content; }
 body[data-bg] .portal-dark .portal-onbg.flex { width: auto; }
 body[data-bg] .portal-dark p.portal-onbg { margin-left: auto; margin-right: auto; }

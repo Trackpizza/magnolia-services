@@ -2,14 +2,12 @@
  * Portal backgrounds the client chooses (10-17, Eric). Stored on their chart
  * by the records app (lib/portalBackground.ts — same value format, checked
  * there too):
- *   ""  ·  "solid:#rrggbb"  ·  "grad:#rrggbb,#rrggbb"  ·  "scene:<id>"
+ *   ""  ·  "solid:#rrggbb"  ·  "grad:#rrggbb,#rrggbb"  ·  "photo:<id>"
  *
  * Only the page BEHIND the cards changes. Each choice also has an ACCENT
  * colour for five small touches on the cards (top stripe, corner glow,
  * heading underline, count badge, chevron — app/globals.css). Accents sit on
- * the dark cards, so they are kept bright; a scene's accent is hand-picked to
- * match its art. The scenes are drawn (SVG / CSS), not photos: sharp at any
- * size, instant to load, nothing to license.
+ * the dark cards, so they are kept bright; a photo's accent is hand-picked.
  */
 
 export type BgOption = { value: string; name: string }
@@ -29,53 +27,36 @@ export const GRADIENTS: BgOption[] = [
   { value: 'grad:#43cea2,#185a9d', name: 'Lagoon' },
 ]
 
-const svg = (s: string) => `url("data:image/svg+xml,${encodeURIComponent(s)}")`
-
-const WAVES = svg(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='240' height='64'><path d='M0 32 Q30 12 60 32 T120 32 T180 32 T240 32' fill='none' stroke='white' stroke-opacity='.14' stroke-width='2'/></svg>",
-)
-const PINES = svg(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='150'><g fill='#06190e' fill-opacity='.5'><path d='M18 150 L42 72 L66 150Z'/><path d='M72 150 L102 46 L132 150Z'/><path d='M128 150 L152 88 L176 150Z'/></g></svg>",
-)
-const STARS = svg(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><g fill='white'>" +
-    "<circle cx='14' cy='22' r='1.2' fill-opacity='.9'/><circle cx='70' cy='60' r='.8' fill-opacity='.6'/><circle cx='130' cy='18' r='1' fill-opacity='.8'/>" +
-    "<circle cx='190' cy='74' r='1.4' fill-opacity='.9'/><circle cx='40' cy='140' r='.9' fill-opacity='.7'/><circle cx='104' cy='118' r='1.3' fill-opacity='.85'/>" +
-    "<circle cx='168' cy='170' r='.8' fill-opacity='.6'/><circle cx='22' cy='200' r='1' fill-opacity='.75'/><circle cx='120' cy='196' r='.7' fill-opacity='.5'/>" +
-    "<circle cx='204' cy='126' r='.9' fill-opacity='.7'/><circle cx='86' cy='170' r='.6' fill-opacity='.5'/></g></svg>",
-)
-const DUNES = svg(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='120'><path d='M0 90 Q80 40 160 80 T320 70 V120 H0Z' fill='#3a1640' fill-opacity='.35'/></svg>",
-)
-const BLOSSOMS = svg(
-  "<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'>" +
-    "<g transform='translate(40 44)' fill='#ffffff' fill-opacity='.7'><circle cx='0' cy='-7' r='6'/><circle cx='7' cy='-2' r='6'/><circle cx='4' cy='6' r='6'/><circle cx='-4' cy='6' r='6'/><circle cx='-7' cy='-2' r='6'/><circle r='3' fill='#f06292' fill-opacity='.9'/></g>" +
-    "<g transform='translate(132 120) scale(.7)' fill='#f8bbd0' fill-opacity='.8'><circle cx='0' cy='-7' r='6'/><circle cx='7' cy='-2' r='6'/><circle cx='4' cy='6' r='6'/><circle cx='-4' cy='6' r='6'/><circle cx='-7' cy='-2' r='6'/><circle r='3' fill='#ad1457' fill-opacity='.8'/></g>" +
-    "<ellipse cx='110' cy='40' rx='5' ry='3' fill='#ffffff' fill-opacity='.5' transform='rotate(30 110 40)'/></svg>",
-)
-
-export const SCENES: (BgOption & { css: string; accent: string })[] = [
-  { value: 'scene:ocean', name: 'Ocean', accent: '#5fe3ee', css: `${WAVES}, linear-gradient(180deg, #0b3d5c 0%, #1279a8 55%, #4fc3d9 100%)` },
-  { value: 'scene:forest', name: 'Forest', accent: '#9be08f', css: `${PINES}, linear-gradient(180deg, #13321f 0%, #1f5135 50%, #3c7a4f 100%)` },
-  {
-    value: 'scene:stars',
-    name: 'Starry night',
-    accent: '#ffd76a',
-    css: `radial-gradient(circle at 82% 10%, rgba(255, 244, 214, .95) 0 26px, rgba(255, 244, 214, .18) 27px 60px, transparent 61px), ${STARS}, linear-gradient(180deg, #070b1f 0%, #121c4a 60%, #24306b 100%)`,
-  },
-  { value: 'scene:desert', name: 'Desert dusk', accent: '#ffb26b', css: `${DUNES}, linear-gradient(180deg, #2d1b4e 0%, #8e3a6e 45%, #e0784f 80%, #f6a35b 100%)` },
-  { value: 'scene:blossom', name: 'Cherry blossom', accent: '#ff86b0', css: `${BLOSSOMS}, linear-gradient(180deg, #fde2ea 0%, #f7b9cb 100%)` },
-  {
-    value: 'scene:aurora',
-    name: 'Northern lights',
-    accent: '#6dffc4',
-    css:
-      'radial-gradient(ellipse 70% 40% at 20% 12%, rgba(64, 255, 170, .45), transparent 70%), ' +
-      'radial-gradient(ellipse 60% 45% at 80% 22%, rgba(150, 90, 255, .42), transparent 70%), ' +
-      'radial-gradient(ellipse 80% 35% at 50% 40%, rgba(0, 200, 255, .25), transparent 75%), ' +
-      'linear-gradient(180deg, #050d1a 0%, #0b1f33 60%, #10283f 100%)',
-  },
+/**
+ * Photos (10-17, Eric): 19 free photos from Unsplash, checked one by one as
+ * "Free to use under the Unsplash License" (commercial use, no credit needed —
+ * kept here anyway). Each in public/portal-bg/ as <id>-tall.webp (phones,
+ * 900×1600), <id>-wide.webp (computers, 1600 wide) and <id>-thumb.webp (the
+ * picker). Only the chosen one loads. Accents hand-picked to match.
+ */
+export const PHOTOS: (BgOption & { accent: string; credit: string; link: string })[] = [
+  { value: 'photo:ocean-calm', name: 'Calm ocean', accent: '#86d0e3', credit: 'Matt Hardy', link: 'https://unsplash.com/photos/body-of-water-under-sky-6ArTTluciuA' },
+  { value: 'photo:ocean-aerial', name: 'Turquoise shore', accent: '#3fd6d9', credit: 'Shifaaz Shamoon', link: 'https://unsplash.com/photos/aerial-photo-of-seashore-sLAk1guBG90' },
+  { value: 'photo:beach-golden', name: 'Golden beach', accent: '#ffc27a', credit: 'Sean Oulashin', link: 'https://unsplash.com/photos/KMn4VEeEPR8' },
+  { value: 'photo:beach-tropical', name: 'Tropical beach', accent: '#4fd8e0', credit: 'Simon Spring', link: 'https://unsplash.com/photos/BJ-FvNGCfEY' },
+  { value: 'photo:palms-sunset', name: 'Palms at sunset', accent: '#ff9ec7', credit: 'Jordan McQueen', link: 'https://unsplash.com/photos/u9tAl8WR3DI' },
+  { value: 'photo:forest-sunrays', name: 'Sunlit forest', accent: '#b4dd8c', credit: 'Sebastian Unrau', link: 'https://unsplash.com/photos/sp-p7uuT0tw' },
+  { value: 'photo:forest-mist', name: 'Misty pines', accent: '#9fd0b4', credit: 'Dan Otis', link: 'https://unsplash.com/photos/OYFHT4X5isg' },
+  { value: 'photo:lake-turquoise', name: 'Mountain lake', accent: '#5fe0d0', credit: 'Adam Vradenburg', link: 'https://unsplash.com/photos/GA09PKfRIQY' },
+  { value: 'photo:lake-pines', name: 'Lake in the pines', accent: '#8fd3a0', credit: 'Luca Bravo', link: 'https://unsplash.com/photos/ESkw2ayO2As' },
+  { value: 'photo:desert-blue', name: 'Desert sky', accent: '#f2b880', credit: 'Matteo Di Iorio', link: 'https://unsplash.com/photos/wkMd_DylG8I' },
+  { value: 'photo:desert-orange', name: 'Desert sunset', accent: '#ffa45c', credit: 'Tijs van Leur', link: 'https://unsplash.com/photos/9bd6LStI8ug' },
+  { value: 'photo:blossom-pink', name: 'Cherry blossom', accent: '#ff9ec2', credit: 'AJ', link: 'https://unsplash.com/photos/pink-flowers-McsNra2VRQQ' },
+  { value: 'photo:blossom-water', name: 'Blossoms by the water', accent: '#f7a8c8', credit: 'Mark Tegethoff', link: 'https://unsplash.com/photos/body-of-water-beside-cherry-blossom-trees-NMLv5HQZnK4' },
+  { value: 'photo:lavender-pink', name: 'Lavender at dusk', accent: '#d0a8ff', credit: 'Antony Bec', link: 'https://unsplash.com/photos/lavender-fields-in-valensole-france-nD9tEn63suc' },
+  { value: 'photo:lavender-field', name: 'Lavender field', accent: '#b98cff', credit: 'Léonard Cotte', link: 'https://unsplash.com/photos/lavender-field-c1Jp-fo53U8' },
+  { value: 'photo:stars', name: 'Starry night', accent: '#a8c0ff', credit: 'Olena Bohovyk', link: 'https://unsplash.com/photos/Cq5NaI0yKBE' },
+  { value: 'photo:milky-way', name: 'Milky Way', accent: '#8fb0ff', credit: 'Nathan Anderson', link: 'https://unsplash.com/photos/L95xDkSSuWw' },
+  { value: 'photo:la-skyline', name: 'LA at night', accent: '#ffc46b', credit: 'Henning Witzel', link: 'https://unsplash.com/photos/los-angeles-skyline-at-night-ukvgqriuOgo' },
+  { value: 'photo:city-lights', name: 'City lights', accent: '#7fb2ff', credit: 'Van Mendoza', link: 'https://unsplash.com/photos/building-lights-photography-r7YZXv5f5cc' },
 ]
+
+export const photoUrl = (id: string, size: 'tall' | 'wide' | 'thumb') => `/portal-bg/${id}-${size}.webp`
 
 const HEX = /^#[0-9a-f]{6}$/
 
@@ -99,17 +80,30 @@ export function accentFrom(hex: string): string {
   return `hsl(${Math.round(h)} ${Math.round(sat * 100)}% ${Math.round(light * 100)}%)`
 }
 
-/** The page background and the card accent for a stored value, or null for the standard page. */
-export function backgroundFor(value: string): { css: string; accent: string } | null {
+/**
+ * The page background for a stored value, or null for the standard page:
+ * `css` for a phone (and the picker), `wide` for a computer — the same for a
+ * colour; a photo has a tall and a wide crop.
+ */
+export function backgroundFor(value: string): { css: string; wide: string; accent: string; thumb?: string } | null {
   const v = (value || '').toLowerCase()
   if (v.startsWith('solid:')) {
     const c = v.slice(6)
-    return HEX.test(c) ? { css: c, accent: accentFrom(c) } : null
+    return HEX.test(c) ? { css: c, wide: c, accent: accentFrom(c) } : null
   }
   if (v.startsWith('grad:')) {
     const [a, b] = v.slice(5).split(',')
-    return HEX.test(a ?? '') && HEX.test(b ?? '') ? { css: `linear-gradient(160deg, ${a} 0%, ${b} 100%)`, accent: accentFrom(b) } : null
+    if (!HEX.test(a ?? '') || !HEX.test(b ?? '')) return null
+    const g = `linear-gradient(160deg, ${a} 0%, ${b} 100%)`
+    return { css: g, wide: g, accent: accentFrom(b) }
   }
-  const scene = SCENES.find((s) => s.value === v)
-  return scene ? { css: scene.css, accent: scene.accent } : null
+  const photo = PHOTOS.find((p) => p.value === v)
+  if (!photo) return null
+  const id = v.slice(6)
+  return {
+    css: `url("${photoUrl(id, 'tall')}")`,
+    wide: `url("${photoUrl(id, 'wide')}")`,
+    accent: photo.accent,
+    thumb: `url("${photoUrl(id, 'thumb')}")`,
+  }
 }
