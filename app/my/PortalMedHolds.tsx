@@ -44,6 +44,12 @@ function Hold({ h, token, session }: { h: PortalMedHold; token: string; session:
   const [error, setError] = useState('')
   const today = new Date().toLocaleDateString('en-CA')
   const late = !!h.deadline && today > h.deadline
+  // Due soon (10-16): the stop date is within 3 days — say so, plainly.
+  const daysLeft = h.deadline
+    ? Math.round((Date.parse(`${h.deadline}T12:00:00Z`) - Date.parse(`${today}T12:00:00Z`)) / 86_400_000)
+    : null
+  const soon = !late && daysLeft !== null && daysLeft <= 3
+  const dueWords = daysLeft === 0 ? 'today' : daysLeft === 1 ? 'tomorrow' : `in ${daysLeft} days`
 
   const open = async () => {
     setBusy(true)
@@ -73,7 +79,11 @@ function Hold({ h, token, session }: { h: PortalMedHold; token: string; session:
         </p>
         {h.deadline && (
           <p className={`mt-1 text-sm font-semibold ${late ? 'text-red-700' : 'text-amber-900'}`}>
-            {late ? `⚠ This was due by ${longDate(h.deadline)} — please call us today.` : `Talk to your doctor before ${longDate(h.deadline)}.`}
+            {late
+              ? `⚠ This was due by ${longDate(h.deadline)} — please call us today.`
+              : soon
+                ? `⏰ Due ${dueWords} — please talk to your doctor by ${longDate(h.deadline)}.`
+                : `Talk to your doctor before ${longDate(h.deadline)}.`}
           </p>
         )}
       </div>
