@@ -163,6 +163,8 @@ interface OpenView {
   medHolds?: PortalMedHold[]
   /** Every form they signed (records lib/portalSigned.ts, 10-16). */
   signedForms?: SignedFormRow[]
+  /** A trial design set on this client's chart only (records lib/portalLooks.ts, 10-17). */
+  look?: string
   history: History | null
   termsNeeded?: undefined
 }
@@ -325,6 +327,15 @@ export default function PortalClient({ token, learnMore = [] }: {
   }, [token, call])
 
   useEffect(() => { load() }, [load])
+
+  // A trial look for THIS client only (10-17): `data-look` on <body>; the
+  // styles are in app/globals.css. Gone when they leave the page.
+  const look = view && !view.locked && 'look' in view ? view.look ?? '' : ''
+  useEffect(() => {
+    if (!look) return
+    document.body.dataset.look = look
+    return () => { delete document.body.dataset.look }
+  }, [look])
 
   // Coming BACK to the portal — the back arrow (served from the browser's
   // page cache), or switching back to this tab — re-asks the server, so a
