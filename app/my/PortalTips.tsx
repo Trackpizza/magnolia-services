@@ -126,7 +126,27 @@ export default function PortalTips() {
     )
   }
 
-  if (env.standalone || dismissed) return null
+  if (env.standalone) return null
+
+  // "Not now" / "Got it" (10-17, Eric): folded away, not gone — a small link
+  // brings the tip back whenever they are ready.
+  if (dismissed && !installed) {
+    return (
+      <button
+        onClick={() => {
+          setDismissed(false)
+          try {
+            localStorage.removeItem(DISMISS_KEY)
+          } catch {
+            /* nothing to undo */
+          }
+        }}
+        className="mb-6 text-sm font-semibold text-brand-600 hover:text-brand-700"
+      >
+        📲 {canInstall ? 'Install app' : 'Add to your Home Screen'}
+      </button>
+    )
+  }
 
   if (installed) {
     return (
