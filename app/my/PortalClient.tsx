@@ -18,6 +18,7 @@ import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
+import SignedForms, { type SignedFormRow } from './SignedForms'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
 
@@ -160,6 +161,8 @@ interface OpenView {
   account?: AccountItem[]
   /** Medication holds still to do (records lib/medHolds.ts, 10-16). */
   medHolds?: PortalMedHold[]
+  /** Every form they signed (records lib/portalSigned.ts, 10-16). */
+  signedForms?: SignedFormRow[]
   history: History | null
   termsNeeded?: undefined
 }
@@ -1110,6 +1113,11 @@ export default function PortalClient({ token, learnMore = [] }: {
         <div ref={bookingRef}>
           <BookTreatment portal={{ token, session: readSession(token) }} />
         </div>
+      )}
+
+      {/* Every form they signed, as signed — view / print (10-16). */}
+      {view.signedForms && view.signedForms.length > 0 && (
+        <SignedForms forms={view.signedForms} token={token} session={session} />
       )}
 
       {view.history && (

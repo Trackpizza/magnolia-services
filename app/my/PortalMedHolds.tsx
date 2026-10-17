@@ -9,7 +9,9 @@
  *  step "doctor": "Have you spoken with your doctor?" — Yes opens the form
  *                 asking what the doctor said (signed again); Not yet says
  *                 when to call by.
- * A finished hold is not sent here at all.
+ *  step "done":   (10-16, Eric) "Your medication plan" — quiet, no buttons:
+ *                 what to stop and when to restart, and what their doctor
+ *                 said, until the last restart day after the treatment.
  */
 import { useState } from 'react'
 import Section from './Section'
@@ -21,9 +23,11 @@ export type PortalMedHold = {
   treatment: string
   apptDate: string
   deadline: string
-  step: 'agree' | 'doctor'
+  step: 'agree' | 'doctor' | 'done'
   meds: { name: string; stop: string; restart: string }[]
   note: string
+  /** Their own answers on "Talking With Your Doctor" — on a done hold. */
+  doctorSaid?: { label: string; value: string }[]
 }
 
 const longDate = (ymd: string) =>
@@ -37,6 +41,45 @@ const primary =
   'w-full bg-brand-600 hover:bg-brand-700 text-white text-base font-semibold px-6 py-4 rounded-xl transition-colors disabled:opacity-50'
 const outline =
   'w-full rounded-xl border border-brand-600 px-6 py-4 text-base font-semibold text-brand-700 hover:bg-brand-50 transition-colors'
+
+/** A finished hold: the plan they agreed with their doctor — nothing to do. */
+function Plan({ h }: { h: PortalMedHold }) {
+  return (
+    <div className="space-y-4">
+      <p className="text-base font-semibold text-gray-900">
+        Your {h.treatment}
+        {h.apptDate && ` on ${longDate(h.apptDate)}`}
+      </p>
+      <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <p className="text-sm text-gray-700 mb-2">Medications:</p>
+        <ul className="space-y-2">
+          {h.meds.map((m, i) => (
+            <li key={i} className="text-sm text-gray-900">
+              <strong>{m.name}</strong> — {m.stop}; {m.restart}.
+            </li>
+          ))}
+        </ul>
+        {h.note && <p className="mt-3 text-sm text-gray-700">Note from Dr. David: {h.note}</p>}
+      </div>
+      {(h.doctorSaid ?? []).length > 0 && (
+        <div className="rounded-xl border border-gray-200 p-4">
+          <p className="text-sm font-semibold text-gray-900 mb-2">What you told us your doctor said</p>
+          <ul className="space-y-1 text-sm text-gray-800">
+            {h.doctorSaid!.map((a, i) => (
+              <li key={i}>
+                <span className="text-gray-600">{a.label}:</span> {a.value}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <p className="text-sm text-gray-600">
+        Follow your doctor&rsquo;s advice — please don&rsquo;t stop, change or restart any medication without their OK.
+        Questions? Call or text us.
+      </p>
+    </div>
+  )
+}
 
 function Hold({ h, token, session }: { h: PortalMedHold; token: string; session: string }) {
   const [busy, setBusy] = useState(false)
@@ -132,15 +175,32 @@ function Hold({ h, token, session }: { h: PortalMedHold; token: string; session:
 }
 
 export default function PortalMedHolds({ holds, token, session }: { holds: PortalMedHold[]; token: string; session: string }) {
+  const todo = holds.filter((h) => h.step !== 'done')
+  const plans = holds.filter((h) => h.step === 'done')
   return (
-    <Section title="Talk to your doctor" badge="Time sensitive" urgent>
-      <div className="space-y-8">
-        {holds.map((h, i) => (
-          <div key={h.id} className={i ? 'border-t border-gray-100 pt-6' : ''}>
-            <Hold h={h} token={token} session={session} />
+    <>
+      {todo.length > 0 && (
+        <Section title="Talk to your doctor" badge="Time sensitive" urgent>
+          <div className="space-y-8">
+            {todo.map((h, i) => (
+              <div key={h.id} className={i ? 'border-t border-gray-100 pt-6' : ''}>
+                <Hold h={h} token={token} session={session} />
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </Section>
+        </Section>
+      )}
+      {plans.length > 0 && (
+        <Section title="Your medication plan">
+          <div className="space-y-8">
+            {plans.map((h, i) => (
+              <div key={h.id} className={i ? 'border-t border-gray-100 pt-6' : ''}>
+                <Plan h={h} />
+              </div>
+            ))}
+          </div>
+        </Section>
+      )}
+    </>
   )
 }
