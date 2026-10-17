@@ -19,7 +19,7 @@ export default function Section({ title, badge, urgent, children, onOpen }: {
 }) {
   return (
     <details
-      className="group bg-white rounded-2xl border border-gray-100"
+      className="portal-card group bg-white rounded-2xl border border-gray-100"
       onToggle={onOpen ? (e) => { if ((e.currentTarget as HTMLDetailsElement).open) onOpen() } : undefined}
     >
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-6 py-5 sm:px-8 [&::-webkit-details-marker]:hidden">

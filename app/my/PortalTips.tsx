@@ -141,7 +141,7 @@ export default function PortalTips() {
             /* nothing to undo */
           }
         }}
-        className="mb-6 text-sm font-semibold text-brand-600 hover:text-brand-700"
+        className="portal-onbg mb-6 text-sm font-semibold text-brand-600 hover:text-brand-700"
       >
         📲 {canInstall ? 'Install app' : 'Add to your Home Screen'}
       </button>

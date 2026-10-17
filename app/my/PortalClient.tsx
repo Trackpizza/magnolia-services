@@ -17,6 +17,8 @@ import Section from './Section'
 import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
+import BackgroundPicker from './BackgroundPicker'
+import { backgroundFor } from './backgrounds'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
 import SignedForms, { type SignedFormRow } from './SignedForms'
 import AgreeBox from './AgreeBox'
@@ -163,8 +165,8 @@ interface OpenView {
   medHolds?: PortalMedHold[]
   /** Every form they signed (records lib/portalSigned.ts, 10-16). */
   signedForms?: SignedFormRow[]
-  /** A trial design set on this client's chart only (records lib/portalLooks.ts, 10-17). */
-  look?: string
+  /** The background they chose (records lib/portalBackground.ts, 10-17). */
+  background?: string
   history: History | null
   termsNeeded?: undefined
 }
@@ -328,14 +330,41 @@ export default function PortalClient({ token, learnMore = [] }: {
 
   useEffect(() => { load() }, [load])
 
-  // A trial look for THIS client only (10-17): `data-look` on <body>; the
-  // styles are in app/globals.css. Gone when they leave the page.
-  const look = view && !view.locked && 'look' in view ? view.look ?? '' : ''
+  // Their background (10-17): the page behind the cards, plus the card
+  // accents — CSS variables on <body> read by app/globals.css. Applied at
+  // once when they pick; saved on their chart; gone when they leave the page.
+  const savedBg = view && !view.locked && 'background' in view ? view.background ?? '' : ''
+  const [bgOverride, setBgOverride] = useState<string | null>(null)
+  const bg = bgOverride ?? savedBg
+  const [pickingBg, setPickingBg] = useState(false)
   useEffect(() => {
+    const look = backgroundFor(bg)
     if (!look) return
-    document.body.dataset.look = look
-    return () => { delete document.body.dataset.look }
-  }, [look])
+    const b = document.body
+    b.dataset.bg = '1'
+    b.style.setProperty('--pbg', look.css)
+    b.style.setProperty('--accent', look.accent)
+    return () => {
+      delete b.dataset.bg
+      b.style.removeProperty('--pbg')
+      b.style.removeProperty('--accent')
+    }
+  }, [bg])
+  const setBackground = useCallback(
+    async (next: string) => {
+      const before = bg
+      setBgOverride(next)
+      try {
+        const { ok } = await call({ action: 'set-background', session: readSession(token), background: next })
+        if (!ok) setBgOverride(before)
+        return ok
+      } catch {
+        setBgOverride(before)
+        return false
+      }
+    },
+    [bg, call, token],
+  )
 
   // Coming BACK to the portal — the back arrow (served from the browser's
   // page cache), or switching back to this tab — re-asks the server, so a
@@ -662,7 +691,7 @@ export default function PortalClient({ token, learnMore = [] }: {
 
   return (
     <div className="space-y-4">
-      <div className="px-1 flex items-start justify-between gap-3">
+      <div className="portal-onbg px-1 flex items-start justify-between gap-3">
         <h1 className="text-3xl font-semibold text-plum-900" style={heading}>
           Hello{view.firstName ? `, ${view.firstName}` : ''}
         </h1>
@@ -687,6 +716,15 @@ export default function PortalClient({ token, learnMore = [] }: {
           Sign out
         </button>
       </div>
+
+      {/* Their own background (10-17) — only the page behind the cards. */}
+      {pickingBg ? (
+        <BackgroundPicker value={bg} onChange={setBackground} onClose={() => setPickingBg(false)} />
+      ) : (
+        <button type="button" onClick={() => setPickingBg(true)} className={'portal-onbg ' + quietBtn + ' px-1 font-semibold'}>
+          🎨 Your background
+        </button>
+      )}
 
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />
@@ -1229,7 +1267,7 @@ export default function PortalClient({ token, learnMore = [] }: {
         )}
       </Section>
 
-      <p className="text-center text-xs text-gray-500 px-4">
+      <p className="portal-onbg text-center text-xs text-gray-500 px-4">
         This page is yours — keep the link. It stays up to date on its own.
       </p>
 
@@ -1248,7 +1286,7 @@ function LegalFooter({ links: extra }: { links?: PortalLink[] }) {
   ]
   const links = [...own, ...(extra ?? []).filter((l) => !/\/(privacy|terms)(#|$)/.test(l.href))]
   return (
-    <p className="text-center text-xs text-gray-400 px-4 pb-2">
+    <p className="portal-onbg text-center text-xs text-gray-400 px-4 pb-2">
       {links.map((l, i) => (
         <span key={l.href}>
           {i > 0 && <span className="mx-1.5">·</span>}
