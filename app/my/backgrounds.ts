@@ -28,13 +28,19 @@ export const GRADIENTS: BgOption[] = [
 ]
 
 /**
- * Photos (10-17, Eric): 19 free photos from Unsplash, checked one by one as
+ * Photos (10-17, Eric): 24 free photos from Unsplash (19 + 5 underwater for Eileen), checked one by one as
  * "Free to use under the Unsplash License" (commercial use, no credit needed —
  * kept here anyway). Each in public/portal-bg/ as <id>-tall.webp (phones,
  * 900×1600), <id>-wide.webp (computers, 1600 wide) and <id>-thumb.webp (the
  * picker). Only the chosen one loads. Accents hand-picked to match.
  */
 export const PHOTOS: (BgOption & { accent: string; credit: string; link: string })[] = [
+  // Underwater — Eileen's favourite (10-17), first in the picker.
+  { value: 'photo:sea-turtle', name: 'Sea turtle', accent: '#ffa86b', credit: 'Wexor Tmg', link: 'https://unsplash.com/photos/L-2p8fapOA8' },
+  { value: 'photo:fish-school', name: 'Reef in the sun', accent: '#ff9f5a', credit: 'Hiroko Yoshii', link: 'https://unsplash.com/photos/9y7y26C-l4Y' },
+  { value: 'photo:coral-reef', name: 'Coral reef', accent: '#5fd6ff', credit: 'Shifaz Abdul Hakkim', link: 'https://unsplash.com/photos/tropical-fish-swimming-among-coral-reefs-NZTsrLSgNv0' },
+  { value: 'photo:live-coral', name: 'Pink coral', accent: '#ff9ec2', credit: 'qui nguyen', link: 'https://unsplash.com/photos/live-corals-0G01UI1MQhg' },
+  { value: 'photo:sunlit-water', name: 'Under the waves', accent: '#5fe0ff', credit: 'Cristian Palmer', link: 'https://unsplash.com/photos/XexawgzYOBc' },
   { value: 'photo:ocean-calm', name: 'Calm ocean', accent: '#86d0e3', credit: 'Matt Hardy', link: 'https://unsplash.com/photos/body-of-water-under-sky-6ArTTluciuA' },
   { value: 'photo:ocean-aerial', name: 'Turquoise shore', accent: '#3fd6d9', credit: 'Shifaaz Shamoon', link: 'https://unsplash.com/photos/aerial-photo-of-seashore-sLAk1guBG90' },
   { value: 'photo:beach-golden', name: 'Golden beach', accent: '#ffc27a', credit: 'Sean Oulashin', link: 'https://unsplash.com/photos/KMn4VEeEPR8' },
