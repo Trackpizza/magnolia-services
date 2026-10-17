@@ -63,7 +63,9 @@ export default async function PortalPage({
           text, spacing and the photo viewer together. Rendered with the page,
           so it leaves when they navigate away; the rest of the site is
           unchanged. */}
-      <style>{'html{font-size:120%}'}</style>
+      {/* 10-17: phones +10% more (132%), and the client's own A− / A+
+          (app/my/TextSize.tsx) multiplies it by --ts. */}
+      <style>{'html{font-size:calc(120% * var(--ts, 1))}@media (max-width:639px){html{font-size:calc(132% * var(--ts, 1))}}'}</style>
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4">
           <Link href="/">

@@ -18,6 +18,7 @@ import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
 import BackgroundPicker from './BackgroundPicker'
+import TextSize, { useTextSize } from './TextSize'
 import { backgroundFor } from './backgrounds'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
 import SignedForms, { type SignedFormRow } from './SignedForms'
@@ -337,6 +338,8 @@ export default function PortalClient({ token, learnMore = [] }: {
   const [bgOverride, setBgOverride] = useState<string | null>(null)
   const bg = bgOverride ?? savedBg
   const [pickingBg, setPickingBg] = useState(false)
+  // Their text size on this device (app/my/TextSize.tsx) — applied before sign-in too.
+  const [textStep, setTextStep] = useTextSize()
   useEffect(() => {
     const look = backgroundFor(bg)
     if (!look) return
@@ -727,6 +730,7 @@ export default function PortalClient({ token, learnMore = [] }: {
           🎨 Your background
         </button>
       )}
+      <TextSize step={textStep} onChange={setTextStep} />
 
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />
