@@ -17,6 +17,7 @@
 import { useMemo, useState } from 'react'
 import ShareSheet from '@/components/ShareSheet'
 import { PortalPhoto, treatmentsOf, treatmentsOfPoint, type Journey, type PhotoLoader } from './PortalJourney'
+import { SiteLink } from './SiteViewer'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -209,9 +210,9 @@ export default function PortalShare({ journey, share, load, token, session, onCh
           />
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex flex-wrap gap-4 text-sm">
-            <a href={shareUrl} target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:text-brand-700">
+            <SiteLink href={shareUrl} className="text-brand-600 hover:text-brand-700">
               See what they see
-            </a>
+            </SiteLink>
             <button type="button" onClick={startPicking} disabled={busy} className="text-brand-600 hover:text-brand-700">
               Change photos
             </button>

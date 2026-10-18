@@ -18,6 +18,7 @@ import RealResults, { type RealResultsAlbum } from './RealResults'
 import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
 import BackgroundPicker from './BackgroundPicker'
+import { SiteLink } from './SiteViewer'
 import TextSize, { useTextSize } from './TextSize'
 import OurPackages, { type OurPackage } from './OurPackages'
 import { backgroundFor } from './backgrounds'
@@ -812,10 +813,8 @@ export default function PortalClient({ token, learnMore = [] }: {
             {/* Preparation that has already started (10-09) — backs up the
                 reminder email for anyone who never opened it. */}
             {view.prepNow && (
-              <a
+              <SiteLink
                 href={view.prepNow.url}
-                target="_blank"
-                rel="noopener noreferrer"
                 className="block rounded-xl border border-brand-600 p-4 hover:bg-brand-50 transition-colors"
               >
                 <span className="block text-base font-semibold text-gray-900">
@@ -824,7 +823,7 @@ export default function PortalClient({ token, learnMore = [] }: {
                 <span className="block mt-1 text-sm text-gray-600">
                   Your visit on {longDate(view.prepNow.date)} — some things need to stop a week or more before.
                 </span>
-              </a>
+              </SiteLink>
             )}
             {linkError && busy === '' && view.healthCheck && (
               <p className="text-sm text-red-700">{linkError}</p>
@@ -861,14 +860,9 @@ export default function PortalClient({ token, learnMore = [] }: {
                     token for any that lack one when it serves this page. */}
                 <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1">
                   {a.prepUrl && (
-                    <a
-                      href={a.prepUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-brand-600 hover:text-brand-700"
-                    >
+                    <SiteLink href={a.prepUrl} className="text-sm font-medium text-brand-600 hover:text-brand-700">
                       How to prepare &rarr;
-                    </a>
+                    </SiteLink>
                   )}
                   {a.manageUrl && (
                     <a href={a.manageUrl} className="text-sm text-brand-600 hover:text-brand-700">
@@ -1208,14 +1202,9 @@ export default function PortalClient({ token, learnMore = [] }: {
                     <span className="block text-gray-900">{v.treatment}</span>
                     <span className="block text-sm text-gray-600">with {v.provider}</span>
                     {v.afterCareUrl && (
-                      <a
-                        href={v.afterCareUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-1 text-sm font-medium text-brand-600 hover:text-brand-700"
-                      >
+                      <SiteLink href={v.afterCareUrl} className="inline-block mt-1 text-sm font-medium text-brand-600 hover:text-brand-700">
                         Aftercare instructions &rarr;
-                      </a>
+                      </SiteLink>
                     )}
                   </span>
                   <span className="shrink-0 text-sm text-gray-600">{pastDate(v.date)}</span>
@@ -1257,17 +1246,14 @@ export default function PortalClient({ token, learnMore = [] }: {
         <Section title="Useful links">
           <div className="space-y-2">
             {view.links.map((l) => (
-              <a
+              <SiteLink
                 key={l.href + l.label}
                 href={l.href}
-                {...(l.href.startsWith('http')
-                  ? { target: '_blank', rel: 'noopener noreferrer' }
-                  : {})}
                 className="flex items-center gap-3 w-full border border-gray-200 hover:border-brand-600 rounded-xl px-5 py-4 transition-colors"
               >
                 <span className="text-xl shrink-0" aria-hidden>{l.emoji}</span>
                 <span className="font-medium text-gray-900">{l.label}</span>
-              </a>
+              </SiteLink>
             ))}
           </div>
         </Section>
@@ -1329,9 +1315,9 @@ function LegalFooter({ links: extra }: { links?: PortalLink[] }) {
       {links.map((l, i) => (
         <span key={l.href}>
           {i > 0 && <span className="mx-1.5">·</span>}
-          <a href={l.href} target="_blank" rel="noopener noreferrer" className="hover:text-gray-600 underline">
+          <SiteLink href={l.href} className="hover:text-gray-600 underline">
             {l.label}
-          </a>
+          </SiteLink>
         </span>
       ))}
     </p>

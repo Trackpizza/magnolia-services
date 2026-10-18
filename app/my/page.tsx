@@ -20,8 +20,8 @@
  * string otherwise rides the Referer header to every third-party asset.
  */
 import type { Metadata, Viewport } from 'next'
-import Link from 'next/link'
 import PortalClient from './PortalClient'
+import { SiteViewerProvider } from './SiteViewer'
 import { getLinks } from '@/lib/links'
 
 export async function generateMetadata({
@@ -69,13 +69,15 @@ export default async function PortalPage({
       <style>{'html{font-size:calc(120% * var(--ts, 1))}'}</style>
       <header className="bg-plum-900">
         <div className="max-w-6xl mx-auto px-6 py-4">
-          <Link href="/">
-            <img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} fetchPriority="high" className="h-9 w-auto" />
-          </Link>
+          {/* Not a link (10-17, Eric): nothing on the portal leads out of it. */}
+          <img src="/wordmark-white.webp" alt="Magnolia Skin Center" width={380} height={141} fetchPriority="high" className="h-9 w-auto" />
         </div>
       </header>
       <main className="max-w-xl mx-auto px-6 py-10 sm:py-14">
-        <PortalClient token={t ?? ''} learnMore={(await getLinks()).resultsLinks ?? []} />
+        {/* Our own pages open inside the portal (10-17, SiteViewer). */}
+        <SiteViewerProvider>
+          <PortalClient token={t ?? ''} learnMore={(await getLinks()).resultsLinks ?? []} />
+        </SiteViewerProvider>
       </main>
     </div>
   )

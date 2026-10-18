@@ -105,3 +105,10 @@ body[data-bg] .portal-dark .portal-card summary h2::after { content: ''; display
 /* 4–5: the count badge and the open/close arrow. */
 body[data-bg] .portal-dark .portal-card summary .rounded-full:not(.bg-brand-600) { border-color: var(--accent); color: var(--accent); }
 body[data-bg] .portal-dark .portal-card summary svg { color: var(--accent); }
+
+/* A site page shown inside the client portal's viewer (10-17, app/my/SiteViewer
+   + the script in app/layout.tsx): the site's own header, footer and "Already a
+   patient?" bar are hidden, so nothing leads out of the portal. */
+html[data-embed] header.bg-plum-900,
+html[data-embed] footer.bg-plum-900,
+html[data-embed] .embed-hide { display: none !important; }

@@ -26,7 +26,7 @@ export default function ExistingPatientBar() {
   if (path.startsWith('/my') || path.startsWith('/admin') || path.startsWith('/journey')) return null
 
   return (
-    <div className="bg-plum-900 text-white">
+    <div className="embed-hide bg-plum-900 text-white">
       <div className="max-w-6xl mx-auto px-6 py-2 flex items-center justify-center sm:justify-end gap-3">
         <span className="text-xs sm:text-sm text-white/80">
           Already a patient? Your plan and appointments are on your own page.

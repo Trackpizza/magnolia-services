@@ -1,4 +1,5 @@
 'use client'
+import { SiteLink } from './SiteViewer'
 /**
  * "I agree to the Terms of Service and acknowledge the Notice of Privacy
  * Practices" — the tick box beside every portal sign-in (10-11). "Acknowledge"
@@ -17,9 +18,9 @@ export default function AgreeBox({ checked, onChange }: { checked: boolean; onCh
       />
       <span>
         I agree to the{' '}
-        <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-brand-700 underline">Terms of Service</a>{' '}
+        <SiteLink href="/terms" className="text-brand-700 underline">Terms of Service</SiteLink>{' '}
         and acknowledge the{' '}
-        <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-brand-700 underline">Notice of Privacy Practices</a>.
+        <SiteLink href="/privacy" className="text-brand-700 underline">Notice of Privacy Practices</SiteLink>.
       </span>
     </label>
   )

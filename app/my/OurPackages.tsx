@@ -13,6 +13,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
 import Section from './Section'
+import { SiteLink } from './SiteViewer'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
 
 export type OurPackage = {
@@ -55,10 +56,11 @@ function Package({ p, phone }: { p: OurPackage; phone: string }) {
           {p.details && (
             <div className="space-y-2 text-sm leading-relaxed text-gray-800 [&_h3]:font-semibold [&_h3]:text-gray-900 [&_li]:ml-5 [&_ul]:list-disc [&_ol]:list-decimal [&_a]:font-semibold [&_a]:text-brand-600 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-brand-700">
               {/* Links (10-17, Eric): coloured + underlined so they read as
-                  links, and opened in a new tab so the portal stays open. */}
+                  links; our own pages open in the portal's viewer (SiteViewer),
+                  other sites in a new tab. */}
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkBreaks]}
-                components={{ a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> }}
+                components={{ a: ({ href, children }) => <SiteLink href={href ?? ''}>{children}</SiteLink> }}
               >
                 {p.details}
               </ReactMarkdown>

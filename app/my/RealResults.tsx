@@ -14,6 +14,7 @@ import { useCallback, useState } from 'react'
 import Link from 'next/link'
 import Section from './Section'
 import { PortalPhoto, type PhotoLoader } from './PortalJourney'
+import { SiteLink } from './SiteViewer'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -121,7 +122,7 @@ export default function RealResults({ albums, token, session, learnMore }: {
               l.url.startsWith('/') ? (
                 <Link key={i} href={l.url} className={book}>{l.label}</Link>
               ) : (
-                <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" className={book}>{l.label}</a>
+                <SiteLink key={i} href={l.url} className={book}>{l.label}</SiteLink>
               ),
             )}
           </div>
