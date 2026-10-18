@@ -167,6 +167,9 @@ interface OpenView {
   medHolds?: PortalMedHold[]
   /** Every form they signed (records lib/portalSigned.ts, 10-16). */
   signedForms?: SignedFormRow[]
+  /** Test charts only (records clients.portalPreview, 10-17): background
+   *  picker + text size show only when true. Absent = off. */
+  preview?: boolean
   /** The background they chose (records lib/portalBackground.ts, 10-17). */
   background?: string
   /** Our packages (records lib/packageCatalog.ts) — test charts only for now. */
@@ -346,8 +349,10 @@ export default function PortalClient({ token, learnMore = [] }: {
   const [bgOverride, setBgOverride] = useState<string | null>(null)
   const bg = bgOverride ?? savedBg
   const [pickingBg, setPickingBg] = useState(false)
-  // Their text size on this device (app/my/TextSize.tsx) — applied before sign-in too.
-  const [textStep, setTextStep] = useTextSize()
+  // Their text size on this device (app/my/TextSize.tsx) — test charts only
+  // for now, so applied only once the page says preview.
+  const preview = !!view && !view.locked && 'preview' in view && view.preview === true
+  const [textStep, setTextStep] = useTextSize(preview)
   useEffect(() => {
     const look = backgroundFor(bg)
     if (!look) return
@@ -730,15 +735,20 @@ export default function PortalClient({ token, learnMore = [] }: {
         </button>
       </div>
 
-      {/* Their own background (10-17) — only the page behind the cards. */}
-      {pickingBg ? (
-        <BackgroundPicker value={bg} onChange={setBackground} onClose={() => setPickingBg(false)} />
-      ) : (
-        <button type="button" onClick={() => setPickingBg(true)} className={'portal-onbg ' + quietBtn + ' px-1 font-semibold'}>
-          🎨 Your background
-        </button>
+      {/* Their own background + text size (10-17) — test charts only until
+          Dr. David OKs them (records clients.portalPreview). */}
+      {preview && (
+        <>
+          {pickingBg ? (
+            <BackgroundPicker value={bg} onChange={setBackground} onClose={() => setPickingBg(false)} />
+          ) : (
+            <button type="button" onClick={() => setPickingBg(true)} className={'portal-onbg ' + quietBtn + ' px-1 font-semibold'}>
+              🎨 Your background
+            </button>
+          )}
+          <TextSize step={textStep} onChange={setTextStep} />
+        </>
       )}
-      <TextSize step={textStep} onChange={setTextStep} />
 
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />

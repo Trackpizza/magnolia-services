@@ -21,19 +21,20 @@ function readStep(): number {
   }
 }
 
-/** Applies the saved size as soon as the page mounts — before sign-in too. */
-export function useTextSize(): [number, (n: number) => void] {
+/** Applies the saved size once `enabled` (test charts only for now, 10-17). */
+export function useTextSize(enabled: boolean): [number, (n: number) => void] {
   const [step, setStep] = useState(0)
   useEffect(() => {
     setStep(readStep())
   }, [])
   useEffect(() => {
+    if (!enabled) return
     const html = document.documentElement
     html.style.setProperty('--ts', String(1 + step * 0.05))
     return () => {
       html.style.removeProperty('--ts')
     }
-  }, [step])
+  }, [step, enabled])
   const save = (n: number) => {
     const next = Math.min(MAX, Math.max(MIN, n))
     setStep(next)
