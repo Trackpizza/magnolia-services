@@ -349,10 +349,10 @@ export default function PortalClient({ token, learnMore = [] }: {
   const [bgOverride, setBgOverride] = useState<string | null>(null)
   const bg = bgOverride ?? savedBg
   const [pickingBg, setPickingBg] = useState(false)
-  // Their text size on this device (app/my/TextSize.tsx) — test charts only
-  // for now, so applied only once the page says preview.
+  // Background picker: test charts only for now (records portalPreview).
   const preview = !!view && !view.locked && 'preview' in view && view.preview === true
-  const [textStep, setTextStep] = useTextSize(preview)
+  // Their text size on this device (app/my/TextSize.tsx) — every client, applied before sign-in too.
+  const [textStep, setTextStep] = useTextSize()
   useEffect(() => {
     const look = backgroundFor(bg)
     if (!look) return
@@ -735,20 +735,17 @@ export default function PortalClient({ token, learnMore = [] }: {
         </button>
       </div>
 
-      {/* Their own background + text size (10-17) — test charts only until
-          Dr. David OKs them (records clients.portalPreview). */}
-      {preview && (
-        <>
-          {pickingBg ? (
-            <BackgroundPicker value={bg} onChange={setBackground} onClose={() => setPickingBg(false)} />
-          ) : (
-            <button type="button" onClick={() => setPickingBg(true)} className={'portal-onbg ' + quietBtn + ' px-1 font-semibold'}>
-              🎨 Your background
-            </button>
-          )}
-          <TextSize step={textStep} onChange={setTextStep} />
-        </>
-      )}
+      {/* Their own background (10-17) — test charts only until Dr. David
+          OKs it (records clients.portalPreview). Text size: every client. */}
+      {preview &&
+        (pickingBg ? (
+          <BackgroundPicker value={bg} onChange={setBackground} onClose={() => setPickingBg(false)} />
+        ) : (
+          <button type="button" onClick={() => setPickingBg(true)} className={'portal-onbg ' + quietBtn + ' px-1 font-semibold'}>
+            🎨 Your background
+          </button>
+        ))}
+      <TextSize step={textStep} onChange={setTextStep} />
 
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />

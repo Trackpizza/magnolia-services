@@ -2,7 +2,8 @@
 /**
  * Text size on the client's page (10-17, Eric): A− / A+ in 5% steps, from 25%
  * smaller to 25% larger, on top of the portal's own size (app/my/page.tsx —
- * 20% larger than the site, 32% on a phone). Kept on THIS device
+ * 20% larger than the site, phones too: the extra 10% on phones was taken
+ * back 10-17 once clients could pick their own size). Kept on THIS device
  * (localStorage): bigger on a phone than on a computer is a normal wish.
  * Applied as `--ts` on <html>; page.tsx's rule multiplies by it.
  */
@@ -21,20 +22,19 @@ function readStep(): number {
   }
 }
 
-/** Applies the saved size once `enabled` (test charts only for now, 10-17). */
-export function useTextSize(enabled: boolean): [number, (n: number) => void] {
+/** Applies the saved size as soon as the page mounts — before sign-in too. */
+export function useTextSize(): [number, (n: number) => void] {
   const [step, setStep] = useState(0)
   useEffect(() => {
     setStep(readStep())
   }, [])
   useEffect(() => {
-    if (!enabled) return
     const html = document.documentElement
     html.style.setProperty('--ts', String(1 + step * 0.05))
     return () => {
       html.style.removeProperty('--ts')
     }
-  }, [step, enabled])
+  }, [step])
   const save = (n: number) => {
     const next = Math.min(MAX, Math.max(MIN, n))
     setStep(next)

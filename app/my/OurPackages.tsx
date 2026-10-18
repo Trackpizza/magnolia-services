@@ -64,6 +64,11 @@ function Package({ p, phone }: { p: OurPackage; phone: string }) {
           <span className="text-sm text-gray-700">Ask Eileen:</span>
           <a href={`sms:+1${digits}?&body=${ask}`} className={pill}>💬 Text</a>
           <a href={`tel:+1${digits}`} className={pill}>📞 Call</a>
+          {/* The number itself (10-17, Eric): on a laptop Text/Call may do
+              nothing, so they can dial it from their phone. */}
+          <a href={`tel:+1${digits}`} className="basis-full text-sm font-semibold text-gray-800 tabular-nums hover:underline">
+            ({digits.slice(0, 3)}) {digits.slice(3, 6)}-{digits.slice(6)}
+          </a>
         </div>
       )}
     </li>
