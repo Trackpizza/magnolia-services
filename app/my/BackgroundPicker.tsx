@@ -55,6 +55,18 @@ export default function BackgroundPicker({ value, onChange, onClose }: {
         </button>
       </div>
 
+      {/* First, so nobody has to hunt for the way back (10-17, Eric). */}
+      <button
+        type="button"
+        onClick={() => pick('')}
+        aria-pressed={value === ''}
+        className={`w-full rounded-xl border-2 px-4 py-3 text-left text-sm font-semibold transition-colors ${
+          value === '' ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-900 hover:bg-gray-50'
+        }`}
+      >
+        {value === '' ? '✓ ' : ''}Standard — no background
+      </button>
+
       <div>
         <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Colors</p>
         <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
@@ -100,9 +112,6 @@ export default function BackgroundPicker({ value, onChange, onClose }: {
         <p className="mt-2 text-[11px] text-gray-500">Photos from Unsplash.</p>
       </div>
 
-      <button type="button" onClick={() => pick('')} className="text-sm font-semibold text-brand-600 hover:text-brand-700" aria-pressed={value === ''}>
-        {value === '' ? '✓ ' : ''}Standard (no background)
-      </button>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   )

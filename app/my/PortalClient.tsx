@@ -19,6 +19,7 @@ import PortalAccount, { type AccountItem } from './PortalAccount'
 import ConsultVideo, { EarlierVideo } from './ConsultVideo'
 import BackgroundPicker from './BackgroundPicker'
 import TextSize, { useTextSize } from './TextSize'
+import OurPackages, { type OurPackage } from './OurPackages'
 import { backgroundFor } from './backgrounds'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
 import SignedForms, { type SignedFormRow } from './SignedForms'
@@ -168,6 +169,8 @@ interface OpenView {
   signedForms?: SignedFormRow[]
   /** The background they chose (records lib/portalBackground.ts, 10-17). */
   background?: string
+  /** Our packages (records lib/packageCatalog.ts) — test charts only for now. */
+  ourPackages?: OurPackage[]
   history: History | null
   termsNeeded?: undefined
 }
@@ -871,6 +874,11 @@ export default function PortalClient({ token, learnMore = [] }: {
           </div>
         )}
       </Section>
+
+      {/* Our packages (10-17) — the clinic's catalogue; test charts only for now. */}
+      {view.ourPackages && view.ourPackages.length > 0 && (
+        <OurPackages packages={view.ourPackages} phone={view.clinicPhone ?? ''} />
+      )}
 
       {/* Packages, deposits & quotes the clinic sent from the chart (10-13). */}
       {view.account && view.account.length > 0 && (
