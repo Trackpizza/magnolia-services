@@ -76,7 +76,7 @@ export default function PortalAccount({ items, token, session }: { items: Accoun
   const label = 'mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500'
 
   return (
-    <Section title="Packages, deposits & quotes" badge={`${items.length}`} onOpen={onOpen}>
+    <Section title="Your packages, deposits & quotes" badge={`${items.length}`} onOpen={onOpen}>
       <div className="space-y-6">
         {packages.length > 0 && (
           <div>
