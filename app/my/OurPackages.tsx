@@ -53,8 +53,15 @@ function Package({ p, phone }: { p: OurPackage; phone: string }) {
         <div className="space-y-4">
           {p.youtubeUrl && <YouTubeEmbed url={p.youtubeUrl} title={p.name} />}
           {p.details && (
-            <div className="space-y-2 text-sm leading-relaxed text-gray-800 [&_h3]:font-semibold [&_h3]:text-gray-900 [&_li]:ml-5 [&_ul]:list-disc [&_ol]:list-decimal">
-              <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>{p.details}</ReactMarkdown>
+            <div className="space-y-2 text-sm leading-relaxed text-gray-800 [&_h3]:font-semibold [&_h3]:text-gray-900 [&_li]:ml-5 [&_ul]:list-disc [&_ol]:list-decimal [&_a]:font-semibold [&_a]:text-brand-600 [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:text-brand-700">
+              {/* Links (10-17, Eric): coloured + underlined so they read as
+                  links, and opened in a new tab so the portal stays open. */}
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm, remarkBreaks]}
+                components={{ a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> }}
+              >
+                {p.details}
+              </ReactMarkdown>
             </div>
           )}
         </div>
