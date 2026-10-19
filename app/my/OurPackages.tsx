@@ -1,8 +1,8 @@
 'use client'
 /**
  * Our packages (10-17, Eileen) — the clinic's packages, from the records app's
- * Packages tab (lib/packageCatalog.ts). For now only on charts with portal
- * preview on (John SamplePersontest), until it goes live.
+ * Packages tab (lib/packageCatalog.ts). On every client
+ * portal since 10-18 (test charts only before that).
  *
  * Each package: what it includes and the price ("Ask us" when there is none),
  * **Learn more** — the deep dive and a YouTube video — and **Ask Eileen**:

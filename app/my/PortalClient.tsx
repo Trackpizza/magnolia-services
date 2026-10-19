@@ -173,7 +173,7 @@ interface OpenView {
   preview?: boolean
   /** The background they chose (records lib/portalBackground.ts, 10-17). */
   background?: string
-  /** Our packages (records lib/packageCatalog.ts) — test charts only for now. */
+  /** Our packages (records lib/packageCatalog.ts) — every client since 10-18. */
   ourPackages?: OurPackage[]
   history: History | null
   termsNeeded?: undefined
@@ -876,7 +876,7 @@ export default function PortalClient({ token, learnMore = [] }: {
         )}
       </Section>
 
-      {/* Our packages (10-17) — the clinic's catalogue; test charts only for now. */}
+      {/* Our packages (10-17) — the clinic's catalogue; every client since 10-18. */}
       {view.ourPackages && view.ourPackages.length > 0 && (
         <OurPackages packages={view.ourPackages} phone={view.clinicPhone ?? ''} />
       )}
