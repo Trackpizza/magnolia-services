@@ -22,7 +22,8 @@ export async function generateMetadata({ params }: Props) {
 
 export default async function PreTreatmentPage({ params }: Props) {
   const service = getServiceBySlug(params.slug)
-  if (!service) notFound()
+  // No guides for this treatment (10-19, the facials) — not a page at all.
+  if (!service || service.noGuides) notFound()
   const links = await getLinks()
   return (
     <GuidePage

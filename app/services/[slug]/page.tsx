@@ -203,7 +203,27 @@ export default async function ServicePage({ params }: Props) {
       {/* Custom editable content (admin-managed markdown) */}
       <ServiceContent markdown={customContent} />
 
-      {/* Guide links → dedicated Pre-Treatment / After Care pages (always shown) */}
+      {/* "After your facial" (10-19) — a short box on the page, no guide. */}
+      {service.afterNote && (
+        <section className="max-w-5xl mx-auto px-6 py-6">
+          <div className="bg-white rounded-2xl border border-gray-100 p-8">
+            <h2 className="text-2xl font-semibold text-plum-900 mb-4" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+              {service.afterNote.title}
+            </h2>
+            <ul className="space-y-2.5">
+              {service.afterNote.points.map((pt, i) => (
+                <li key={i} className="flex gap-3 text-base text-gray-600 leading-relaxed">
+                  <span className="mt-2.5 w-1.5 h-1.5 rounded-full bg-brand-500 shrink-0" />
+                  {pt}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* Guide links → dedicated Pre-Treatment / After Care pages (none for noGuides) */}
+      {!service.noGuides && (
       <section className="max-w-5xl mx-auto px-6 py-6">
         <div className="grid sm:grid-cols-2 gap-4">
           <Link href={`/services/${service.slug}/pre-treatment`} className="group flex items-center justify-between gap-4 bg-white rounded-2xl border border-gray-100 p-6 hover:border-brand-300 hover:shadow-sm transition-all">
@@ -222,6 +242,7 @@ export default async function ServicePage({ params }: Props) {
           </Link>
         </div>
       </section>
+      )}
 
       {/* CTA */}
       <ServiceCTA

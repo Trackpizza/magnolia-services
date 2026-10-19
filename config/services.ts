@@ -15,6 +15,12 @@ export interface ServiceEntry {
   /** No video for this treatment (10-12): the service page and both guides
    *  show no video and no "coming soon" box. */
   noVideo?: boolean
+  /** No Pre-Treatment / After Care guides (10-19, the facials): no guide
+   *  links on the page, and both guide URLs 404. */
+  noGuides?: boolean
+  /** A short "After your facial"-style box on the page itself (10-19) —
+   *  instead of an After Care guide. */
+  afterNote?: { title: string; points: string[] }
 }
 
 export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids: string[] }> = [
@@ -64,6 +70,11 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
     ids: ['prx-derm-perfexion', 'prx-plus-brightening', 'prx-c-plus-brightening', 'sensi-peel', 'ultra-peel', 'pigment-peel'],
   },
   {
+    name: 'Facials',
+    description: 'AquaFirme XS facials matched to your skin — detox, sun damage, anti-aging, brightening, clear skin and hydration, with no downtime.',
+    ids: ['detoxifyxs-facial', 'restorexs-facial', 'ultimatexs-facial', 'brightenxs-facial', 'clearxs-facial', 'hydratexs-facial'],
+  },
+  {
     name: 'IV Therapy & Injections',
     description: 'Targeted nutrient injections and IV formulas to boost energy, metabolism, and overall wellness.',
     ids: ['b-complex-injection', 'glutathione-injection', 'mic-blend-injection', 'lipotropic-plus', 'ultraburn-injection', 'ic-lipolean'],
@@ -80,6 +91,19 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
     ids: ['weight-loss-consultation', 'weight-loss-program'],
   },
 ]
+
+/** "After your facial" (10-19) — the same for every AquaFirme XS facial.
+ *  From the practitioner guide (each ends with moisturizer + SPF 30+, a course
+ *  of 4–6 every two weeks, then monthly). For Eileen to review. */
+const AFTER_FACIAL = {
+  title: 'After your facial',
+  points: [
+    'Your skin is finished with moisturizer and SPF 30+. Keep wearing a broad-spectrum SPF 30 or higher every day, especially during your course of facials.',
+    'There is no downtime — you can go straight back to your day.',
+    'For the best results, plan a course of 4 to 6 facials about two weeks apart, then once a month to maintain your results.',
+    'Questions afterward? Text or call us — we are happy to help.',
+  ],
+}
 
 const DISCLAIMER =
   'The information on this page is for educational purposes only and does not constitute medical advice. Results may vary. All aesthetic treatments should only be performed by a licensed or trained professional following a proper consultation. Please consult with a qualified provider to determine if this treatment is right for you. Magnolia Skin Center is located in Burbank, CA and serves clients in the greater Los Angeles area.'
@@ -1177,6 +1201,191 @@ export const SERVICES: ServiceEntry[] = [
     ],
     disclaimer: DISCLAIMER,
     alsoKnownAs: ['semaglutide', 'tirzepatide', 'ozempic alternative', 'wegovy alternative', 'glp-1 program', 'weight loss injections', 'medical weight loss'],
+  },
+  // ── AquaFirme XS facials (10-19, Eric) ─────────────────────────────────────
+  // Written for clients from the AquaFirme XS practitioner guide — no protocol
+  // steps or settings. noGuides: no Pre-Treatment / After Care pages and none
+  // linked from the records app (no prep or aftercare emails); afterNote is the
+  // short "After your facial" box on the page instead. Text for Eileen to review.
+  {
+    id: 'detoxifyxs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'detoxifyxs-facial-for-congested-skin-clogged-pores-dull-skin-detox-burbank-ca',
+    name: 'DetoxifyXS Facial',
+    category: 'Facials',
+    tagline:
+      'A 30-minute AquaFirme XS facial that deep-cleans, detoxifies and rebalances congested skin — fresh, clear and calm, with no downtime.',
+    searchDescription:
+      'DetoxifyXS is a 30-minute AquaFirme XS facial in Burbank for congested skin and clogged pores — deep cleansing, an oxygenating treatment and purifying serums, with no downtime.',
+    keywords: ['detox facial burbank', 'facial for congested skin', 'clogged pores facial', 'aquafirme xs facial', 'deep cleansing facial burbank', 'oxygen facial'],
+    highlights: [
+      { icon: '', title: 'Made for congested skin', body: 'Designed to detoxify and rebalance skin that feels clogged, dull or out of balance.' },
+      { icon: '', title: 'An oxygenating treatment', body: 'The EXO₂ oxygenating gel treatment leaves skin feeling refreshed, revived and glowing.' },
+      { icon: '', title: 'Clarifying and purifying serums', body: 'The EVO step clears and purifies with two targeted serums — Clarify and Detox — matched to congested skin.' },
+      { icon: '', title: '30 minutes, no downtime', body: 'A quick, comfortable treatment — you can go straight back to your day.' },
+    ],
+    treats: ['Congested Skin', 'Clogged Pores', 'Dull Skin', 'Uneven Texture', 'Skin Imbalance'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your DetoxifyXS facial begins with a gentle cleanse to remove makeup and impurities. Next comes the EXO₂ oxygenating gel treatment, then the AquaFirme XS EVO step, which uses Clarify and Detox serums to deep-clean and purify congested skin. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['detox facial', 'deep cleansing facial', 'oxygen facial', 'pore cleansing facial', 'aquafirme facial', 'hydrafacial alternative'],
+  },
+  {
+    id: 'restorexs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'restorexs-facial-for-sun-damage-uneven-skin-tone-sun-spots-burbank-ca',
+    name: 'RestoreXS Facial',
+    category: 'Facials',
+    tagline:
+      'A 45-minute AquaFirme XS facial for sun-damaged skin — brightens, evens tone and restores a healthy glow, with no downtime.',
+    searchDescription:
+      'RestoreXS is a 45-minute AquaFirme XS facial in Burbank for sun damage and uneven skin tone — oxygenating treatment, brightening and restoring serums and ultrasound infusion, with no downtime.',
+    keywords: ['sun damage facial burbank', 'facial for uneven skin tone', 'sun spots facial', 'aquafirme xs facial', 'brightening facial burbank', 'restorative facial'],
+    highlights: [
+      { icon: '', title: 'Targets sun damage', body: 'Designed for skin showing the effects of the sun — uneven tone, dullness and sun spots.' },
+      { icon: '', title: 'Three restoring serums', body: 'The EVO step brightens, purifies and strengthens with Vivify, Detox and Defy serums.' },
+      { icon: '', title: 'Ultrasound infusion', body: 'The ULTRA step uses gentle ultrasound to help a concentrated serum work deeper into the skin.' },
+      { icon: '', title: '45 minutes, no downtime', body: 'Comfortable and relaxing — you can go straight back to your day.' },
+    ],
+    treats: ['Sun Damage', 'Uneven Skin Tone', 'Sun Spots', 'Dullness', 'Loss of Radiance'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your RestoreXS facial begins with a gentle cleanse, then the EXO₂ oxygenating gel treatment. The AquaFirme XS EVO step follows with Vivify, Detox and Defy serums to brighten and restore sun-affected skin, and the ULTRA step uses ultrasound to infuse a concentrated serum. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['sun damage facial', 'sun spot facial', 'restorative facial', 'brightening facial', 'aquafirme facial', 'uneven skin tone treatment'],
+  },
+  {
+    id: 'ultimatexs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'ultimatexs-facial-for-anti-aging-skin-rejuvenation-fine-lines-glow-burbank-ca',
+    name: 'UltimateXS Facial',
+    category: 'Facials',
+    tagline:
+      'Our most complete AquaFirme XS facial — 60 minutes of total skin rejuvenation for every skin type, finished with an LED massage.',
+    searchDescription:
+      'UltimateXS is a 60-minute anti-aging AquaFirme XS facial in Burbank for all skin types — oxygenating treatment, four targeted serums, ultrasound infusion and an LED massage, with no downtime.',
+    keywords: ['anti aging facial burbank', 'skin rejuvenation facial', 'luxury facial burbank', 'aquafirme xs facial', 'led facial burbank', 'best facial burbank'],
+    highlights: [
+      { icon: '', title: 'Our most complete facial', body: 'Every step of the AquaFirme XS system in one treatment, for overall skin rejuvenation.' },
+      { icon: '', title: 'Four targeted serums', body: 'The EVO step cleanses, brightens, purifies and strengthens with Clarify, Vivify, Detox and Defy.' },
+      { icon: '', title: 'Ultrasound infusion and LED massage', body: 'ULTRA ultrasound helps a concentrated serum work deeper, and an LED massage finishes the treatment.' },
+      { icon: '', title: 'For all skin types', body: 'A full, relaxing hour that leaves skin refreshed and glowing — with no downtime.' },
+    ],
+    treats: ['Fine Lines', 'Loss of Firmness', 'Dullness', 'Uneven Texture', 'Overall Skin Rejuvenation'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your UltimateXS facial begins with a gentle cleanse, then the EXO₂ oxygenating gel treatment. The AquaFirme XS EVO step follows with all four serums — Clarify, Vivify, Detox and Defy — then the ULTRA step uses ultrasound to infuse a concentrated serum, and an LED massage works in the remaining serum. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['anti-aging facial', 'signature facial', 'led facial', 'luxury facial', 'aquafirme facial', 'skin rejuvenation facial'],
+  },
+  {
+    id: 'brightenxs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'brightenxs-facial-for-pigmentation-dull-skin-dark-spots-uneven-tone-burbank-ca',
+    name: 'BrightenXS Facial',
+    category: 'Facials',
+    tagline:
+      'A 30-minute AquaFirme XS facial that brightens dull skin and evens pigmentation for a fresh, luminous complexion.',
+    searchDescription:
+      'BrightenXS is a 30-minute AquaFirme XS facial in Burbank for pigmentation, dull skin and uneven tone — oxygenating treatment and brightening serums, with no downtime.',
+    keywords: ['brightening facial burbank', 'facial for pigmentation', 'dark spots facial', 'dull skin facial', 'aquafirme xs facial', 'glow facial burbank'],
+    highlights: [
+      { icon: '', title: 'Brightens and evens tone', body: 'Designed for pigmentation, dullness and uneven tone, including environmental damage.' },
+      { icon: '', title: 'Brightening serums', body: 'The EVO step uses Vivify and Defy serums to brighten and strengthen the skin.' },
+      { icon: '', title: 'An oxygenating treatment', body: 'The EXO₂ oxygenating gel treatment leaves skin refreshed and glowing. Ultrasound infusion can be added.' },
+      { icon: '', title: '30 minutes, no downtime', body: 'A quick lunchtime facial — you can go straight back to your day.' },
+    ],
+    treats: ['Pigmentation', 'Dark Spots', 'Dull Skin', 'Uneven Skin Tone', 'Environmental Damage'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your BrightenXS facial begins with a gentle cleanse, then the EXO₂ oxygenating gel treatment. The AquaFirme XS EVO step follows with Vivify and Defy serums to brighten and even the skin. If it suits your skin, your provider may add the ULTRA ultrasound infusion. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['brightening facial', 'pigmentation facial', 'glow facial', 'dark spot facial', 'aquafirme facial', 'dull skin treatment'],
+  },
+  {
+    id: 'clearxs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'clearxs-facial-for-acne-oily-skin-breakouts-congested-pores-burbank-ca',
+    name: 'ClearXS Facial',
+    category: 'Facials',
+    tagline:
+      'A 30-minute AquaFirme XS facial for oily and acne-prone skin — clears congestion and helps calm breakouts.',
+    searchDescription:
+      'ClearXS is a 30-minute AquaFirme XS facial in Burbank for oily and acne-prone skin — deep cleansing, an oxygenating treatment and clarifying serums, with no downtime.',
+    keywords: ['acne facial burbank', 'facial for oily skin', 'breakout facial', 'congested pores facial', 'aquafirme xs facial', 'clarifying facial burbank'],
+    highlights: [
+      { icon: '', title: 'For oily and acne-prone skin', body: 'Designed for oily skin, breakouts and congestion.' },
+      { icon: '', title: 'Three clarifying serums', body: 'The EVO step clears, brightens and purifies with Clarify, Vivify and Detox serums.' },
+      { icon: '', title: 'An oxygenating treatment', body: 'The EXO₂ oxygenating gel treatment leaves skin refreshed. Ultrasound infusion can be added.' },
+      { icon: '', title: '30 minutes, no downtime', body: 'Quick and comfortable — you can go straight back to your day.' },
+    ],
+    treats: ['Acne-Prone Skin', 'Oily Skin', 'Breakouts', 'Congested Pores', 'Blackheads'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your ClearXS facial begins with a gentle cleanse, then the EXO₂ oxygenating gel treatment. The AquaFirme XS EVO step follows with Clarify, Vivify and Detox serums to clear congestion and purify oily, acne-prone skin. If it suits your skin, your provider may add the ULTRA ultrasound infusion. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['acne facial', 'clarifying facial', 'oily skin facial', 'breakout facial', 'aquafirme facial', 'pore cleansing facial'],
+  },
+  {
+    id: 'hydratexs-facial',
+    noVideo: true,
+    noGuides: true,
+    afterNote: AFTER_FACIAL,
+    slug: 'hydratexs-facial-for-dry-skin-dehydrated-skin-fine-lines-mature-skin-burbank-ca',
+    name: 'HydrateXS Facial',
+    category: 'Facials',
+    tagline:
+      'A 20 to 30-minute AquaFirme XS facial that quenches dry, dehydrated and mature skin and softens the look of fine lines.',
+    searchDescription:
+      'HydrateXS is a 20 to 30-minute AquaFirme XS facial in Burbank for dry, dehydrated and mature skin and fine lines — hydrating serums, with optional oxygenating and ultrasound steps, and no downtime.',
+    keywords: ['hydrating facial burbank', 'facial for dry skin', 'dehydrated skin facial', 'mature skin facial', 'aquafirme xs facial', 'fine lines facial'],
+    highlights: [
+      { icon: '', title: 'Deep hydration', body: 'Designed for mature, dry and dehydrated skin that needs moisture back.' },
+      { icon: '', title: 'Hydrating, strengthening serums', body: 'The EVO step purifies and strengthens with Detox and Defy serums.' },
+      { icon: '', title: 'Optional add-ons', body: 'Your provider can add the EXO₂ oxygenating treatment or ULTRA ultrasound infusion if they suit your skin.' },
+      { icon: '', title: 'Quick, with no downtime', body: '20 to 30 minutes — you can go straight back to your day.' },
+    ],
+    treats: ['Dry Skin', 'Dehydrated Skin', 'Fine Lines', 'Wrinkles', 'Mature Skin'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Your HydrateXS facial begins with a gentle cleanse. The AquaFirme XS EVO step uses Detox and Defy serums to hydrate and strengthen dry, dehydrated skin. If it suits your skin, your provider may add the EXO₂ oxygenating treatment or the ULTRA ultrasound infusion. We finish with moisturizer and SPF 30+. Most clients enjoy a course of 4 to 6 treatments about two weeks apart, followed by monthly maintenance.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['hydrating facial', 'dry skin facial', 'moisture facial', 'anti-aging facial', 'aquafirme facial', 'mature skin facial'],
   },
 ]
 
