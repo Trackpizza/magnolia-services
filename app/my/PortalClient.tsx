@@ -751,6 +751,9 @@ export default function PortalClient({ token, learnMore = [] }: {
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />
 
+      {/* Order (10-20, Eric): what is waiting on them first (medication holds,
+          to-dos, photo requests), then their own things, then the clinic's
+          (real results, our packages). */}
       {/* Talk to your doctor — time sensitive (10-16): medications to pause
           before a treatment. First of all, because it has the earliest
           deadline on the page. */}
@@ -832,6 +835,32 @@ export default function PortalClient({ token, learnMore = [] }: {
         </Section>
       )}
 
+      {/* Photos the clinic is waiting on.
+          Near the top, above the plan, because it is the one thing on this
+          page somebody else is waiting for — everything else is theirs to
+          read whenever. It also makes "check your page" a real instruction:
+          an email from three weeks ago is not somewhere a patient can be
+          sent, and this is why Eileen can text four words instead of
+          re-sending a link. */}
+      {(view.photoRequests ?? []).map((r) => (
+        <Section key={r.url} title="Could you send us a photo?" badge="Waiting on you" urgent>
+          <p className="text-sm text-gray-600 mb-4">
+            It has been {r.label}
+            {r.procedureName ? ` since your ${r.procedureName}` : ""}. A couple of photos lets
+            your provider see how it is settling — it takes a minute on your phone, and they
+            go straight onto your record.
+          </p>
+          {r.slots.length > 0 && (
+            <p className="text-sm text-gray-600 mb-4">
+              We will ask for {r.slots.length}: {r.slots.join(', ')}.
+            </p>
+          )}
+          <a href={r.url} className={primaryBtn + ' text-center block'}>
+            Take the photos
+          </a>
+        </Section>
+      ))}
+
       {/* ── What is booked ────────────────────────────────────────────── */}
       <Section title="Your appointments" badge={view.upcoming.length ? `${view.upcoming.length} booked` : undefined}>
         {view.upcoming.length === 0 ? (
@@ -875,16 +904,6 @@ export default function PortalClient({ token, learnMore = [] }: {
           </div>
         )}
       </Section>
-
-      {/* Our packages (10-17) — the clinic's catalogue; every client since 10-18. */}
-      {view.ourPackages && view.ourPackages.length > 0 && (
-        <OurPackages packages={view.ourPackages} phone={view.clinicPhone ?? ''} />
-      )}
-
-      {/* Packages, deposits & quotes the clinic sent from the chart (10-13). */}
-      {view.account && view.account.length > 0 && (
-        <PortalAccount items={view.account} token={token} session={session} />
-      )}
 
       {/* ── The plan ──────────────────────────────────────────────────── */}
       {view.plan.length > 0 && (() => {
@@ -1014,31 +1033,10 @@ export default function PortalClient({ token, learnMore = [] }: {
         );
       })()}
 
-      {/* Photos the clinic is waiting on.
-          Near the top, above the plan, because it is the one thing on this
-          page somebody else is waiting for — everything else is theirs to
-          read whenever. It also makes "check your page" a real instruction:
-          an email from three weeks ago is not somewhere a patient can be
-          sent, and this is why Eileen can text four words instead of
-          re-sending a link. */}
-      {(view.photoRequests ?? []).map((r) => (
-        <Section key={r.url} title="Could you send us a photo?" badge="Waiting on you" urgent>
-          <p className="text-sm text-gray-600 mb-4">
-            It has been {r.label}
-            {r.procedureName ? ` since your ${r.procedureName}` : ""}. A couple of photos lets
-            your provider see how it is settling — it takes a minute on your phone, and they
-            go straight onto your record.
-          </p>
-          {r.slots.length > 0 && (
-            <p className="text-sm text-gray-600 mb-4">
-              We will ask for {r.slots.length}: {r.slots.join(', ')}.
-            </p>
-          )}
-          <a href={r.url} className={primaryBtn + ' text-center block'}>
-            Take the photos
-          </a>
-        </Section>
-      ))}
+      {/* Packages, deposits & quotes the clinic sent from the chart (10-13). */}
+      {view.account && view.account.length > 0 && (
+        <PortalAccount items={view.account} token={token} session={session} />
+      )}
 
       {/* Dr. David's videos — walkthroughs he recorded in Visage Clinical:
           the AI photo consult and the real-photo journey, in ONE card (to
@@ -1094,11 +1092,6 @@ export default function PortalClient({ token, learnMore = [] }: {
             onChanged={load}
           />
         </Section>
-      )}
-
-      {/* Real results from our clients — albums the clinic sent (10-11). */}
-      {view.realResults && view.realResults.length > 0 && (
-        <RealResults albums={view.realResults} token={token} session={session} learnMore={learnMore} />
       )}
 
       {/* Your before-and-after photos — the photo & marketing authorization.
@@ -1236,6 +1229,16 @@ export default function PortalClient({ token, learnMore = [] }: {
             and we will go through them with you.
           </p>
         </Section>
+      )}
+
+      {/* Real results from our clients — albums the clinic sent (10-11). */}
+      {view.realResults && view.realResults.length > 0 && (
+        <RealResults albums={view.realResults} token={token} session={session} learnMore={learnMore} />
+      )}
+
+      {/* Our packages (10-17) — the clinic's catalogue; every client since 10-18. */}
+      {view.ourPackages && view.ourPackages.length > 0 && (
+        <OurPackages packages={view.ourPackages} phone={view.clinicPhone ?? ''} />
       )}
 
       {/* ── The clinic's own buttons ────────────────────────────────
