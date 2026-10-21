@@ -23,6 +23,7 @@ import TextSize, { useTextSize } from './TextSize'
 import OurPackages, { type OurPackage } from './OurPackages'
 import { backgroundFor } from './backgrounds'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
+import SendUsSomething from './SendUsSomething'
 import SignedForms, { type SignedFormRow } from './SignedForms'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
@@ -860,6 +861,11 @@ export default function PortalClient({ token, learnMore = [] }: {
           </a>
         </Section>
       ))}
+
+      {/* ── Send us something (10-21) ─────────────────────────────────
+          Photos of a concern, or a document — records /api/public/portal-upload,
+          behind this session. Only Eileen is told. */}
+      {session && <SendUsSomething token={token} session={session} clinicPhone={view.clinicPhone ?? ''} />}
 
       {/* ── What is booked ────────────────────────────────────────────── */}
       <Section title="Your appointments" badge={view.upcoming.length ? `${view.upcoming.length} booked` : undefined}>
