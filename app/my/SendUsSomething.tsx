@@ -167,7 +167,11 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
     }
   }
 
-  const tel = clinicPhone ? `tel:+1${clinicPhone.replace(/\D/g, '').slice(-10)}` : ''
+  const digits = (clinicPhone ?? '').replace(/\D/g, '').slice(-10)
+  const tel = digits.length === 10 ? `tel:+1${digits}` : ''
+  // Written out, not just "Call us now": on a laptop a tel: link dials nothing,
+  // so the number itself has to be on the screen (10-21, Eric).
+  const shown = digits.length === 10 ? `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}` : clinicPhone ?? ''
 
   return (
     <Section title="Send us something">
@@ -191,8 +195,13 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
           <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
             <strong>If your skin is white, gray-blue, or very painful after a filler, or you have trouble seeing or
             breathing — don&apos;t wait.</strong>{' '}
-            {tel ? <a href={tel} className="font-semibold underline">Call us now</a> : 'Call us now'} or 911. Photos sent here
-            are looked at during clinic hours.
+            Call us now{shown && (
+              <>
+                {' '}at{' '}
+                {tel ? <a href={tel} className="font-semibold underline whitespace-nowrap">{shown}</a> : <strong>{shown}</strong>}
+              </>
+            )}{' '}
+            or 911. Photos sent here are looked at during clinic hours.
           </div>
           {treatments.length > 0 && (
             <label className="block">
