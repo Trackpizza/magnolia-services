@@ -8,6 +8,7 @@
  */
 import { useState } from 'react'
 import Section from './Section'
+import { startPayment } from './pay'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -25,6 +26,9 @@ export type AccountItem = {
   lines: { on: string; delta: number }[]
   method: string
   status: string
+  /** Paying online (10-26, test charts): due = Pay button, paid = waiting
+   *  for Eileen, confirmed = an ordinary paid package. */
+  pay?: { state: 'due' | 'paid' | 'confirmed'; amountCents: number | null } | null
 }
 
 const money = (c: number | null) =>
@@ -57,6 +61,17 @@ function Note({ text }: { text: string }) {
 
 export default function PortalAccount({ items, token, session }: { items: AccountItem[]; token: string; session: string }) {
   const [told, setTold] = useState(false)
+  const [paying, setPaying] = useState('')
+  const [payError, setPayError] = useState('')
+  const pay = async (id: string) => {
+    setPaying(id)
+    setPayError('')
+    const msg = await startPayment(token, session, { action: 'pay', id })
+    if (msg) {
+      setPayError(msg)
+      setPaying('')
+    }
+  }
   const onOpen = () => {
     if (told) return
     setTold(true)
@@ -76,7 +91,12 @@ export default function PortalAccount({ items, token, session }: { items: Accoun
   const label = 'mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500'
 
   return (
-    <Section title="Your packages, deposits & quotes" badge={`${items.length}`} onOpen={onOpen}>
+    <Section
+      title="Your packages, deposits & quotes"
+      badge={items.some((i) => i.pay?.state === 'due') ? 'Payment due' : `${items.length}`}
+      urgent={items.some((i) => i.pay?.state === 'due')}
+      onOpen={onOpen}
+    >
       <div className="space-y-6">
         {packages.length > 0 && (
           <div>
@@ -89,8 +109,27 @@ export default function PortalAccount({ items, token, session }: { items: Accoun
                     <strong className="text-2xl tabular-nums">{p.left}</strong> of {p.total} {unitWord(p.unit, p.total)} left
                   </p>
                   <div className="mt-2"><Dots total={p.total} left={p.left} /></div>
+                  {p.pay?.state === 'due' && (
+                    <div className="mt-3 space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => pay(p.id)}
+                        disabled={!!paying}
+                        className="w-full rounded-xl bg-brand-600 px-6 py-4 text-base font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+                      >
+                        {paying === p.id ? 'Opening the secure payment page…' : `Pay ${money(p.pay.amountCents)}`}
+                      </button>
+                      <p className="text-xs text-gray-600">Secure card payment by Stripe. You&apos;ll get a receipt from us by email.</p>
+                      {payError && paying === '' && <p className="text-sm text-red-700">{payError}</p>}
+                    </div>
+                  )}
+                  {p.pay?.state === 'paid' && (
+                    <p className="mt-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
+                      ✓ Paid {money(p.pay.amountCents)} — Eileen will confirm your package.
+                    </p>
+                  )}
                   <p className="mt-2 text-xs text-gray-600">
-                    {[p.amountCents !== null ? `Paid ${money(p.amountCents)}` : '', `since ${day(p.addedOn)}`, p.goodUntil ? `good until ${day(p.goodUntil)}` : '']
+                    {[p.amountCents !== null && p.pay?.state !== 'due' ? `Paid ${money(p.amountCents)}` : '', `since ${day(p.addedOn)}`, p.goodUntil ? `good until ${day(p.goodUntil)}` : '']
                       .filter(Boolean)
                       .join(' · ')}
                   </p>

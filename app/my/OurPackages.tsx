@@ -15,6 +15,7 @@ import remarkBreaks from 'remark-breaks'
 import Section from './Section'
 import { SiteLink } from './SiteViewer'
 import YouTubeEmbed from '@/components/YouTubeEmbed'
+import { startPayment } from './pay'
 
 export type OurPackage = {
   id: string
@@ -32,8 +33,24 @@ const money = (c: number | null) =>
 const pill =
   'inline-flex items-center gap-1.5 rounded-full border border-brand-600 px-4 py-2 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors'
 
-function Package({ p, phone }: { p: OurPackage; phone: string }) {
+/** Buy online (10-26) — test charts only; null hides it. */
+type Buy = { token: string; session: string } | null
+
+function Package({ p, phone, buy }: { p: OurPackage; phone: string; buy: Buy }) {
   const [open, setOpen] = useState(false)
+  const [buying, setBuying] = useState(false)
+  const [buyError, setBuyError] = useState('')
+  const canBuy = !!buy && typeof p.priceCents === 'number' && p.priceCents >= 50
+  const onBuy = async () => {
+    if (!buy) return
+    setBuying(true)
+    setBuyError('')
+    const msg = await startPayment(buy.token, buy.session, { action: 'buy', catalogId: p.id })
+    if (msg) {
+      setBuyError(msg)
+      setBuying(false)
+    }
+  }
   const digits = phone.replace(/\D/g, '').slice(-10)
   const ask = encodeURIComponent(`Hi Eileen, I'd like to hear more about the ${p.name}.`)
   return (
@@ -68,6 +85,22 @@ function Package({ p, phone }: { p: OurPackage; phone: string }) {
           )}
         </div>
       )}
+      {canBuy && (
+        <div className="space-y-2">
+          <button
+            type="button"
+            onClick={onBuy}
+            disabled={buying}
+            className="w-full rounded-xl bg-brand-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+          >
+            {buying ? 'Opening the secure payment page…' : `Buy — ${money(p.priceCents)}`}
+          </button>
+          <p className="text-xs text-gray-600">
+            Secure card payment by Stripe. Eileen confirms your package before your first visit with it.
+          </p>
+          {buyError && <p className="text-sm text-red-700">{buyError}</p>}
+        </div>
+      )}
       {digits.length === 10 && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-gray-700">Ask Eileen:</span>
@@ -84,12 +117,15 @@ function Package({ p, phone }: { p: OurPackage; phone: string }) {
   )
 }
 
-export default function OurPackages({ packages, phone }: { packages: OurPackage[]; phone: string }) {
+export default function OurPackages({ packages, phone, buy = null }: { packages: OurPackage[]; phone: string; buy?: Buy }) {
   return (
     <Section title="Our packages" badge={`${packages.length}`}>
-      <p className="mb-4 text-sm text-gray-600">Treatment packages at Magnolia Skin Center. Interested? Ask Eileen — she&rsquo;ll set it up with you.</p>
+      <p className="mb-4 text-sm text-gray-600">
+        Treatment packages at Magnolia Skin Center.{' '}
+        {buy ? 'Buy one here, or ask Eileen — she’ll set it up with you.' : 'Interested? Ask Eileen — she’ll set it up with you.'}
+      </p>
       <ul className="space-y-3">
-        {packages.map((p) => <Package key={p.id} p={p} phone={phone} />)}
+        {packages.map((p) => <Package key={p.id} p={p} phone={phone} buy={buy} />)}
       </ul>
     </Section>
   )

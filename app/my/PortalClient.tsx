@@ -24,6 +24,7 @@ import OurPackages, { type OurPackage } from './OurPackages'
 import { backgroundFor } from './backgrounds'
 import PortalMedHolds, { type PortalMedHold } from './PortalMedHolds'
 import SendUsSomething from './SendUsSomething'
+import PaidNotice from './PaidNotice'
 import SignedForms, { type SignedFormRow } from './SignedForms'
 import AgreeBox from './AgreeBox'
 import { phoneSignInConfigured, robotCheckToken } from '@/lib/phoneSignIn'
@@ -176,6 +177,8 @@ interface OpenView {
   background?: string
   /** Our packages (records lib/packageCatalog.ts) — every client since 10-18. */
   ourPackages?: OurPackage[]
+  /** Pay / Buy packages online (records lib/packagePay.ts, 10-26) — test charts only. */
+  payEnabled?: boolean
   history: History | null
   termsNeeded?: undefined
 }
@@ -752,6 +755,9 @@ export default function PortalClient({ token, learnMore = [] }: {
       {/* Staying signed in: open in Safari / Add to Home Screen (10-03). */}
       <PortalTips />
 
+      {/* Back from paying for a package (10-26). */}
+      <PaidNotice />
+
       {/* Order (10-20, Eric): what is waiting on them first (medication holds,
           to-dos, photo requests), then their own things, then the clinic's
           (real results, our packages). */}
@@ -1244,7 +1250,11 @@ export default function PortalClient({ token, learnMore = [] }: {
 
       {/* Our packages (10-17) — the clinic's catalogue; every client since 10-18. */}
       {view.ourPackages && view.ourPackages.length > 0 && (
-        <OurPackages packages={view.ourPackages} phone={view.clinicPhone ?? ''} />
+        <OurPackages
+          packages={view.ourPackages}
+          phone={view.clinicPhone ?? ''}
+          buy={view.payEnabled && session ? { token, session } : null}
+        />
       )}
 
       {/* ── The clinic's own buttons ────────────────────────────────
