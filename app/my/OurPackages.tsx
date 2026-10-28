@@ -8,7 +8,7 @@
  * **Learn more** — the deep dive and a YouTube video — and **Ask Eileen**:
  * Text / Call the clinic. Nothing is bought here; Eileen sets it up.
  */
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import remarkBreaks from 'remark-breaks'
@@ -36,8 +36,15 @@ const pill =
 /** Buy online (10-26) — test charts only; null hides it. */
 type Buy = { token: string; session: string } | null
 
-function Package({ p, phone, buy }: { p: OurPackage; phone: string; buy: Buy }) {
-  const [open, setOpen] = useState(false)
+function Package({ p, phone, buy, focused = false }: { p: OurPackage; phone: string; buy: Buy; focused?: boolean }) {
+  // Arrived from an email's package button: details open, scrolled to.
+  const [open, setOpen] = useState(focused)
+  const ref = useRef<HTMLLIElement>(null)
+  useEffect(() => {
+    // A plain jump, after the sections above have rendered — smooth scrolling
+    // does not run in every browser view (10-27).
+    if (focused) setTimeout(() => ref.current?.scrollIntoView({ block: 'start' }), 700)
+  }, [focused])
   const [buying, setBuying] = useState(false)
   const [buyError, setBuyError] = useState('')
   const canBuy = !!buy && typeof p.priceCents === 'number' && p.priceCents >= 50
@@ -54,7 +61,7 @@ function Package({ p, phone, buy }: { p: OurPackage; phone: string; buy: Buy }) 
   const digits = phone.replace(/\D/g, '').slice(-10)
   const ask = encodeURIComponent(`Hi Eileen, I'd like to hear more about the ${p.name}.`)
   return (
-    <li className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-3">
+    <li ref={ref} className={`rounded-2xl border bg-gray-50 p-4 space-y-3 scroll-mt-4 ${focused ? 'border-brand-600' : 'border-gray-100'}`}>
       <div>
         <p className="text-base font-semibold text-gray-900">{p.name}</p>
         <p className="text-sm text-gray-700">
@@ -117,15 +124,16 @@ function Package({ p, phone, buy }: { p: OurPackage; phone: string; buy: Buy }) 
   )
 }
 
-export default function OurPackages({ packages, phone, buy = null }: { packages: OurPackage[]; phone: string; buy?: Buy }) {
+export default function OurPackages({ packages, phone, buy = null, focus = '' }: { packages: OurPackage[]; phone: string; buy?: Buy; focus?: string }) {
+  const focusing = !!focus && packages.some((p) => p.id === focus)
   return (
-    <Section title="Our packages" badge={`${packages.length}`}>
+    <Section title="Our packages" badge={`${packages.length}`} defaultOpen={focusing}>
       <p className="mb-4 text-sm text-gray-600">
         Treatment packages at Magnolia Skin Center.{' '}
         {buy ? 'Buy one here, or ask Eileen — she’ll set it up with you.' : 'Interested? Ask Eileen — she’ll set it up with you.'}
       </p>
       <ul className="space-y-3">
-        {packages.map((p) => <Package key={p.id} p={p} phone={phone} buy={buy} />)}
+        {packages.map((p) => <Package key={p.id} p={p} phone={phone} buy={buy} focused={focusing && p.id === focus} />)}
       </ul>
     </Section>
   )

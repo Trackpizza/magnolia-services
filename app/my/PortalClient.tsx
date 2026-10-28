@@ -303,6 +303,13 @@ export default function PortalClient({ token, learnMore = [] }: {
   // One loader per session, so the photos' effects do not re-fetch on every
   // render of this page.
   const session = view && !view.locked ? readSession(token) : ''
+  // ?package=<id> — an email's package button (records lib/emailBlast.ts,
+  // 10-27): Our packages opens on that package. Read once, in the browser.
+  const [focusPackage, setFocusPackage] = useState('')
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search).get('package') ?? ''
+    if (/^[A-Za-z0-9_-]{1,128}$/.test(p)) setFocusPackage(p)
+  }, [])
   const photoLoader = useMemo(() => portalLoader(token, session), [token, session])
 
   const [booking, setBooking] = useState(false)
@@ -1254,6 +1261,7 @@ export default function PortalClient({ token, learnMore = [] }: {
           packages={view.ourPackages}
           phone={view.clinicPhone ?? ''}
           buy={view.payEnabled && session ? { token, session } : null}
+          focus={focusPackage}
         />
       )}
 
