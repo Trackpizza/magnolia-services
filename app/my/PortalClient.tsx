@@ -726,7 +726,7 @@ export default function PortalClient({ token, learnMore = [] }: {
           Hello{view.firstName ? `, ${view.firstName}` : ''}
         </h1>
         {/* Sign out (10-02): a shared or borrowed phone should not stay signed
-            in for 90 days. Ends the session on the server too, then this
+            in (sessions never expire since 10-31). Ends the session on the server too, then this
             device asks for a code again. */}
         <button
           onClick={async () => {

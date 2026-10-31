@@ -1,5 +1,5 @@
 /**
- * Where the 90-day portal login lives on this device.
+ * Where the portal login lives on this device (no expiry since 10-31 — only Sign out ends it).
  *
  * localStorage, per browser, and it is only a KEY — the server decides what it
  * opens and which patient it belongs to, so a stolen one is worth nothing on

@@ -152,7 +152,7 @@ export default function PortalTips() {
     return (
       <div className={box}>
         <p className="font-semibold text-plum-900 mb-1">Installed</p>
-        <p>Open it any time from the Magnolia icon — it stays signed in for 90 days.</p>
+        <p>Open it any time from the Magnolia icon — it stays signed in until you sign out.</p>
       </div>
     )
   }
@@ -163,7 +163,7 @@ export default function PortalTips() {
         <p className="font-semibold text-plum-900 mb-1">Keep your page one tap away</p>
         <p>
           Install it as an app — it gets its own Magnolia icon{env.android ? ' on your home screen' : ' on your computer'} and
-          stays signed in for 90 days.
+          stays signed in until you sign out.
         </p>
         <div className="mt-3 flex items-center gap-4">
           <button
@@ -195,11 +195,11 @@ export default function PortalTips() {
       <p className="font-semibold text-plum-900 mb-1">Keep your page one tap away</p>
       <p>
         {env.ios ? (
-          <>Tap the <strong>Share</strong> button (the square with the arrow), then <strong>Add to Home Screen</strong>. Open it from the new Magnolia icon and sign in once more — after that it stays signed in for 90 days.</>
+          <>Tap the <strong>Share</strong> button (the square with the arrow), then <strong>Add to Home Screen</strong>. Open it from the new Magnolia icon and sign in once more — after that it stays signed in until you sign out.</>
         ) : env.android ? (
-          <>Tap <strong>⋮</strong> at the top, then <strong>Add to Home screen</strong> (or <strong>Install app</strong>). Open it from the new Magnolia icon — it stays signed in for 90 days.</>
+          <>Tap <strong>⋮</strong> at the top, then <strong>Add to Home screen</strong> (or <strong>Install app</strong>). Open it from the new Magnolia icon — it stays signed in until you sign out.</>
         ) : (
-          <>Bookmark this page — you will stay signed in on this computer for 90 days. In Safari on a Mac you can also choose <strong>File → Add to Dock</strong> to make it an app.</>
+          <>Bookmark this page — you will stay signed in on this computer until you sign out. In Safari on a Mac you can also choose <strong>File → Add to Dock</strong> to make it an app.</>
         )}
       </p>
       <button
