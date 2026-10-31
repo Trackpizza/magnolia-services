@@ -17,6 +17,7 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import Section from './Section'
+import CameraSheet from './CameraSheet'
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
@@ -63,6 +64,8 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
   const [busy, setBusy] = useState('')
   const [error, setError] = useState('')
   const [sent, setSent] = useState<Mode | null>(null)
+  /** The in-page camera is open (CameraSheet). */
+  const [camera, setCamera] = useState(false)
   const input = useRef<HTMLInputElement>(null)
 
   const call = async (body: Record<string, unknown>) => {
@@ -95,6 +98,7 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
     setVisitId('')
     setDocType('medication')
     setError('')
+    setCamera(false)
   }
 
   const open = (m: Mode) => {
@@ -274,7 +278,19 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
             </div>
           )}
 
-          {files.length < MAX[mode] && (
+          {/* Two ways in (10-30, Eric): the camera IN the page — a file input
+              alone never offers the webcam on a laptop — or a file / library. */}
+          {camera && files.length < MAX[mode] && (
+            <CameraSheet
+              room={MAX[mode] - files.length}
+              startFacing={mode === 'document' ? 'environment' : 'user'}
+              onShot={(jpeg) =>
+                setFiles((xs) => (xs.length >= MAX[mode] ? xs : [...xs, { blob: jpeg, type: 'image/jpeg', name: 'camera.jpg', preview: URL.createObjectURL(jpeg) }]))
+              }
+              onClose={() => setCamera(false)}
+            />
+          )}
+          {!camera && files.length < MAX[mode] && (
             <>
               <input
                 ref={input}
@@ -284,11 +300,19 @@ export default function SendUsSomething({ token, session, clinicPhone }: { token
                 className="hidden"
                 onChange={(e) => void pick(e.target.files)}
               />
-              <button type="button" className={outline} onClick={() => input.current?.click()} disabled={!!busy}>
+              <p className="text-sm text-gray-600">
                 {files.length === 0
-                  ? mode === 'concern' ? '📷 Take or choose photos (1–4)' : '📄 Take a photo or choose a file'
-                  : `＋ Add more (${files.length} of ${MAX[mode]})`}
-              </button>
+                  ? mode === 'concern' ? 'Up to 4 photos.' : 'A photo or a PDF — up to 5.'
+                  : `${files.length} of ${MAX[mode]} — add more if you like.`}
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <button type="button" className={outline} onClick={() => setCamera(true)} disabled={!!busy}>
+                  📷 Take photo{mode === 'concern' ? '(s)' : ''}
+                </button>
+                <button type="button" className={outline} onClick={() => input.current?.click()} disabled={!!busy}>
+                  🖼 Upload from this device
+                </button>
+              </div>
             </>
           )}
 
