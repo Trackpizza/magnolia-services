@@ -49,7 +49,9 @@ const CameraIcon = ({ className }: { className: string }) => (
 const STEPS = [
   { n: '1', title: 'Upload your photo', body: 'One clear, front-facing photo is all it takes.' },
   { n: '2', title: 'Instant confirmation', body: 'Sent straight to your inbox, so you know it arrived.' },
-  { n: '3', title: 'Dr. David records your video', body: 'His walkthrough of your photo, with a simulated preview of the result.' },
+  // The preview is optional since 2026-10-30: the portal form asks "with a
+  // simulated preview" or "Dr. David only — no AI". Keep this matching it.
+  { n: '3', title: 'Dr. David records your video', body: 'His walkthrough of your photo — with a simulated preview of the result, or without one. Your choice.' },
   { n: '4', title: 'Watch your private link', body: 'Delivered by text and email — yours to keep and rewatch.' },
 ]
 
@@ -135,7 +137,8 @@ export default async function PhotoConsultPage() {
           <div className="bg-white rounded-2xl border border-gray-100 p-6 sm:p-8">
             <p className="text-xs font-semibold text-brand-600 uppercase tracking-widest mb-3">Good to know</p>
             <ul className="space-y-2 text-sm font-light text-gray-600 leading-relaxed">
-              <li>The preview is a <span className="font-medium text-gray-900">computer simulation for illustration</span> — not a real result, not a guarantee, and not medical advice. Individual results vary.</li>
+              <li>The preview is <span className="font-medium text-gray-900">optional</span>. If you choose one, it is a <span className="font-medium text-gray-900">computer simulation for illustration</span> — not a real result, not a guarantee, and not medical advice. Individual results vary.</li>
+              <li>Prefer no AI? Choose <span className="font-medium text-gray-900">Dr. David only</span> — he goes over your actual photo, and your photo is never sent to an AI tool.</li>
               <li>Your photo and details are used to prepare your walkthrough and to contact you about it.</li>
               <li>You choose separately whether your before/after may ever be used in marketing. Saying no changes nothing about your consult.</li>
             </ul>
