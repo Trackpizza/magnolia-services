@@ -27,7 +27,7 @@ export const SERVICE_CATEGORIES: Array<{ name: string; description: string; ids:
   {
     name: 'Agnes RF',
     description: 'Precision radiofrequency microneedling that safely reaches deeper skin layers for lasting, non-surgical results.',
-    ids: ['agnes-rf-microneedling', 'agnes-rf-eye-bag-treatment', 'agnes-rf-acne-scar-treatment', 'agnes-rf-non-surgical-facelift'],
+    ids: ['agnes-rf-microneedling', 'agnes-rf-eye-bag-treatment', 'agnes-rf-acne-scar-treatment', 'agnes-rf-non-surgical-facelift', 'agnes-rf-targeted-treatment'],
   },
   {
     name: 'Scarlet PRO SRF',
@@ -220,6 +220,35 @@ export const SERVICES: ServiceEntry[] = [
     ],
     disclaimer: DISCLAIMER,
     alsoKnownAs: ['turkey neck', 'double chin', 'saggy jawline', 'droopy cheeks', 'face fat', 'melt chin fat', 'tech neck lines'],
+  },
+  {
+    id: 'agnes-rf-targeted-treatment',
+    noVideo: true,
+    slug: 'agnes-rf-targeted-treatment-for-one-area-acne-scars-wrinkles-loose-skin-burbank-ca',
+    name: 'Agnes RF Targeted Treatment',
+    category: 'Agnes RF',
+    tagline:
+      'The same precision Agnes RF microneedling, focused on one area of concern — a single scar patch, the lines around the mouth, a stubborn spot of laxity — for a shorter session and a smaller recovery zone.',
+    searchDescription:
+      'Agnes RF Targeted Treatment focuses insulated-needle radiofrequency energy on one region of the skin, remodeling collagen exactly where you need it without treating the whole face.',
+    keywords: ['agnes rf targeted', 'spot treatment', 'single area rf microneedling', 'acne scar patch', 'smile lines', 'agnes rf burbank'],
+    highlights: [
+      { icon: '', title: 'One area, treated precisely', body: 'Instead of a full-face session, the treatment is focused on the single region that concerns you most, with the energy, depth and tip chosen for that spot.' },
+      { icon: '', title: 'The same Agnes RF technology', body: 'Ultra-fine insulated needles deliver square-wave radiofrequency energy into the deeper skin layers, where lasting collagen remodeling happens.' },
+      { icon: '', title: 'A shorter session', body: 'Treating one region means less time in the chair than a full Agnes RF facial treatment.' },
+      { icon: '', title: 'A smaller recovery zone', body: 'Redness, swelling and pin-prick marks stay within the treated area, so the rest of your face is untouched.' },
+      { icon: '', title: 'Results that build over time', body: 'The collagen response continues for weeks after your session, and the area keeps improving as your skin rebuilds.' },
+    ],
+    treats: ['Acne Scars', 'Fine Lines', 'Smile Lines', 'Lip Lines', 'Localized Skin Laxity', 'Uneven Texture'],
+    howItWorks: [
+      {
+        step: '1',
+        title: 'How It Works',
+        body: 'Agnes RF Targeted Treatment uses the same insulated microneedles and square-wave radiofrequency energy as a full Agnes RF session, focused on one region of the skin. Your provider selects the needle tip, depth and energy for that area, then treats only where it is needed. Because the needle shaft is insulated, the surface of the skin is protected while the energy reaches the deeper layers, starting a collagen remodeling response that continues to build for weeks. It is a good fit when one concern stands out — a patch of acne scarring, lines around the mouth or eyes, or a single area of loose skin — or as a touch-up between full treatments.',
+      },
+    ],
+    disclaimer: DISCLAIMER,
+    alsoKnownAs: ['agnes spot treatment', 'one area rf microneedling', 'acne scar spot treatment', 'touch-up rf microneedling'],
   },
   {
     id: 'scarlet-pro-srf-microneedling',

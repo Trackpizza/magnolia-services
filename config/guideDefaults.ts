@@ -13,6 +13,21 @@
  */
 
 export const DEFAULT_PREP: Record<string, string> = {
+  'agnes-rf-targeted-treatment': `### Pre-Treatment Care for Agnes RF Targeted Treatment
+
+✅ One week before your visit, speak with your physician or Dr. David before stopping any prescription medications, and avoid alcohol.
+
+✅ Pause blood-thinning supplements like fish oil, vitamin E, ginkgo, or high-dose ibuprofen and aspirin to help minimize bruising.
+
+✅ Five days before your appointment, stop using retinoids, salicylic acid, benzoyl peroxide, or any harsh chemical exfoliants on and around the area being treated.
+
+✅ Tell us before your visit if your health, medications or allergies have changed — especially an allergy to lidocaine, a history of cold sores, pregnancy or breastfeeding, or a recent procedure in that area.
+
+✅ On the day of your session, arrive with the area completely clean — no makeup, no moisturizers, no heavy creams.
+
+✅ Expect a few days of redness, mild swelling and tiny pin-prick marks in the treated area only.
+
+One area, precisely refreshed — let's get you ready at Magnolia Skin Center ✨`,
   radiesse: `### Pre-Treatment Care for RADIESSE® Dermal Filler
 
 ✅ One week before coming in, speak with your physician or Dr. David before stopping any prescription medications, and avoid alcohol.
@@ -33,6 +48,21 @@ Structure, contour and new collagen start with smart prep — let's get you read
 }
 
 export const DEFAULT_AFTERCARE: Record<string, string> = {
+  'agnes-rf-targeted-treatment': `### Post-Care for Agnes RF Targeted Treatment
+
+✅ Skip alcohol, strenuous workouts, hot saunas, and harsh skincare like retinoids or scrubs on the treated area for the next week.
+
+✅ Keep the area completely clean, washing only with a gentle, non-alcoholic cleanser, and always wash your hands first.
+
+✅ Apply cool compresses to soothe any mild swelling, which is normal for 3 to 5 days.
+
+✅ Stay deeply hydrated and protect the area with SPF 50.
+
+✅ Expect dry, peeling skin and small, raised "collagen balls" in the treated area that clear within 2 to 5 days.
+
+✅ Mild redness, itchiness, tenderness, or temporary numbness in that area are all normal parts of healing.
+
+Let's let that new collagen rebuild exactly where you need it at Magnolia Skin Center ✨`,
   radiesse: `### Post-Care for RADIESSE® Dermal Filler
 
 ✅ Apply a clean, cool ice pack gently to ease swelling and tenderness.
