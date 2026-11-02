@@ -150,7 +150,8 @@ interface OpenView {
    *  already given, newest first. */
   testimonial?: { signed: boolean; sent: string[] }
   /** Photo & marketing authorization — offered until it is signed. */
-  photoAuth?: { signed: boolean }
+  /** level "none" = they chose "Not at this time" (records 11-01). */
+  photoAuth?: { signed: boolean; level?: 'private' | 'public' | 'none' | null }
   /** "Your progress" — their photos by opaque id, minus any the clinic hid. */
   journey?: Journey
   /** Their live public share of some of those photos, if any. */
@@ -1129,6 +1130,23 @@ export default function PortalClient({ token, learnMore = [] }: {
           </p>
           <button onClick={() => openLink('marketing-consent')} disabled={busy !== ''} className={primaryBtn}>
             {busy === 'marketing-consent' ? 'Opening…' : 'Read the authorization'}
+          </button>
+          {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
+        </Section>
+      )}
+
+      {/* "Not at this time" (records 11-01, Eileen): the form said they can
+          change their mind here, so the door stays open — quietly. Level 1 / 2
+          patients never see this. */}
+      {view.photoAuth?.signed && view.photoAuth.level === 'none' && (
+        <Section title="Your before-and-after photos">
+          <p className="text-sm text-gray-600 mb-4">
+            You chose not to share your photos for now — they stay in your medical record only.
+            Changed your mind? You can choose to share them privately (consultations and private
+            links) or everywhere, including our website and social media. Entirely optional.
+          </p>
+          <button onClick={() => openLink('marketing-consent')} disabled={busy !== ''} className={primaryBtn}>
+            {busy === 'marketing-consent' ? 'Opening…' : 'Changed your mind? Read the authorization'}
           </button>
           {linkError && <p className="mt-3 text-sm text-plum-900">{linkError}</p>}
         </Section>
