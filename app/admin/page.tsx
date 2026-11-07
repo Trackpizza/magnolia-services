@@ -4,6 +4,7 @@ import type { ServiceLinks, DayKey, DayHours } from '@/lib/types'
 import { DEFAULT_LINKS, DAY_KEYS, DEFAULT_HOURS } from '@/lib/types'
 import { SERVICES } from '@/config/services'
 import { DEFAULT_AFTERCARE, DEFAULT_PREP, withGuideDefaults } from '@/config/guideDefaults'
+import TargetedPricingEditor from '@/components/TargetedPricingEditor'
 
 const DAY_LABELS: Record<DayKey, string> = {
   monday: 'Monday', tuesday: 'Tuesday', wednesday: 'Wednesday', thursday: 'Thursday',
@@ -205,6 +206,7 @@ export default function AdminPage() {
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,
         resultsLinks: data.resultsLinks ?? [],
+        targetedPricing: data.targetedPricing ?? {},
       }))
     } else {
       setAuthError('Incorrect password')
@@ -233,6 +235,7 @@ export default function AdminPage() {
           DAY_KEYS.map(d => [d, { ...DEFAULT_HOURS[d], ...((data.hours ?? {})[d] ?? {}) }])
         ) as Record<DayKey, DayHours>,
         resultsLinks: data.resultsLinks ?? [],
+        targetedPricing: data.targetedPricing ?? {},
       }))
     }
     setLoading(false)
@@ -441,6 +444,22 @@ export default function AdminPage() {
             onRemove={i => removeCustomLink('serviceFooter', i)}
           />
         </section>
+
+        {/* ── Build Your Journey — Agnes RF Targeted (11-07) ───── */}
+        <details className="bg-white rounded-2xl border border-gray-200 p-6">
+          <summary className="cursor-pointer select-none">
+            <span className="text-lg font-bold text-gray-900">Build Your Journey — Agnes RF Targeted pricing</span>
+            <span className="block text-sm text-gray-500 mt-0.5">
+              Prices and descriptions on <a href="/build-your-journey" target="_blank" rel="noopener noreferrer" className="text-brand-600 underline">/build-your-journey</a> (unlisted)
+            </span>
+          </summary>
+          <div className="mt-5">
+            <div className="flex justify-end mb-4">
+              <SaveButton section="targeted" onClick={() => save('targeted', { targetedPricing: links.targetedPricing ?? {} })} />
+            </div>
+            <TargetedPricingEditor value={links.targetedPricing ?? {}} onChange={v => setLinks(l => ({ ...l, targetedPricing: v }))} />
+          </div>
+        </details>
 
         {/* ── Before & After results page ─────────────────────── */}
         <section className="bg-white rounded-2xl border border-gray-200 p-6">

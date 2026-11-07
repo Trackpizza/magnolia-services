@@ -44,6 +44,7 @@ export async function getLinks(): Promise<ServiceLinks> {
       afterCareContent: withGuideDefaults(data.afterCareContent, DEFAULT_AFTERCARE),
       hours,
       resultsLinks: cleanLinks(data.resultsLinks),
+      targetedPricing: data.targetedPricing,
     }
   } catch {
     return FALLBACK

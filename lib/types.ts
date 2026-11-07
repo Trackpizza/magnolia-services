@@ -42,6 +42,8 @@ export interface ServiceLinks {
   afterCareContent: Record<string, string> // id → After Care markdown
   hours: Record<DayKey, DayHours>  // business hours → openingHoursSpecification schema
   resultsLinks?: FooterLink[]  // "Learn more" links on every shared Before & After page (/results/<id>)
+  /** /build-your-journey prices + blurbs (11-07) — config/targetedAreas.ts has the defaults. */
+  targetedPricing?: import('@/config/targetedAreas').TargetedPricing
 }
 
 export const DEFAULT_LINKS: ServiceLinks = {

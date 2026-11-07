@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
   // clinic changes its cancellation policy and the page keeps serving the old
   // one for up to a minute, which is exactly the page where that matters.
   revalidatePath('/terms')
+  revalidatePath('/build-your-journey')
   for (const slug of getAllSlugs()) {
     revalidatePath(`/services/${slug}`)
     revalidatePath(`/services/${slug}/pre-treatment`)
