@@ -33,7 +33,7 @@ after-care guides, and book a complimentary video consultation.
 - **Not yet tested:** the live camera on a real phone (the browser pane blocks cameras; the
   photo overlay itself was checked with a stand-in image). Phone labels are small (~7px) —
   labels and areas are both tap targets.
-- Commit `783b028`.
+- Commit `783b028`. Later 11-07 (Eric): body labels widened (`f206406`); **layout** = plan in a sticky side panel on a computer (with the tapped area), one-line CLOSED-by-default plan bar on a phone (`edda8e0`); **booking** = Text Us + Book a Video Call in the header (`mainFooter.bookingUrl`), a "Not sure which areas?" InlineConsultCTA, and "Or book a free video consultation" under the plan.
 
 ## 2026-10-04 — `/booking` is THE booking page
 - `/bookingpreview`'s page moved to **`/booking`** (video consult button +
