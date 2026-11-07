@@ -270,11 +270,13 @@ export default function TargetedBuilder({
   packages,
   discountPct,
   phone,
+  bookingUrl,
 }: {
   areas: Area[]
   packages: Pkg[]
   discountPct: number
   phone: string
+  bookingUrl: string
 }) {
   const [view, setView] = useState<'face' | 'body'>('face')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -445,11 +447,16 @@ export default function TargetedBuilder({
       💬 Text us this plan
     </a>
   )
+  const bookLink = (
+    <a href={bookingUrl} target="_blank" rel="noopener noreferrer" className="block text-center text-sm font-medium text-brand-700 hover:text-brand-800 underline">
+      Or book a free video consultation
+    </a>
+  )
   const finePrint = <p className="text-[11px] text-gray-500">Estimate only — your final plan and price are set at your consultation. Or call {phone}.</p>
   const countLabel = `${picked.length} ${picked.length === 1 ? 'item' : 'items'}`
 
   return (
-    <div className="pb-28 lg:pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8 lg:items-start">
+    <div className="pb-4 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8 lg:items-start">
       <div>
         {/* View + photo controls */}
         <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
@@ -556,6 +563,7 @@ export default function TargetedBuilder({
                 {totalLine}
               </div>
               {textButton('block w-full')}
+              {bookLink}
               {finePrint}
             </>
           )}
@@ -595,6 +603,7 @@ export default function TargetedBuilder({
                       </p>
                     )}
                   </div>
+                  {bookLink}
                   {finePrint}
                 </div>
               )}
