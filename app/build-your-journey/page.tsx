@@ -30,7 +30,7 @@ export default async function BuildYourJourneyPage() {
           </Link>
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-10">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-10">
         <div className="text-center mb-6">
           <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-2">Agnes RF Targeted Treatment</p>
           <h1 className="text-4xl sm:text-5xl font-semibold text-plum-900 leading-tight" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>

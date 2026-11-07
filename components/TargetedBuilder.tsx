@@ -282,6 +282,8 @@ export default function TargetedBuilder({
   const [sessions, setSessions] = useState<1 | 2 | 3>(1)
   const [photo, setPhoto] = useState<string | null>(null)
   const [camera, setCamera] = useState(false)
+  /** Phone: the bottom plan bar opens on tap (closed by default). */
+  const [planOpen, setPlanOpen] = useState(false)
 
   const byId = useMemo(() => {
     const m: Record<string, { id: string; name: string; price: number | null; blurb: string; pkg?: Pkg }> = {}
@@ -353,189 +355,249 @@ export default function TargetedBuilder({
 
   const others = areas.filter((a) => a.view === 'other')
 
-  return (
-    <div className="pb-44">
-      {/* View + photo controls */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
-        <div className="inline-flex rounded-full bg-white border border-cream-200 p-1">
-          {(['face', 'body'] as const).map((v) => (
-            <button
-              key={v}
-              onClick={() => setView(v)}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${view === v ? 'bg-plum-900 text-white' : 'text-plum-800 hover:bg-cream-100'}`}
-            >
-              {v === 'face' ? 'Face' : 'Body'}
-            </button>
-          ))}
-        </div>
-        {view === 'face' &&
-          (photo ? (
-            <div className="flex items-center gap-2 text-sm">
-              <button onClick={() => setCamera(true)} className="px-3 py-1.5 rounded-full border border-cream-200 bg-white text-plum-800 hover:bg-cream-100">
-                Retake
-              </button>
-              <button onClick={() => setPhoto(null)} className="px-3 py-1.5 rounded-full border border-cream-200 bg-white text-plum-800 hover:bg-cream-100">
-                Remove my photo
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => setCamera(true)} className="px-4 py-1.5 rounded-full bg-brand-600 text-white text-sm font-medium hover:bg-brand-700">
-              📸 Use my photo
-            </button>
-          ))}
+  const short = (n: string) => n.replace(/\s*\(.*\)$/, '')
+
+  // The tapped area: under the map on a phone, at the top of the side panel on a computer.
+  const infoCard = act && (
+    <div className="rounded-2xl bg-white border border-brand-200 shadow-sm p-5">
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-xl font-semibold text-plum-900" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+          {act.name}
+        </h3>
+        <button onClick={() => setActive(null)} className="text-gray-400 hover:text-gray-700 text-lg leading-none px-1" aria-label="Close">
+          ✕
+        </button>
       </div>
-      {view === 'face' && photo && (
-        <p className="text-center text-xs text-gray-500 -mt-2 mb-3">🔒 Your photo stays on this device only — it isn’t uploaded or saved.</p>
+      <p className="text-sm text-gray-700 mt-1.5 leading-relaxed">{act.blurb}</p>
+      {act.pkg && <p className="text-xs text-gray-500 mt-1.5">Includes: {act.pkg.includes.map((id) => short(byId[id]?.name ?? '')).join(', ')}</p>}
+      <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
+        <p className="text-lg font-semibold text-plum-900">
+          {act.price === null ? <span className="text-base text-gray-600">Priced at your consultation</span> : <>{money(act.price)} <span className="text-sm font-normal text-gray-500">per session</span></>}
+        </p>
+        {actCover ? (
+          <p className="text-sm text-brand-700 font-medium">✓ Included in {short(actCover.name)}</p>
+        ) : selected.has(act.id) ? (
+          <button onClick={() => remove(act.id)} className="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            Remove from total
+          </button>
+        ) : (
+          <button onClick={() => add(act.id)} className="px-5 py-2 rounded-full bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700">
+            + Add to total
+          </button>
+        )}
+      </div>
+    </div>
+  )
+
+  const suggestionBox = suggestion && (
+    <div className="rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900 flex flex-wrap items-center justify-between gap-2">
+      <span>
+        💡 <strong>{short(suggestion.pkg.name)}</strong> covers {suggestion.names.join(', ')} for {money(suggestion.pkg.price!)} — save {money(suggestion.save)}.
+      </span>
+      <button onClick={() => add(suggestion.pkg.id)} className="px-3 py-1 rounded-full bg-amber-600 text-white text-xs font-semibold">
+        Switch
+      </button>
+    </div>
+  )
+
+  const sessionsPicker = (
+    <div className="flex items-center gap-2">
+      <span className="text-xs text-gray-600">Sessions</span>
+      <div className="inline-flex rounded-full border border-cream-200 p-0.5">
+        {([1, 2, 3] as const).map((n) => (
+          <button key={n} onClick={() => setSessions(n)} className={`w-8 py-1 rounded-full text-sm font-medium ${sessions === n ? 'bg-plum-900 text-white' : 'text-plum-800'}`}>
+            {n}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+
+  const totalLine = (
+    <div className="text-right">
+      <p className="text-xl font-semibold text-plum-900 leading-tight">
+        {priced.length ? money(total) : '—'}
+        {atConsult.length > 0 && <span className="text-xs font-normal text-gray-500"> + consult pricing</span>}
+      </p>
+      {sessions > 1 && discount > 0 && (
+        <p className="text-[11px] text-gray-500">
+          {sessions} × {money(perSession)} − {discountPct}% package savings ({money(discount)})
+        </p>
       )}
+    </div>
+  )
 
-      <div className={`mx-auto rounded-3xl overflow-hidden border border-cream-200 ${view === 'face' && photo ? 'bg-black' : 'bg-white'} ${view === 'face' ? 'max-w-2xl' : 'max-w-md'}`}>
-        <Map view={view} areas={areas} photo={photo} selected={selected} covered={covered} active={active} onTap={setActive} />
-      </div>
-      <p className="text-center text-xs text-gray-500 mt-2">Tap an area or its name.</p>
+  const chips = (
+    <div className="flex flex-wrap gap-1.5">
+      {picked.map((x) => (
+        <span key={x.id} className="inline-flex items-center gap-1 rounded-full bg-brand-50 border border-brand-200 pl-3 pr-1 py-0.5 text-xs text-plum-900">
+          {short(x.name)} · {x.price === null ? 'at consult' : money(x.price)}
+          <button onClick={() => remove(x.id)} className="px-1.5 text-gray-500 hover:text-red-600" aria-label={`Remove ${x.name}`}>
+            ✕
+          </button>
+        </span>
+      ))}
+    </div>
+  )
 
-      {/* Anywhere */}
-      {others.length > 0 && (
-        <div className="mt-5 text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Also treated</p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {others.map((a) => {
-              const on = selected.has(a.id)
+  const textButton = (cls = '') => (
+    <a href={smsHref} className={`text-center px-5 py-2.5 rounded-full bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700 ${cls}`}>
+      💬 Text us this plan
+    </a>
+  )
+  const finePrint = <p className="text-[11px] text-gray-500">Estimate only — your final plan and price are set at your consultation. Or call {phone}.</p>
+  const countLabel = `${picked.length} ${picked.length === 1 ? 'item' : 'items'}`
+
+  return (
+    <div className="pb-28 lg:pb-12 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8 lg:items-start">
+      <div>
+        {/* View + photo controls */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-4">
+          <div className="inline-flex rounded-full bg-white border border-cream-200 p-1">
+            {(['face', 'body'] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={`px-5 py-1.5 rounded-full text-sm font-medium transition-colors ${view === v ? 'bg-plum-900 text-white' : 'text-plum-800 hover:bg-cream-100'}`}
+              >
+                {v === 'face' ? 'Face' : 'Body'}
+              </button>
+            ))}
+          </div>
+          {view === 'face' &&
+            (photo ? (
+              <div className="flex items-center gap-2 text-sm">
+                <button onClick={() => setCamera(true)} className="px-3 py-1.5 rounded-full border border-cream-200 bg-white text-plum-800 hover:bg-cream-100">
+                  Retake
+                </button>
+                <button onClick={() => setPhoto(null)} className="px-3 py-1.5 rounded-full border border-cream-200 bg-white text-plum-800 hover:bg-cream-100">
+                  Remove my photo
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setCamera(true)} className="px-4 py-1.5 rounded-full bg-brand-600 text-white text-sm font-medium hover:bg-brand-700">
+                📸 Use my photo
+              </button>
+            ))}
+        </div>
+        {view === 'face' && photo && <p className="text-center text-xs text-gray-500 -mt-2 mb-3">🔒 Your photo stays on this device only — it isn’t uploaded or saved.</p>}
+
+        <div className={`mx-auto rounded-3xl overflow-hidden border border-cream-200 ${view === 'face' && photo ? 'bg-black' : 'bg-white'} ${view === 'face' ? 'max-w-2xl' : 'max-w-md'}`}>
+          <Map view={view} areas={areas} photo={photo} selected={selected} covered={covered} active={active} onTap={setActive} />
+        </div>
+        <p className="text-center text-xs text-gray-500 mt-2">Tap an area or its name.</p>
+
+        {/* Anywhere */}
+        {others.length > 0 && (
+          <div className="mt-5 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2">Also treated</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {others.map((a) => {
+                const on = selected.has(a.id)
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => setActive(a.id)}
+                    className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${
+                      on ? 'bg-brand-700 border-brand-700 text-white' : active === a.id ? 'bg-brand-50 border-brand-400 text-plum-900' : 'bg-white border-cream-200 text-plum-800 hover:bg-cream-100'
+                    }`}
+                  >
+                    {on ? '✓ ' : ''}
+                    {a.name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Phone: the tapped area right under the map. */}
+        {infoCard && <div className="mt-5 max-w-xl mx-auto lg:hidden">{infoCard}</div>}
+
+        {/* Packages */}
+        <div className="mt-8 max-w-2xl mx-auto">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2 text-center">Packages</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            {packages.map((p) => {
+              const on = selected.has(p.id)
               return (
                 <button
-                  key={a.id}
-                  onClick={() => setActive(a.id)}
-                  className={`px-4 py-1.5 rounded-full text-sm border transition-colors ${
-                    on ? 'bg-brand-700 border-brand-700 text-white' : active === a.id ? 'bg-brand-50 border-brand-400 text-plum-900' : 'bg-white border-cream-200 text-plum-800 hover:bg-cream-100'
-                  }`}
+                  key={p.id}
+                  onClick={() => setActive(p.id)}
+                  className={`text-left rounded-xl border px-4 py-3 transition-colors ${on ? 'border-brand-600 bg-brand-50' : active === p.id ? 'border-brand-400 bg-white' : 'border-cream-200 bg-white hover:bg-cream-50'}`}
                 >
-                  {on ? '✓ ' : ''}
-                  {a.name}
+                  <span className="block text-sm font-medium text-plum-900">
+                    {on ? '✓ ' : ''}
+                    {p.name}
+                  </span>
+                  <span className="block text-sm text-gray-600 mt-0.5">{p.price === null ? 'Priced at consultation' : money(p.price)}</span>
                 </button>
               )
             })}
           </div>
         </div>
-      )}
-
-      {/* The tapped area */}
-      {act && (
-        <div className="mt-5 max-w-xl mx-auto rounded-2xl bg-white border border-brand-200 shadow-sm p-5">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-xl font-semibold text-plum-900" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
-              {act.name}
-            </h3>
-            <button onClick={() => setActive(null)} className="text-gray-400 hover:text-gray-700 text-lg leading-none px-1" aria-label="Close">
-              ✕
-            </button>
-          </div>
-          <p className="text-sm text-gray-700 mt-1.5 leading-relaxed">{act.blurb}</p>
-          {act.pkg && (
-            <p className="text-xs text-gray-500 mt-1.5">
-              Includes: {act.pkg.includes.map((id) => byId[id]?.name.replace(/\s*\(.*\)$/, '')).join(', ')}
-            </p>
-          )}
-          <div className="flex flex-wrap items-center justify-between gap-3 mt-4">
-            <p className="text-lg font-semibold text-plum-900">
-              {act.price === null ? <span className="text-base text-gray-600">Priced at your consultation</span> : <>{money(act.price)} <span className="text-sm font-normal text-gray-500">per session</span></>}
-            </p>
-            {actCover ? (
-              <p className="text-sm text-brand-700 font-medium">✓ Included in {actCover.name.replace(/\s*\(.*\)$/, '')}</p>
-            ) : selected.has(act.id) ? (
-              <button onClick={() => remove(act.id)} className="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">
-                Remove from total
-              </button>
-            ) : (
-              <button onClick={() => add(act.id)} className="px-5 py-2 rounded-full bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700">
-                + Add to total
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Packages */}
-      <div className="mt-8 max-w-2xl mx-auto">
-        <p className="text-xs font-semibold uppercase tracking-widest text-gray-500 mb-2 text-center">Packages</p>
-        <div className="grid gap-2 sm:grid-cols-2">
-          {packages.map((p) => {
-            const on = selected.has(p.id)
-            return (
-              <button
-                key={p.id}
-                onClick={() => setActive(p.id)}
-                className={`text-left rounded-xl border px-4 py-3 transition-colors ${on ? 'border-brand-600 bg-brand-50' : active === p.id ? 'border-brand-400 bg-white' : 'border-cream-200 bg-white hover:bg-cream-50'}`}
-              >
-                <span className="block text-sm font-medium text-plum-900">
-                  {on ? '✓ ' : ''}
-                  {p.name}
-                </span>
-                <span className="block text-sm text-gray-600 mt-0.5">{p.price === null ? 'Priced at consultation' : money(p.price)}</span>
-              </button>
-            )
-          })}
-        </div>
       </div>
 
-      {/* Running total */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-cream-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          {suggestion && (
-            <div className="mb-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-sm text-amber-900 flex flex-wrap items-center justify-between gap-2">
-              <span>
-                💡 <strong>{suggestion.pkg.name.replace(/\s*\(.*\)$/, '')}</strong> covers {suggestion.names.join(', ')} for {money(suggestion.pkg.price!)} — save {money(suggestion.save)}.
-              </span>
-              <button onClick={() => add(suggestion.pkg.id)} className="px-3 py-1 rounded-full bg-amber-600 text-white text-xs font-semibold">
-                Switch
-              </button>
-            </div>
-          )}
+      {/* Computer: the plan beside the map, staying in view while scrolling. */}
+      <aside className="hidden lg:block sticky top-6 space-y-4">
+        {infoCard}
+        <div className="rounded-2xl bg-white border border-cream-200 shadow-sm p-5 space-y-3">
+          <h3 className="text-xl font-semibold text-plum-900" style={{ fontFamily: 'var(--font-cormorant), Georgia, serif' }}>
+            Your plan
+          </h3>
           {picked.length === 0 ? (
-            <p className="text-sm text-gray-600 text-center py-2">Tap an area, then <strong>Add to total</strong>.</p>
+            <p className="text-sm text-gray-600">Tap an area, then <strong>Add to total</strong>.</p>
           ) : (
             <>
-              <div className="flex flex-wrap gap-1.5 mb-2 max-h-20 overflow-y-auto">
-                {picked.map((x) => (
-                  <span key={x.id} className="inline-flex items-center gap-1 rounded-full bg-brand-50 border border-brand-200 pl-3 pr-1 py-0.5 text-xs text-plum-900">
-                    {x.name.replace(/\s*\(.*\)$/, '')} · {x.price === null ? 'at consult' : money(x.price)}
-                    <button onClick={() => remove(x.id)} className="px-1.5 text-gray-500 hover:text-red-600" aria-label={`Remove ${x.name}`}>
-                      ✕
-                    </button>
-                  </span>
-                ))}
+              {suggestionBox}
+              {chips}
+              <div className="flex items-center justify-between gap-3 pt-1">
+                {sessionsPicker}
+                {totalLine}
               </div>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-600">Sessions</span>
-                  <div className="inline-flex rounded-full border border-cream-200 p-0.5">
-                    {([1, 2, 3] as const).map((n) => (
-                      <button
-                        key={n}
-                        onClick={() => setSessions(n)}
-                        className={`w-8 py-1 rounded-full text-sm font-medium ${sessions === n ? 'bg-plum-900 text-white' : 'text-plum-800'}`}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xl font-semibold text-plum-900 leading-tight">
+              {textButton('block w-full')}
+              {finePrint}
+            </>
+          )}
+        </div>
+      </aside>
+
+      {/* Phone: a bar along the bottom, closed by default — one line, tap to open. */}
+      <div className="lg:hidden fixed inset-x-0 bottom-0 z-40 border-t border-cream-200 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
+        <div className="max-w-3xl mx-auto px-4 py-2.5">
+          {picked.length === 0 ? (
+            <p className="text-sm text-gray-600 text-center py-1.5">Tap an area, then <strong>Add to total</strong>.</p>
+          ) : (
+            <>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setPlanOpen((o) => !o)} className="flex-1 min-w-0 text-left" aria-expanded={planOpen}>
+                  <span className="block text-xs text-gray-600">
+                    Your plan · {countLabel}
+                    {sessions > 1 ? ` · ${sessions} sessions` : ''}
+                    {suggestion ? ' · 💡' : ''} <span className="text-brand-700 font-medium">{planOpen ? 'Hide ▾' : 'Show ▴'}</span>
+                  </span>
+                  <span className="block text-lg font-semibold text-plum-900 leading-tight">
                     {priced.length ? money(total) : '—'}
                     {atConsult.length > 0 && <span className="text-xs font-normal text-gray-500"> + consult pricing</span>}
-                  </p>
-                  {sessions > 1 && discount > 0 && (
-                    <p className="text-[11px] text-gray-500">
-                      {sessions} × {money(perSession)} − {discountPct}% package savings ({money(discount)})
-                    </p>
-                  )}
-                </div>
-                <a href={smsHref} className="w-full sm:w-auto text-center px-5 py-2.5 rounded-full bg-brand-600 text-white text-sm font-semibold hover:bg-brand-700">
-                  💬 Text us this plan
-                </a>
+                  </span>
+                </button>
+                {textButton('shrink-0')}
               </div>
-              <p className="text-[11px] text-gray-500 mt-1.5">
-                Estimate only — your final plan and price are set at your consultation. Or call {phone}.
-              </p>
+              {planOpen && (
+                <div className="mt-3 space-y-3 max-h-[55vh] overflow-y-auto pb-1">
+                  {suggestionBox}
+                  {chips}
+                  <div className="flex items-center justify-between gap-3">
+                    {sessionsPicker}
+                    {sessions > 1 && discount > 0 && (
+                      <p className="text-[11px] text-gray-500 text-right">
+                        {sessions} × {money(perSession)} − {discountPct}% ({money(discount)})
+                      </p>
+                    )}
+                  </div>
+                  {finePrint}
+                </div>
+              )}
             </>
           )}
         </div>
