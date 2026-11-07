@@ -11,6 +11,30 @@ after-care guides, and book a complimentary video consultation.
 
 ---
 
+## 2026-11-07 — `/build-your-journey` (UNLISTED): Agnes RF Targeted face/body pricing map
+- **What:** tap an area (or its label) on a face or body line drawing → blurb + price +
+  **Add to total**; packages list; a 💡 "X covers … for less — save $Y / Switch" hint; 1/2/3
+  sessions (× price, less the package discount, default 15%); sticky running total;
+  **💬 Text us this plan** = `sms:` to `mainFooter.phone` with the list + estimate.
+- **📸 Use my photo:** front camera + the records app's head-and-shoulders guide (same 92×160
+  frame as records `components/CameraSilhouette.tsx`), then the dotted areas draw over the
+  client's own face. **The photo is never uploaded or stored** — page memory only, gone on
+  refresh; "Choose a photo" fallback. Keep it that way: an upload would make it PHI.
+- **Files:** `config/targetedAreas.ts` (areas, shapes, labels, packages, default prices +
+  drafted blurbs; names match the records "Which one?" list), `components/TargetedBuilder.tsx`,
+  `app/build-your-journey/page.tsx`, `/admin` → "Build Your Journey — Agnes RF Targeted
+  pricing" (`components/TargetedPricingEditor.tsx`; stored as `serviceLinks/config.targetedPricing`;
+  blank price = "Priced at consultation"; saves revalidate the page).
+- **Unlisted:** `robots: noindex`, in `robots.ts` disallow, not in the sitemap, no links to it.
+  To launch: drop the noindex + robots line, add to sitemap, link from the Targeted page.
+- **Waiting on Eileen:** edit the drafted blurbs + confirm prices in /admin (defaults: Upper
+  Eyes $1,200, Full Lower Face $5,500, Nose Lift at consultation; several packages cost MORE
+  than their parts on her sheet — the 💡 hint only fires when a package is cheaper).
+- **Not yet tested:** the live camera on a real phone (the browser pane blocks cameras; the
+  photo overlay itself was checked with a stand-in image). Phone labels are small (~7px) —
+  labels and areas are both tap targets.
+- Commit `783b028`.
+
 ## 2026-10-04 — `/booking` is THE booking page
 - `/bookingpreview`'s page moved to **`/booking`** (video consult button +
   `BookTreatment`, which hides itself while the records app's "Let patients
