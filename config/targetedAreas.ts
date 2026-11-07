@@ -137,7 +137,7 @@ export const TARGETED_AREAS: TargetedArea[] = [
     id: 'hyperhidrosis', name: 'Hyperhidrosis', view: 'body', price: 1600,
     blurb: 'Treats excessive underarm sweating by targeting the sweat glands under the skin.',
     shapes: [ell(36.4, 37, 2.4, 3.2), ell(63.6, 37, 2.4, 3.2)],
-    label: { side: 'left', y: 34, to: [34, 37] },
+    label: { side: 'right', y: 37, to: [66, 37] },
   },
   {
     id: 'bra-roll', name: 'Bra Roll Fat', view: 'body', price: 1600,
@@ -149,7 +149,7 @@ export const TARGETED_AREAS: TargetedArea[] = [
     id: 'stretch-marks', name: 'Stretch Marks', view: 'body', price: 1600,
     blurb: 'Improves the color and texture of stretch marks — on the stomach, hips, thighs or arms.',
     shapes: [ell(50, 70, 10, 8)],
-    label: { side: 'left', y: 70, to: [40, 70] },
+    label: { side: 'right', y: 70, to: [60, 70] },
   },
   {
     id: 'knee', name: 'Knee Fat', view: 'body', price: 1600,

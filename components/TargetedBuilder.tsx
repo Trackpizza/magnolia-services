@@ -30,7 +30,7 @@ const drawRank = (id: string) => {
 
 const VIEWS: Record<Exclude<TargetedView, 'other'>, { box: string; leftX: number; rightX: number; font: number }> = {
   face: { box: '0 36 92 68', leftX: 25, rightX: 67, font: 2.45 },
-  body: { box: '0 0 100 170', leftX: 27, rightX: 73, font: 4.2 },
+  body: { box: '-14 0 128 170', leftX: 27, rightX: 73, font: 4.2 },
 }
 
 /** The line drawing behind the face map (when there's no photo). */
