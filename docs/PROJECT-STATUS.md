@@ -11,6 +11,22 @@ after-care guides, and book a complimentary video consultation.
 
 ---
 
+## 2026-11-09 — `/packages` PLACEHOLDER (UNLISTED) for the Burbank street-event flyer
+- **Why:** the club flyer (2.25 × 4 in, printed 11-10) has a QR code to
+  `https://services.magnoliaskincenter.com/packages` — "Explore our clinical treatment
+  packages · Holiday Specials". The real page wasn't ready, so this stops a scan landing on a 404.
+- **What:** `app/packages/page.tsx` — the three specials **hard-coded in the flyer's own
+  words**: PRX Glow & Laser (PRX Plus or PRX C · 4 treatments · $1,200 · includes 2 Micro
+  Lasers), NAD+ Cellular Injections (10 · $600), Vitamin B12 Boosts (10 · $250), prices from
+  the records app's Packages tab on 11-09; per-visit price; **💬 Text us about this** (Messages
+  opens with "Hi! I saw the Holiday Special for … on your flyer"), **📞 Call**, Book a
+  consultation. noindex + robots disallow. LIVE 11-09 (forced rollout).
+- **⚠ Prices are in the code** — if Eileen changes them in the Packages tab before the real
+  page lands, change them here too and roll out.
+- **Next (a couple of weeks):** the real page reads the records Packages tab — per-package
+  "Show on website" + "Holiday special" ticks + a "Show until" date (a public, PHI-free
+  records endpoint for the catalogue). Then drop the hard-coded list.
+
 ## 2026-11-07 — `/build-your-journey` (UNLISTED): Agnes RF Targeted face/body pricing map
 - **What:** tap an area (or its label) on a face or body line drawing → blurb + price +
   **Add to total**; packages list; a 💡 "X covers … for less — save $Y / Switch" hint; 1/2/3
