@@ -9,6 +9,13 @@ after-care guides, and book a complimentary video consultation.
 **Related docs:** [`README.md`](../README.md) (dev/deploy quickstart) ·
 [`docs/ACCESSIBILITY-CHECKLIST.md`](ACCESSIBILITY-CHECKLIST.md) (WCAG 2.2 AA audit).
 
+> **🔔 REMIND ERIC EVERY NEW THREAD (since 11-09, until the real page ships):** `/packages`
+> (the Burbank flyer's QR code) has its **prices WRITTEN INTO THE CODE**
+> (`app/packages/page.tsx`: PRX Glow & Laser $1,200 · NAD+ $600 · B12 $250) — **not read from
+> the records app's Packages tab**. If Eileen changes a holiday price there, change it here too
+> and roll out. The fix = the real page: "Show on website", "Holiday special" and "Show until"
+> options in the records Packages tab, read by this page (see the 11-09 entry below).
+
 ---
 
 ## 2026-11-09 — `/packages` PLACEHOLDER (UNLISTED) for the Burbank street-event flyer
