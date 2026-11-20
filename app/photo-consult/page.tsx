@@ -26,14 +26,8 @@ export const metadata: Metadata = {
   title: 'Free Photo Consult | Magnolia Skin Center',
   description:
     'Send one photo and Dr. David records a personal video walking through what he sees, what the result could look like, and the non-surgical options he would suggest. Complimentary, from Magnolia Skin Center in Burbank, CA.',
-  // ⚠️ UNLISTED UNTIL THE CLOUD BAA IS ACCEPTED — the same rule /bookingtesting
-  // follows, for the same reason. This page sends people to a form that still
-  // says "Test mode — please use a sample/AI image, not a real photo", and a
-  // patient who found it through Google would arrive at that with no context.
-  //
-  // AT LAUNCH, three things flip together: delete this `robots` line, remove
-  // '/photo-consult' from app/robots.ts, and add it back to app/sitemap.ts.
-  robots: { index: false, follow: false },
+  // Listed since go-live (2026-11-19): the intake form's test-mode banner is
+  // gone, so this page is indexable and in the sitemap.
 }
 
 /** The intake form, on the clinical project. Hardcoded like the other absolute URLs here. */
