@@ -23,16 +23,46 @@ export const metadata: Metadata = {
 
 const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
+/**
+ * NEVER BLANK AFTER A SAVE (11-20, Eric: "I changed B12 … the page went back to
+ * not showing anything, then 30 seconds later a refresh got it back").
+ *
+ * The page rebuilds every minute; one rebuild that couldn't reach the records
+ * app (a slow or cold moment) used to cache "being updated" for a minute. Now:
+ * two tries (8 s each), then the LAST GOOD list this server already showed,
+ * and if there is none, a THROW — Next keeps serving the previous good page
+ * when a rebuild fails, and error.tsx retries by itself. The "being updated"
+ * box is only for a real empty list (nothing ticked).
+ */
+let lastGood: WebsitePackage[] | null = null
+
+async function fetchOnce(): Promise<WebsitePackage[]> {
+  const res = await fetch(`${API}/api/public/packages`, {
+    // Stays a once-a-minute cached page (fast for a QR scan), not a live call per visitor.
+    next: { revalidate: 60 },
+    signal: AbortSignal.timeout(8000),
+  })
+  if (!res.ok) throw new Error(`packages feed ${res.status}`)
+  const d = (await res.json()) as { packages?: WebsitePackage[] }
+  if (!Array.isArray(d.packages)) throw new Error('packages feed: bad body')
+  return d.packages
+}
+
 async function loadPackages(): Promise<WebsitePackage[] | null> {
   if (!API) return null
-  try {
-    const res = await fetch(`${API}/api/public/packages`, { next: { revalidate: 60 } })
-    if (!res.ok) return null
-    const d = (await res.json()) as { packages?: WebsitePackage[] }
-    return d.packages ?? []
-  } catch {
-    return null
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      lastGood = await fetchOnce()
+      return lastGood
+    } catch (err) {
+      console.warn('packages feed failed', attempt + 1, err instanceof Error ? err.message : err)
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 1500))
+    }
   }
+  if (lastGood) return lastGood
+  // At build time a failure must not break the deploy — the page fixes itself on the first rebuild.
+  if (process.env.NEXT_PHASE === 'phase-production-build') return null
+  throw new Error('packages feed unreachable')
 }
 
 function e164(phone: string): string {
