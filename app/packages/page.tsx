@@ -2,51 +2,38 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLinks } from '@/lib/links'
 import { CallTextPills } from '@/components/Contact'
+import PackageCard, { type WebsitePackage } from './PackageCard'
 
-// PLACEHOLDER (11-09, Eric): the Burbank street-event club flyer's QR code
-// points here ("Explore our clinical treatment packages — Holiday Specials").
-// The real page comes later, from the records app's Packages tab (a "Show on
-// website" tick per package, a holiday-special tick, a "show until" date).
-// Until then the three specials are written here, in the flyer's own words,
-// with the prices from the Packages tab on 11-09. Change them here (and
-// redeploy) if Eileen changes them before the real page lands.
+// THE REAL PAGE (11-19, Eric) — replaces the 11-09 placeholder with its
+// hard-coded prices. The packages come from the records app's Packages tab:
+// every package that is Offered and ticked "🌐 Show on the website", not past
+// its "Show until" day, holiday specials first (records
+// /api/public/packages — the clinic's catalogue only, no client data).
+// Built there, on this page within a minute: no code change, no rollout.
+//
+// No Stripe yet: "Text Eileen to start", pay at the first visit.
+// The Burbank event flyer's QR code points here.
 export const revalidate = 60
 
 export const metadata: Metadata = {
-  title: 'Holiday Specials — Treatment Packages | Magnolia Skin Center',
-  description: 'PRX Glow & Laser, NAD+ cellular injections and Vitamin B12 boosts — holiday package prices at Magnolia Skin Center, Burbank.',
+  title: 'Treatment Packages & Holiday Specials | Magnolia Skin Center',
+  description: 'Treatment packages and holiday specials at Magnolia Skin Center, Burbank — text Nurse Eileen to start, pay at your first visit.',
   robots: { index: false, follow: false },
 }
 
-type Special = { title: string; package: string; visits: string; price: number; perVisit: string; blurb: string; includes?: string }
+const API = process.env.NEXT_PUBLIC_RECORDS_API ?? ''
 
-const SPECIALS: Special[] = [
-  {
-    title: 'PRX Glow & Laser',
-    package: 'PRX Plus or PRX C',
-    visits: '4 treatments',
-    price: 1200,
-    perVisit: '$300 a treatment',
-    blurb: 'Your choice of PRX Plus or PRX C.',
-    includes: 'Includes 2 Micro Lasers',
-  },
-  {
-    title: 'NAD+ Cellular Injections',
-    package: 'NAD+ Injections',
-    visits: '10 injections',
-    price: 600,
-    perVisit: '$60 an injection',
-    blurb: 'Supercharge cellular energy and clear brain fog.',
-  },
-  {
-    title: 'Vitamin B12 Boosts',
-    package: 'Vitamin B12 Injections',
-    visits: '10 injections',
-    price: 250,
-    perVisit: '$25 an injection',
-    blurb: 'Combat fatigue and restore daily energy.',
-  },
-]
+async function loadPackages(): Promise<WebsitePackage[] | null> {
+  if (!API) return null
+  try {
+    const res = await fetch(`${API}/api/public/packages`, { next: { revalidate: 60 } })
+    if (!res.ok) return null
+    const d = (await res.json()) as { packages?: WebsitePackage[] }
+    return d.packages ?? []
+  } catch {
+    return null
+  }
+}
 
 function e164(phone: string): string {
   const d = phone.replace(/\D/g, '')
@@ -56,10 +43,12 @@ function e164(phone: string): string {
 }
 
 export default async function PackagesPage() {
-  const links = await getLinks()
+  const [links, packages] = await Promise.all([getLinks(), loadPackages()])
   const phone = links.mainFooter.phone
   const bookingUrl = links.mainFooter.bookingUrl
   const serif = { fontFamily: 'var(--font-cormorant), Georgia, serif' }
+  const anySpecial = (packages ?? []).some((p) => p.special)
+  const askBody = encodeURIComponent("Hi Eileen! I'd like to hear about your treatment packages.")
   return (
     <div className="min-h-screen bg-cream-100">
       <header className="bg-plum-900">
@@ -72,54 +61,39 @@ export default async function PackagesPage() {
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-12">
         <div className="text-center mb-8">
-          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-2">Clinical treatment packages</p>
+          <p className="text-sm font-medium text-brand-600 uppercase tracking-widest mb-2">
+            {anySpecial ? 'Holiday specials' : 'Clinical treatment packages'}
+          </p>
           <h1 className="text-4xl sm:text-5xl font-semibold text-plum-900 leading-tight" style={serif}>
-            Holiday Specials
+            Treatment Packages
           </h1>
           <p className="text-gray-600 mt-3 max-w-xl mx-auto">
-            Package prices for the season. Text us to book or ask a question — Nurse Eileen will set it up with you.
+            Text Nurse Eileen to start a package — she&rsquo;ll set it up with you. Nothing to pay online: you pay at
+            your first visit.
           </p>
         </div>
 
-        <ul className="space-y-5">
-          {SPECIALS.map((s) => {
-            const body = `Hi! I saw the Holiday Special for ${s.title} on your flyer — I'd like to know more.`
-            const sms = phone ? `sms:${e164(phone)}?&body=${encodeURIComponent(body)}` : ''
-            return (
-              <li key={s.title} className="rounded-2xl border border-brand-200 bg-white p-5 sm:p-6 shadow-sm">
-                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <h2 className="text-2xl sm:text-3xl font-semibold text-plum-900" style={serif}>
-                    {s.title}
-                  </h2>
-                  <p className="text-2xl font-semibold text-plum-900">${s.price.toLocaleString('en-US')}</p>
-                </div>
-                <p className="mt-1 text-sm text-gray-700">
-                  {s.package} · {s.visits} · <span className="text-gray-500">{s.perVisit}</span>
-                </p>
-                {s.includes && <p className="mt-2 text-sm font-semibold text-brand-700">★ {s.includes}</p>}
-                <p className="mt-3 text-gray-700">{s.blurb}</p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {sms && (
-                    <a
-                      href={sms}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
-                    >
-                      💬 Text us about this
-                    </a>
-                  )}
-                  {phone && (
-                    <a
-                      href={`tel:${e164(phone)}`}
-                      className="inline-flex items-center gap-1.5 rounded-full border border-brand-600 px-5 py-2.5 text-sm font-semibold text-brand-700 hover:bg-brand-50 transition-colors"
-                    >
-                      📞 Call
-                    </a>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+        {packages && packages.length > 0 ? (
+          <ul className="space-y-5">
+            {packages.map((p) => (
+              <PackageCard key={p.id} p={p} phone={phone ?? ''} />
+            ))}
+          </ul>
+        ) : (
+          // The feed failed or nothing is ticked yet: never a blank page for a flyer scan.
+          <div className="rounded-2xl border border-brand-200 bg-white p-6 text-center shadow-sm">
+            <p className="text-lg text-gray-800">Our current packages are being updated.</p>
+            <p className="mt-1 text-sm text-gray-600">Text Eileen and she&rsquo;ll tell you what&rsquo;s on offer.</p>
+            {phone && (
+              <a
+                href={`sms:${e164(phone)}?&body=${askBody}`}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-600 px-5 py-3 text-base font-semibold text-white hover:bg-brand-700 transition-colors"
+              >
+                💬 Text Eileen
+              </a>
+            )}
+          </div>
+        )}
 
         <div className="mt-10 rounded-2xl bg-plum-900 px-6 py-8 text-center text-white">
           <p className="text-2xl font-semibold" style={serif}>
